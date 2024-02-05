@@ -29,9 +29,16 @@ const userSchema = new mongoose.Schema({
     },
     mobile : Number,
     noOfJobsApplied : Number ,
-   address : addresSchema,
-   subscription : subscriptionSchema
-
+    address : addresSchema,
+    subscription : subscriptionSchema,
+    isVerified : {
+            type : Boolean,
+            default : false
+        },
+    isBlocked : {
+        type : Boolean,
+        default : false
+    }
 })
 
 const User = mongoose.model('users',userSchema)

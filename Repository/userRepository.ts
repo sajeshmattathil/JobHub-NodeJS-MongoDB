@@ -1,3 +1,4 @@
+import Otp from "../Model/otp";
 import User from "../Model/user"
 
 try{
@@ -18,8 +19,45 @@ try{
     }
  }
 
+ const getOtp = async (userId : string)=>{
+      try {
+         return await Otp.findOne({userId : userId})
+      } catch (error) {
+         console.log('Otp not found in database',error)
+      }
+ }
+interface otpData {
+   userId : string,
+   otp : string,
+   createdAt : Date
+}
+
+ const findAndUpdateOtp = async (data :otpData)=>{
+   try {
+      return await Otp.updateOne({userId : data.userId},{$set:{
+         createdAt :data.createdAt ,
+         otp : data.otp,
+         userId : data.userId
+        }})
+   } catch (error) {
+      console.log('Error in updating otp ');
+      return
+      
+   }
+ }
+
+ const setVerifiedTrue = async (userId : string)=>{
+   try {
+      return await User.updateOne({email: userId},{$set: {isVerified : true}})
+   } catch (error) {
+      
+   }
+ }
  export default { 
-    findUser
+    findUser,
+    getOtp,
+    findAndUpdateOtp,
+    setVerifiedTrue
  }
 
 //  async (email : string) =>{

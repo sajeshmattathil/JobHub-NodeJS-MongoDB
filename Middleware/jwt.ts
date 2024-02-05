@@ -19,19 +19,6 @@ let token: string | null = null
     return res.json({status:404});
   }
 
-// jwt.verify(token, process.env.SECRET_KEY as string, (err: VerifyErrors | null, decoded) => {
-//     if (err || !decoded) {
-//          res.status(401).json({ status: 401, message: 'Unauthorized' });
-//     }
-
-//    if(decoded !== undefined){
-//     const userId : string = decoded.userId;
-//     console.log(userId);
-//    } 
-   
-//     next();
-//     console.log('Access granted');
-// });
 const decodedPayload = jwt.verify(token, process.env.SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.userId,'User id');
 console.log('Access granted');
