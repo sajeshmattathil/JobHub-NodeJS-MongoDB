@@ -35,7 +35,8 @@ const createNewUser = async (user: ReqBody) => {
 interface userDetailsInterface {
    _id : ObjectId,
    email : string ,
-   password : string
+   password : string,
+   isBlocked : boolean
 }
 interface otp {
   userId : string ,
@@ -54,7 +55,6 @@ const saveOtp = async (data : otp )=>{
     else{
       const saveOtp = await Otp.create(data)
      console.log(saveOtp,'>>>>')
-
     } 
 
     return
@@ -81,7 +81,9 @@ const verifyLoginUser = async (user : ReqBody)  =>{
 
       const comparePsw =await bcrypt.compare(user.password, userDetails.password)
 
-          if(userDetails && comparePsw ) return {userData : userDetails.email, message : "user verified"}
+          if(userDetails && comparePsw && !userDetails.isBlocked ){
+            return {userData : userDetails.email, message : "user verified"}
+          } 
           else return { userData : null , message : 'Password is incorrect'}
      }
     else{

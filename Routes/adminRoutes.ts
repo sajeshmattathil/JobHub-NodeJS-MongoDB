@@ -4,6 +4,6 @@ const router = express.Router()
 
 router.post('/login_submit',adminController.loginSubmit)
 router.get('/users',adminController.getAllUsers)
-router.put('/blockandunblock_user',adminController.blockUnblockUser)
+router.put('/blockandunblock',adminController.blockUnblockUser)
 
 export default router

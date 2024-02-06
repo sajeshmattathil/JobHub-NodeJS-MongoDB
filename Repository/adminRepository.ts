@@ -21,10 +21,11 @@ const getAllUsers = async ()=>{
     }
 }
 
-const blockUblockUser = async (email : string)=>{
+const blockUblockUser = async (email : string ,isBlocked : boolean)=>{
     try {
-        // return await User.updateOne({email : email},{$set : {isBlocked : !isBlocked}})
+         return await User.updateOne({email : email},{$set : {isBlocked : !isBlocked}})
     } catch (error) {
+        console.log('Error in blocking user',error);
         
     }
 }

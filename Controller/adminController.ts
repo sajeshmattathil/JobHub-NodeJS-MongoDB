@@ -58,10 +58,23 @@ const getAllUsers = async (req : Request,res : Response )=>{
       res.status(500).json( {usersData : null,status :500 }) 
    }
 }
+ interface blockunblock{
+   email : string,
+   isBlocked : boolean
+ }
 
-const blockUnblockUser = async (req : Request<{}, {}, loginBody>,res : Response) =>{
+const blockUnblockUser = async (req : Request<{}, {}, blockunblock>,res : Response) =>{
    try {
-      const response = await adminService.blockUblockUser(req.body.email)
+      const response = await adminService.blockUblockUser(req.body.email,req.body.isBlocked)
+      console.log(response,'blockREsoponse');
+
+      if(response.message) {
+         res.status(201).json({status :201})
+      } 
+
+      else{
+         res.status(404).json({status : 404})
+      } 
       
    } catch (error) {
       

@@ -49,10 +49,15 @@ const getAllUsers = async ()=>{
   }
 }
 
-const blockUblockUser = async(email : string)=>{
+const blockUblockUser = async(email : string,isBlocked : boolean)=>{
   try {
-     const blockUblockUser = await adminRepository.blockUblockUser(email)
+     const blockUblockUser = await adminRepository.blockUblockUser(email,isBlocked)
+     console.log(blockUblockUser,'blockUblockUser') 
+     if(blockUblockUser) return {message : true}
+     else return {message : null}
   } catch (error) {
+    console.log('Error in block n unblock',error);
+    return {message : null}
     
   }
 }
