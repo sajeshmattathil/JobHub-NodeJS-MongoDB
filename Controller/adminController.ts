@@ -2,11 +2,7 @@ import { Request , Response } from "express"
 import jwt from "../Middleware/jwt"
 import adminService from "../Service/adminService"
 
-try{
 
-}catch(error){
-
-}
 interface loginBody {
     email : string,
     password : string,
