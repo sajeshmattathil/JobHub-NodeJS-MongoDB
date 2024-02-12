@@ -13,14 +13,19 @@ const hrSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    isAdmin :  {
-        type : Boolean,
-        default : true
-    },
+   
     resume : String,
     isApproved : {
         type : Boolean,
         default : false
+    },
+    company: {
+        type : String,
+        required : true
+    },
+    website: {
+        type : String,
+        required : true
     },
     isVerified :  {
         type : Boolean,

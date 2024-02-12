@@ -11,7 +11,6 @@ import userRouter from './Routes/userRoutes'
 import hrRouter from './Routes/hrRoutes'
 import adminRouter from './Routes/adminRoutes'
 
-
 app.use(cors())
 app.use(express.json())
 app.use(cookieParser());

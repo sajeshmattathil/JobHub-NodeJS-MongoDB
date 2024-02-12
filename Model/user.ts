@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
 
-const addresSchema = new mongoose.Schema({
-    address : String,
-    city : String ,
-    state : String ,
-    PIN : Number ,
-    country : String 
-})
+
 
 const subscriptionSchema = new mongoose.Schema({
     isSubscribed : Boolean ,
@@ -28,8 +22,10 @@ const userSchema = new mongoose.Schema({
         required : true
     },
     mobile : Number,
+    skills : [String],
+    experience : String,
+    resume : String,
     noOfJobsApplied : Number ,
-    address : addresSchema,
     subscription : subscriptionSchema,
     isVerified : {
             type : Boolean,

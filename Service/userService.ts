@@ -43,9 +43,9 @@ const saveOtp = async (data: otp) => {
   try {
     console.log(data, "saveOtp");
 
-    const checkUserExists = await getSavedOtp(data.userId);
+    const checkUserExists = await userRepository.getOtp(data.userId);
     console.log(checkUserExists, "checkUserExists");
-    if (checkUserExists) {
+    if (checkUserExists?.userId) {
       await userRepository.findAndUpdateOtp(data);
     } else {
       const saveOtp = await Otp.create(data);
@@ -94,10 +94,50 @@ const setVerifiedTrue = async (userId: string) => {
   } catch (error) {}
 };
 
+const getUser = async (id : string)=>{
+  try {
+    const getUser = await userRepository.findUser(id)
+    if(getUser) return {
+      data : getUser,
+      message : 'success'
+    }
+    else return {
+      data : null,
+      message : 'Not found'
+    }
+  } catch (error) {
+    return {
+      data : null,
+      message : 'error'
+    }
+  }
+}
+interface userData {
+  email : string,
+  fname : string,
+  lname : string,
+  resume : string,
+  experience : string,
+ skills : [string]
+}
+
+const updateUser = async (data : userData)=>{
+  try {
+    const updateUser = await userRepository.updateUser(data)
+   if (updateUser?.message) return {message : 'success'}
+   else return { message : 'failed'}
+    
+  } catch (error) {
+    
+  }
+}
+
 export default {
   createNewUser,
   saveOtp,
   getSavedOtp,
   setVerifiedTrue,
   verifyLoginUser,
+  getUser,
+  updateUser
 };

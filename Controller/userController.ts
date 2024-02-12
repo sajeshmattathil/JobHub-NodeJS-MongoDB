@@ -146,8 +146,34 @@ const loginSubmit = async (
   }
 };
 
+const getUser = async (req : Request,res : Response)=>{
+  try {
+    const id = req.params.userId
+    const response = await userService.getUser(id)
+    if(response?.message === 'success') res.status(201).json({status :201,user : response?.data})
+    if(response?.message === 'error') res.status(500).json({status :500,user : null})
+    if(response?.message === 'Not found') res.status(400).json({status :400,user : null})
+    
+  } catch (error) {
+    console.log('Something went wrong',error)
+  }
+}
+
+const updateUser = async (req : Request,res : Response)=>{
+  try {
+    console.log(req.body,'req.body update');
+    
+    const updateUser = await userService.updateUser(req.body)
+    if(updateUser?.message === 'success') res.status(201).json({status : 201})
+    else res.status(400).json({status : 400})
+  } catch (error) {
+    
+  }
+}
 export default {
   signupSubmit,
   verifyOtp,
   loginSubmit,
+  getUser,
+  updateUser
 };

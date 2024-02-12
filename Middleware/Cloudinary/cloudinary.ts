@@ -1,3 +1,4 @@
+import { NextFunction ,Request,Response } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
@@ -5,13 +6,30 @@ cloudinary.config({
   api_key:process.env.API_KEY,
   api_secret:process.env.API_SECRET
 });
-
-const upload = cloudinary.uploader.upload('path_to_your_pdf_file.pdf', { resource_type: "raw" }, (error, result) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log(result);
+const fileUpload =async (req : Request, res : Response,next : NextFunction)=>{
+  try {
+    // if(req.body)const resume = req.body.file
+    console.log(req.body,'middleware')
+    // const upload =await cloudinary.uploader.upload(req.body.resume, { resource_type: "raw" }, (error, result) => {
+    //   if (error) {
+    //     console.error(error,'errorrrrrr');
+    //   } else {
+    //     console.log(result,'resultttt');
+    //   }
+    
+    // });
+  
+  } catch (error) {
+    console.log(error);
+    
   }
-});
+}
 
-export default upload
+
+
+
+export default fileUpload
+
+function next() {
+  throw new Error('Function not implemented.');
+}

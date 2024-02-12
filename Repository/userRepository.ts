@@ -53,11 +53,37 @@ interface otpData {
       
    }
  }
+ interface userData {
+   email : string,
+   fname : string,
+   lname : string,
+   resume : string,
+   experience : string,
+  skills : [string]
+ }
+
+ const updateUser = async (data : userData)=>{
+   try {
+      await User.updateOne({email : data.email},{$set :{
+          email : data.email,
+          fname : data.fname,
+          lname : data.lname,
+          resume : data.resume,
+          experience : data.experience,
+         skills : data.skills
+      }})
+      return {message : 'success'}
+   } catch (error) {
+      console.log('error in update user in db',error);
+      
+   }
+ }
  export default { 
     findUser,
     getOtp,
     findAndUpdateOtp,
-    setVerifiedTrue
+    setVerifiedTrue,
+    updateUser
  }
 
 //  async (email : string) =>{
