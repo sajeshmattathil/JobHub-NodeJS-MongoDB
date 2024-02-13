@@ -164,8 +164,11 @@ const updateUser = async (req : Request,res : Response)=>{
     console.log(req.body,'req.body update');
     
     const updateUser = await userService.updateUser(req.body)
+
     if(updateUser?.message === 'success') res.status(201).json({status : 201})
+
     else res.status(400).json({status : 400})
+    
   } catch (error) {
     
   }

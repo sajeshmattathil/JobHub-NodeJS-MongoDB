@@ -88,9 +88,7 @@ const hrLogin = async (req : Request, res : Response)=>{
 }
 const  createJOb = async (req : Request, res : Response)=>{
   try {
-    console.log(req.body,'req.body');
     const response = await hrService.saveJob(req.body)
-    console.log(response,'response');
     
     if(response.message === 'success') res.status(201).json({status : 201,message : 'success'})
     if(response.message === 'failed') res.status(400).json({status : 400,message : 'Creating new Job failed'})
@@ -103,8 +101,12 @@ const  createJOb = async (req : Request, res : Response)=>{
 const getJobs = async (req : Request, res : Response)=>{
   try {
     console.log(11111);
+    const hrEmail = req.params.id
+    console.log(hrEmail,'email');
     
-    const response = await hrService.getJobsData()
+    const response = await hrService.getJobsData(hrEmail)
+    console.log(response,'resoponsejobs');
+    
     if(response?.message === '') res.status(201).json({status : 201,jobs : response?.data})
     if(response?.message === 'No jobs found') res.status(400).json({status : 400,jobs : ''})
     if(response?.message === 'error') res.status(500).json({status : 500,jobs : ''})

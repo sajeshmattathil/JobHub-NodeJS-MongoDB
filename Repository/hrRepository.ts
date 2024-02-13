@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import hr from '../Model/hr';
 import Hr from '../Model/hr';
 import Job from '../Model/job';
@@ -43,9 +44,9 @@ interface otpData {
        
     }
   }
-  const getJobsData = async ()=>{
+  const getJobsData = async (id: ObjectId)=>{
     try {
-        return await Job.find({})
+        return await Job.find({hrObjectId : id})
     } catch (error) {
         
     }
@@ -55,5 +56,6 @@ export default {
     getOtp,
     findAndUpdateOtp,
     setVerifiedTrue,
+   
     getJobsData
 }
