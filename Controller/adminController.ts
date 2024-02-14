@@ -1,5 +1,5 @@
 import { Request , Response } from "express"
-import jwt from "../Middleware/jwt"
+import jwt from "../Middleware/JWT/jwtUser"
 import adminService from "../Service/adminService"
 
 

@@ -3,19 +3,26 @@ import { Request,Response, NextFunction } from 'express';
 
 
 const generateToken = (email : string) => {
-  const token = jwt.sign({ userId: email }, process.env.SECRET_KEY as string,{ expiresIn: '24h' });
+  try {
+  const token = jwt.sign({ userId: email }, process.env.USER_SECRET_KEY as string,{ expiresIn: '24h' });
   return token
+  } catch (error) {
+    console.error('error happen in generating user token');
+  }
+  
  
 };
 const verifyToken = (req : Request, res : Response , next : NextFunction)  => {
-const header : string | undefined = req.headers.authorization
+  try {
+    const header : string | undefined = req.headers.authorization
+const role : string | undefined |string[] = req.headers.role
 
 let token: string | null = null
   if(header !== undefined) {
      token = header.split(' ')[1]
   } 
 
-  if (!token) {
+  if (!token || role !== 'user' ) {
     return res.json({status:404});
   }
 
@@ -24,6 +31,10 @@ console.log(decodedPayload.userId,'User id');
 console.log('Access granted');
 
 next()
+
+  } catch (error) {
+    console.error('error happend in verifying user token and role')
+  }
 
 }
 export default  {

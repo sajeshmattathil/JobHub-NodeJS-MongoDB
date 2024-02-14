@@ -3,6 +3,7 @@ import hrService from "../Service/hrService";
 import sendOTPByEmail from "../Utils/mailer";
 import { ObjectId } from "mongodb";
 import hrRepository from "../Repository/hrRepository";
+import jwtHR from "../Middleware/JWT/jwtHR";
 
 const hrSignup =async (req:Request ,res : Response)=>{
     try {
@@ -78,7 +79,10 @@ const hrLogin = async (req : Request, res : Response)=>{
         const response = await hrService.verifyHrData(req.body)
         console.log(response,'response');
         
-         if(response?.message === 'verified') res.status(201).json({status : 201})
+         if(response?.message === 'verified'){
+          const token = jwtHR.generateToken(req.body.email);
+          res.status(201).json({status : 201,token : token})
+         } 
          if(response?.message === 'declained') res.status(400).json({status : 400})
          if(response?.message == 'no user found') res.status(401).json({status : 401})
          if(response?.message === '') res.status(500).json({status : 500})

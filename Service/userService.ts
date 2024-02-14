@@ -46,13 +46,16 @@ const saveOtp = async (data: otp) => {
     const checkUserExists = await userRepository.getOtp(data.userId);
     console.log(checkUserExists, "checkUserExists");
     if (checkUserExists?.userId) {
-      await userRepository.findAndUpdateOtp(data);
+    const updateOTP =  await userRepository.findAndUpdateOtp(data);
+    if(updateOTP) return {message : 'success'}
+
     } else {
       const saveOtp = await Otp.create(data);
       console.log(saveOtp, ">>>>");
+      return {message : 'success'}
     }
 
-    return;
+    return {message : 'failed'}
   } catch (error) {}
 };
 
@@ -65,6 +68,7 @@ const getSavedOtp = async (userID: string) => {
     console.log("Otp not found");
   }
 };
+
 const verifyLoginUser = async (user: ReqBody) => {
   try {
     const userDetails: userDetailsInterface | undefined | null =

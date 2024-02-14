@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import userService from "../Service/userService";
 import { ObjectId } from "mongodb";
-import jwt from "../Middleware/jwt";
 import sendOTPByEmail from "../Utils/mailer";
+import jwtUser from "../Middleware/JWT/jwtUser";
 
 try {
 } catch (error) {}
@@ -87,7 +87,6 @@ const verifyOtp = async (
         req.body.otp === getSavedOtp.otp &&
         currentTime < expiryTime.getTime()
       ) {
-        console.log(1111);
         const setVerifiedTrue = await userService.setVerifiedTrue(
           req.body.userId
         );
@@ -105,6 +104,19 @@ const verifyOtp = async (
     res.status(500).json({ status: 500, message: "Internal server error" });
   }
 };
+
+const resendOTP =async (req : Request,res : Response)=>{
+  try {
+    sendOTPByEmail(req.body.userId, req.body.otp);
+
+    const saveOtp = await userService.saveOtp(req.body);
+    if(saveOtp?.message === 'success') res.status(200).json({status : 200})
+     res.status(400).json({status : 400})
+
+  } catch (error) {
+    
+  }
+}
 
 interface loginSubmitResponse {
   status: number;
@@ -125,7 +137,7 @@ const loginSubmit = async (
     console.log(verifyUser.userData, "verify user");
 
     if (verifyUser?.userData) {
-      const token = jwt.generateToken(verifyUser.userData);
+      const token = jwtUser.generateToken(verifyUser.userData);
       res.status(201).json({
         status: 201,
         message: "User verification successful",
@@ -176,6 +188,7 @@ const updateUser = async (req : Request,res : Response)=>{
 export default {
   signupSubmit,
   verifyOtp,
+  resendOTP,
   loginSubmit,
   getUser,
   updateUser
