@@ -26,7 +26,7 @@ let token: string | null = null
     return res.json({status:404});
   }
 
-const decodedPayload = jwt.verify(token, process.env.SECRET_KEY as string) as JwtPayload;
+const decodedPayload = jwt.verify(token, process.env.ADMIN_SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.userId,'User id');
 console.log('Access granted');
 

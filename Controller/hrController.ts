@@ -92,7 +92,10 @@ const hrLogin = async (req : Request, res : Response)=>{
 }
 const  createJOb = async (req : Request, res : Response)=>{
   try {
+    console.log(req.body,'bodyyy ---- create job');
+    
     const response = await hrService.saveJob(req.body)
+    console.log(response,'res----createjob');
     
     if(response.message === 'success') res.status(201).json({status : 201,message : 'success'})
     if(response.message === 'failed') res.status(400).json({status : 400,message : 'Creating new Job failed'})
@@ -107,13 +110,17 @@ const getJobs = async (req : Request, res : Response)=>{
     console.log(11111);
     const hrEmail = req.params.id
     console.log(hrEmail,'email');
+    const pageNumber :string | number = req.query.page  as string
+    const jobsPerPage :string | number  = req.query.jobsPerPage  as string
+console.log(pageNumber,jobsPerPage,'----queries');
+
     
-    const response = await hrService.getJobsData(hrEmail)
-    console.log(response,'resoponsejobs');
+    const response = await hrService.getJobsData(hrEmail,Number(pageNumber),Number(jobsPerPage))
+    // console.log(response,'resoponsejobs');
     
-    if(response?.message === '') res.status(201).json({status : 201,jobs : response?.data})
-    if(response?.message === 'No jobs found') res.status(400).json({status : 400,jobs : ''})
-    if(response?.message === 'error') res.status(500).json({status : 500,jobs : ''})
+    if(response?.message === '') res.status(201).json({status : 201,jobs : response?.data,totalPages : response?.totalPages})
+    if(response?.message === 'No jobs found') res.status(400).json({status : 400,jobs : '',totalPages :null})
+    if(response?.message === 'error') res.status(500).json({status : 500,jobs : '',totalPages :null})
 
 
   } catch (error) {

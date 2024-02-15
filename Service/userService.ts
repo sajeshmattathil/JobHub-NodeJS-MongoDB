@@ -136,6 +136,22 @@ const updateUser = async (data : userData)=>{
   }
 }
 
+const getJobs = async (pageNumber : number,jobsPerPage : number)=>{
+  try {
+    const jobCount = await userRepository.jobCount()
+    console.log(jobCount,'jobCount');
+    
+    const getJobs = await userRepository.getJobs(pageNumber,jobsPerPage)
+    if(getJobs !== undefined){
+      if(getJobs.length ) return {data : getJobs,totalPages : jobCount, message : 'success'}
+      else return {data : null,message : 'no data'}
+    }
+    else return {data : null,totalPages : null , message : 'failed'}
+  } catch (error) {
+    console.log('error in fetching jobs by user');
+    
+  }
+}
 export default {
   createNewUser,
   saveOtp,
@@ -143,5 +159,6 @@ export default {
   setVerifiedTrue,
   verifyLoginUser,
   getUser,
-  updateUser
+  updateUser,
+  getJobs
 };

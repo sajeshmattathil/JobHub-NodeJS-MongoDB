@@ -44,11 +44,20 @@ interface otpData {
        
     }
   }
-  const getJobsData = async (id: ObjectId)=>{
+  const getJobsData = async (id: ObjectId,pageNumber : number,jobsPerPage : number)=>{
     try {
-        return await Job.find({hrObjectId : id})
+      console.log(pageNumber,jobsPerPage,'repo ');
+      
+        return await Job.find({hrObjectId : id}).sort({createdAt : -1}).skip(jobsPerPage * (pageNumber-1)).limit(jobsPerPage)
     } catch (error) {
         
+    }
+  }
+  const jobCount = async (id: ObjectId)=>{
+    try {
+       return await Job.countDocuments({hrObjectId : id})
+    } catch (error) {
+       console.error('error happened in fetching job count in userrepo')
     }
   }
 export default {
@@ -56,6 +65,6 @@ export default {
     getOtp,
     findAndUpdateOtp,
     setVerifiedTrue,
-   
+    jobCount,
     getJobsData
 }

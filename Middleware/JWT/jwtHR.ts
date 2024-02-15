@@ -5,7 +5,7 @@ import { Request,Response, NextFunction } from 'express';
 const generateToken = (email : string) => {
 
     try {
-        const token = jwt.sign({ userId: email }, process.env.SECRET_KEY as string,{ expiresIn: '24h' });
+        const token = jwt.sign({ userId: email }, process.env.HR_SECRET_KEY as string,{ expiresIn: '24h' });
   return token
     } catch (error) {
     console.error('error happen in generating HR token');

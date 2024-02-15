@@ -16,6 +16,8 @@ const verifyToken = (req : Request, res : Response , next : NextFunction)  => {
   try {
     const header : string | undefined = req.headers.authorization
 const role : string | undefined |string[] = req.headers.role
+console.log(role,'role ---user');
+
 
 let token: string | null = null
   if(header !== undefined) {
@@ -23,10 +25,10 @@ let token: string | null = null
   } 
 
   if (!token || role !== 'user' ) {
-    return res.json({status:404});
+    return res.json({status:404 ,message :'authentication or authorization failed'});
   }
 
-const decodedPayload = jwt.verify(token, process.env.SECRET_KEY as string) as JwtPayload;
+const decodedPayload = jwt.verify(token, process.env.USER_SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.userId,'User id');
 console.log('Access granted');
 
@@ -39,5 +41,6 @@ next()
 }
 export default  {
   generateToken,
-  verifyToken
+  verifyToken,
+  
 }

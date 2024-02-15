@@ -97,23 +97,37 @@ const saveJob = async (data: jobData) => {
   try {
     const hrObjectId = await hrRepository.findHr(data.createdBy);
     if (hrObjectId) data.hrObjectId = hrObjectId?._id;
+    console.log(hrObjectId, "obid");
+
     const job = new Job(data);
     await job.save();
     return { message: "success" };
   } catch (error) {
+    console.log(error, "error--createjob");
+
     return { message: "failed" };
   }
 };
-const getJobsData = async (hrEmail: string) => {
+const getJobsData = async (
+  hrEmail: string,
+  pageNumber: number,
+  jobsPerPage: number
+) => {
   try {
     const hrData = await hrRepository.findHr(hrEmail);
-    
-    if (  hrData !== null  && Object.keys(hrData).length) {
-      const getJobsData = await hrRepository.getJobsData(hrData._id);
-      
+    if (hrData !== null && Object.keys(hrData).length) {
+      const getJobsData = await hrRepository.getJobsData(
+        hrData._id,
+        pageNumber,
+        jobsPerPage
+      );
+      const jobCount = await hrRepository.jobCount(hrData._id);
+// console.log(getJobsData,jobCount,'service---');
+
       if (getJobsData != undefined) {
-        if (getJobsData.length) return { data: getJobsData, message: "" };
-        else return { data: null, message: "No jobs found" };
+        if (getJobsData.length)
+          return { data: getJobsData, totalPages: jobCount, message: "" };
+        else return { data: null, totalPages: null, message: "No jobs found" };
       }
     }
   } catch (error) {

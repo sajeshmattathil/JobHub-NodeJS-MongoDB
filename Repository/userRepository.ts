@@ -1,3 +1,4 @@
+import Job from "../Model/job";
 import Otp from "../Model/otp";
 import User from "../Model/user"
 
@@ -78,12 +79,30 @@ interface otpData {
       
    }
  }
+
+ const getJobs = async (pageNumber : number,jobsPerPage : number)=>{
+   try {
+      return await Job.find().sort({createdAt : -1}).skip(jobsPerPage * (pageNumber-1)).limit(jobsPerPage)
+   } catch (error) {
+      console.error('error in fetching jobs from db for user')
+   }
+ }
+
+ const jobCount = async ()=>{
+   try {
+      return await Job.countDocuments()
+   } catch (error) {
+      console.error('error happened in fetching job count in userrepo')
+   }
+ }
  export default { 
     findUser,
     getOtp,
     findAndUpdateOtp,
     setVerifiedTrue,
-    updateUser
+    updateUser,
+    getJobs,
+    jobCount
  }
 
 //  async (email : string) =>{

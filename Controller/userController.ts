@@ -185,11 +185,32 @@ const updateUser = async (req : Request,res : Response)=>{
     
   }
 }
+
+const getJobs = async (req : Request,res : Response) =>{
+  try {
+    const pageNumber :string | number = req.query.page  as string
+    const jobsPerPage :string | number  = req.query.jobsPerPage  as string
+
+
+
+    const getJobs = await userService.getJobs(Number(pageNumber),Number(jobsPerPage))
+     console.log(getJobs,'jobs---controller');
+    
+    if(getJobs?.message === 'success') res.status(201).json({jobData : getJobs.data ,totalPages : getJobs.totalPages, status :201})
+    if(getJobs?.message === 'failed') res.status(400).json({jobData : null,totalPages : null, status :400})
+    else res.status(204).json({jobData : null ,totalPages : null, status :204})
+
+  } catch (error) {
+    console.log('error happened in usercontroller for fetching jobs ');
+    
+  }
+}
 export default {
   signupSubmit,
   verifyOtp,
   resendOTP,
   loginSubmit,
   getUser,
-  updateUser
+  updateUser,
+  getJobs
 };
