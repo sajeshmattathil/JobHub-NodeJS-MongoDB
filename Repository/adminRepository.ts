@@ -1,4 +1,5 @@
 import Admin from "../Model/admin";
+import Hr from "../Model/hr";
 import User from "../Model/user";
 
 const findAdmin = async (email : string) =>{
@@ -29,9 +30,33 @@ const blockUblockUser = async (email : string ,isBlocked : boolean)=>{
         
     }
 }
+const getHiringManagers = async ()=>{
+    try {
+        return await Hr.find({})
+    } catch (error) {
+        console.log('error happend in fetching hiringmanagers data in repo ');
+    }
+}
+const blockUblockHR = async (email : string ,isBlocked : boolean)=>{
+    try {
+        return await Hr.updateOne({email : email},{$set : {isBlocked : !isBlocked}})
+   } catch (error) {
+       console.log('Error in blocking hr',error);   
+   }
+}
+const hrApprove = async (email : string)=>{
+    try {
+        return await Hr.updateOne({email : email},{$set : {isApproved : true}})
+   } catch (error) {
+       console.log('Error in approve hr',error);    
+   }
+}
 
 export default {
     findAdmin,
     getAllUsers,
-    blockUblockUser
+    blockUblockUser,
+    getHiringManagers,
+    blockUblockHR,
+    hrApprove
 }

@@ -129,10 +129,11 @@ console.log(pageNumber,jobsPerPage,'----queries');
   }
 }
 
+
 export default {
     hrSignup,
     verifyOtp,
     hrLogin,
     createJOb,
-    getJobs
+    getJobs,
 }

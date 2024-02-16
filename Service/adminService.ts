@@ -58,11 +58,53 @@ const blockUblockUser = async(email : string,isBlocked : boolean)=>{
   } catch (error) {
     console.log('Error in block n unblock',error);
     return {message : null}
-    
   }
+}
+const getHiringManagers = async ()=>{
+  try {
+    const getHiringManagers = await adminRepository.getHiringManagers()
+   if(getHiringManagers !== undefined ){
+    if(getHiringManagers.length) return {
+      message : 'success',
+      data : getHiringManagers
+    }
+   }
+   else{
+    return {message : 'failed',
+            data : null
+  }
+   }
+  } catch (error) {
+    console.log('error happened in fetching hiring managers data in adminService'); 
+  }
+}
+const blockUnblockHR = async (email : string,isBlocked : boolean)=>{
+  try {
+    const blockUblockHR = await adminRepository.blockUblockHR(email,isBlocked)
+    console.log(blockUblockHR,'blockUblockUser') 
+    if(blockUblockHR) return {message : true}
+    else return {message : null}
+ } catch (error) {
+   console.log('Error in block n unblock',error);
+   return {message : null}
+ }
+}
+const hrApprove = async (email : string)=>{
+  try {
+    const hrApprove = await adminRepository.hrApprove(email)
+    console.log(hrApprove,'hrApprove') 
+    if(hrApprove) return {message : true}
+    else return {message : null}
+ } catch (error) {
+   console.log('Error in hrApprove',error);
+   return {message : null}
+ }
 }
 export default {
     verifyLoginAdmin,
     getAllUsers,
-    blockUblockUser
+    blockUblockUser,
+    getHiringManagers,
+    blockUnblockHR,
+    hrApprove
 }

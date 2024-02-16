@@ -73,12 +73,62 @@ const blockUnblockUser = async (req : Request<{}, {}, blockunblock>,res : Respon
       } 
       
    } catch (error) {
+      console.log('error in block user in controller');
+   }
+}
+const hiringManagers = async (req : Request,res : Response )=>{
+   try {
+      const response = await adminService.getHiringManagers()
+     console.log(response,'hrs response controller');
+     
+      if(response !== undefined){
+         if(response.message === 'success'){
+            res.status(201).json({status : 201,HRData : response?.data})
+            }
+            else res.status(404).json({status : 404,HRData : null})
+      }
+   } catch (error) {
+      console.log('error happened in fetching HR data in admincontroller');
+      res.status(500).json({status : 500 ,HRData : null})
+   }
+}
+const blockUnblockHR = async (req : Request,res : Response)=>{
+   try {
+      const response = await adminService.blockUnblockHR(req.body.email,req.body.isBlocked)
+      console.log(response,'HRblockREsoponse');
+
+      if(response.message) {
+         res.status(201).json({status :201})
+      } 
+
+      else{
+         res.status(404).json({status : 404})
+      } 
+   } catch (error) {
       
    }
 }
+const hrApprove= async (req : Request, res : Response)=>{
+   try {
+      const response = await adminService.hrApprove(req.body.email)
+      console.log(response,'HRblockREsoponse');
 
+      if(response.message) {
+         res.status(201).json({status :201})
+      } 
+
+      else{
+         res.status(404).json({status : 404})
+      } 
+   } catch (error) {
+      
+   }
+ }
 export default {
     loginSubmit,
     getAllUsers,
-    blockUnblockUser
+    blockUnblockUser,
+    hiringManagers,
+    blockUnblockHR,
+    hrApprove
 }
