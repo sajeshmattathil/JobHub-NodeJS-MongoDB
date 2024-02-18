@@ -25,6 +25,7 @@ const verifyLoginAdmin =async (body : loginBody)=>{
         if(adminDetails !== undefined  && adminDetails !== null){
    
          const comparePsw =await bcrypt.compare(body.password, adminDetails.password)
+   console.log(comparePsw,'companre');
    
              if(adminDetails && comparePsw ) return {adminData : adminDetails.email, message : "Admin verified"}
              else return { adminData : null , message : 'Password is incorrect'}

@@ -16,9 +16,11 @@ interface loginSubmitResponse {
  
 const loginSubmit = async (req : Request<{}, {}, loginBody>,res : Response <loginSubmitResponse>)=>{
     try{
+      console.log(req.body,'body');
+      
         const verifyAdmin = await adminService.verifyLoginAdmin(req.body)
     
-        console.log(verifyAdmin.adminData,'verify user');
+        console.log(verifyAdmin,'verify user');
     
         if(verifyAdmin?.adminData) {
             const token = jwt.generateToken(verifyAdmin.adminData)
@@ -30,9 +32,9 @@ const loginSubmit = async (req : Request<{}, {}, loginBody>,res : Response <logi
                 })
              }
           else{
-             res.status(400).json({
-                status : 400,
-                message : "User login failed. Invalid credentials.",
+             res.status(200).json({
+                status : 200,
+                message : "Admin login failed. Invalid credentials.",
                 })
           }
        }catch(error){
