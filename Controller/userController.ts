@@ -196,9 +196,9 @@ const getJobs = async (req : Request,res : Response) =>{
     const getJobs = await userService.getJobs(Number(pageNumber),Number(jobsPerPage))
      console.log(getJobs,'jobs---controller');
     
-    if(getJobs?.message === 'success') res.status(201).json({jobData : getJobs.data ,totalPages : getJobs.totalPages, status :201})
-    if(getJobs?.message === 'failed') res.status(400).json({jobData : null,totalPages : null, status :400})
-    else res.status(204).json({jobData : null ,totalPages : null, status :204})
+    if(getJobs?.message === 'success') res.status(201).json({jobData : getJobs.data ,totalJobs : getJobs.totalPages, status :201})
+    if(getJobs?.message === 'failed') res.status(400).json({jobData : null,totalJobs : null, status :400})
+    else res.status(204).json({jobData : null ,totalJobs : null, status :204})
 
   } catch (error) {
     console.log('error happened in usercontroller for fetching jobs ');
