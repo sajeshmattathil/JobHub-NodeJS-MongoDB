@@ -14,6 +14,14 @@ jobRole :{
         type : [String],
         required : true
     },
+    jobType : {
+        type : String,
+        required: true
+    },
+    locations :{
+        type : [String],
+        required : true
+    },
     company: {
         type : String,
         required : true

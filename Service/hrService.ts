@@ -122,7 +122,7 @@ const getJobsData = async (
         jobsPerPage
       );
       const jobCount = await hrRepository.jobCount(hrData._id);
-// console.log(getJobsData,jobCount,'service---');
+      // console.log(getJobsData,jobCount,'service---');
 
       if (getJobsData != undefined) {
         if (getJobsData.length)
@@ -134,6 +134,27 @@ const getJobsData = async (
     return { data: null, message: "error" };
   }
 };
+
+const getHR = async (id: string) => {
+  try {
+    const getHR = await hrRepository.findHr(id);
+    if (getHR)
+      return {
+        data: getHR,
+        message: "success",
+      };
+    else
+      return {
+        data: null,
+        message: "Not found",
+      };
+  } catch (error) {
+    return {
+      data: null,
+      message: "error",
+    };
+  }
+};
 export default {
   saveHrData,
   saveOtp,
@@ -142,4 +163,5 @@ export default {
   verifyHrData,
   saveJob,
   getJobsData,
+  getHR,
 };

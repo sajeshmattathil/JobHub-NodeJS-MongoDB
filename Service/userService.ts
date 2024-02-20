@@ -152,13 +152,49 @@ const getJobs = async (pageNumber : number,jobsPerPage : number)=>{
     
   }
 }
+const checkUserExists = async (userId : string)=>{
+  try {
+    const findUser = await userRepository.findUser(userId)
+   if(findUser !== undefined ){
+    if( findUser !== null){
+      if(findUser.email){
+        return { message : 'user exists' }
+      }else{
+        return {message : 'user not found'}
+      }
+    }
+   }
+   return {message :'user not found'}
+  } catch (error) {
+    console.log('error happened in verifyin userId is existing or not for forgot password in Controller');
+  }
+}
+interface Body {
+  email : string;
+  password : string  ; 
+  confirm : string;
+}
+
+const resetPassword = async (body : Body)=>{
+  try {
+    const hashedPassword = await bcrypt.hash(body.password,15)  
+    body.password = hashedPassword
+    const resetPassword = await userRepository.resetPassword(body)
+    return {message : 'success'}
+  } catch (error) {
+    console.log('error in resetPassword at userService'); 
+    return {message : 'failed'}
+  }
+}
 export default {
   createNewUser,
   saveOtp,
   getSavedOtp,
   setVerifiedTrue,
   verifyLoginUser,
+  checkUserExists,
   getUser,
   updateUser,
-  getJobs
+  getJobs,
+  resetPassword
 };

@@ -129,6 +129,21 @@ console.log(pageNumber,jobsPerPage,'----queries');
   }
 }
 
+const getHR = async (req : Request,res : Response)=>{
+  try {
+    const id = req.params.Id
+
+    const response = await hrService.getHR(id)
+    console.log(id,response,'resoponse & id');
+    
+    if(response?.message === 'success') res.status(201).json({status :201,HR : response?.data})
+    if(response?.message === 'error') res.status(500).json({status :500,HR : null})
+    if(response?.message === 'Not found') res.status(400).json({status :400,HR : null})
+    
+  } catch (error) {
+    console.log('Something went wrong',error)
+  }
+}
 
 export default {
     hrSignup,
@@ -136,4 +151,6 @@ export default {
     hrLogin,
     createJOb,
     getJobs,
+    getHR,
+  
 }

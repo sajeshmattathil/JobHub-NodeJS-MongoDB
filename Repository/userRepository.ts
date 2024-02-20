@@ -95,6 +95,25 @@ interface otpData {
       console.error('error happened in fetching job count in userrepo')
    }
  }
+
+ interface Body {
+   email : string;
+   password : string;
+   confirm : string;
+ 
+ }
+ 
+
+ const resetPassword = async (body :Body)=>{
+   try {
+      return await User.updateOne({email:body.email},{$set:{
+         password : body.password
+      }})
+   } catch (error) {
+      console.log('error in resetPassword at repo');
+      
+   }
+ }
  export default { 
     findUser,
     getOtp,
@@ -102,7 +121,8 @@ interface otpData {
     setVerifiedTrue,
     updateUser,
     getJobs,
-    jobCount
+    jobCount,
+    resetPassword
  }
 
 //  async (email : string) =>{

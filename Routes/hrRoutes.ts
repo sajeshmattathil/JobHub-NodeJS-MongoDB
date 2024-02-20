@@ -7,9 +7,6 @@ router.post('/verifyOtp',hrController.verifyOtp)
 router.post('/login_submit',hrController.hrLogin)
 router.post('/createJOb',hrController.createJOb)
 router.get('/getJobs/:id',hrController.getJobs)
-
-
-
-
+router.get('/getHR/:id',hrController.getHR)
 
 export default router

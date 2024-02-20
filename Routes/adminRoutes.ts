@@ -4,12 +4,9 @@ const router = express.Router()
 
 router.post('/login_submit',adminController.loginSubmit)
 router.get('/users',adminController.getAllUsers)
-router.put('/blockandunblock',adminController.blockUnblockUser)
+router.patch('/blockandunblock',adminController.blockUnblockUser)
 router.get('/hiringmanagers',adminController.hiringManagers)
-router.put('/hrblockandunblock',adminController.blockUnblockHR)
-router.put('/hrapprove',adminController.hrApprove)
-
-
-
+router.patch('/hrblockandunblock',adminController.blockUnblockHR)
+router.patch('/hrapprove',adminController.hrApprove)
 
 export default router

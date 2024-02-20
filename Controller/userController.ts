@@ -56,9 +56,10 @@ const signupSubmit = async (
   }
 };
 interface verifyOtpBody {
-  userId: string;
+  userId : string  ;
   otp: string;
   createdAt: Date;
+  purpose ?: string
 }
 interface getOtp {
   _id: ObjectId;
@@ -82,15 +83,16 @@ const verifyOtp = async (
       expiryTime.setMinutes(expiryTime.getMinutes() + 10);
 
       const currentTime = Date.now();
+console.log( req.body.otp,getSavedOtp.otp ,'two otps');
 
       if (
         req.body.otp === getSavedOtp.otp &&
         currentTime < expiryTime.getTime()
       ) {
-        const setVerifiedTrue = await userService.setVerifiedTrue(
-          req.body.userId
-        );
-        res.status(201).json({ status: 201, message: "User verified" });
+        if(!req.body.purpose){
+          const setVerifiedTrue = await userService.setVerifiedTrue(req.body.userId);
+        } 
+        res.status(201).json({ status: 201, message: "otp verified" });
       } else {
         res
           .status(401)
@@ -205,6 +207,44 @@ const getJobs = async (req : Request,res : Response) =>{
     
   }
 }
+
+const saveForgotOtp = async (req : Request,res : Response)=>{
+  try {
+
+    const checkUserExists = await userService.checkUserExists(req.body.userId)
+
+    console.log(checkUserExists,'checkUserExists');
+
+    if(checkUserExists?.message == 'user exists'){
+      sendOTPByEmail(req.body.userId,req.body.otp)
+      await userService.saveOtp(req.body);
+
+      res.status(201).json({status : 201})
+    }
+    else if(checkUserExists?.message == 'user not found'){
+      console.log(66144987817);
+      
+      res.status(404).json({status:404})
+    }
+    else  res.status(400).json({status : 400})
+
+  } catch (error) {
+     res.status(500).json({status : 500})  
+  }
+}
+
+const resetPassword = async (req : Request,res : Response)=>{
+  try {
+     const response = await userService.resetPassword(req.body)
+     console.log(response,'resetpassword response');
+     
+     if(response.message === 'success') res.status(201).json({status : 201})
+     else res.status(404).json({status : 404})
+  } catch (error) {
+    console.log('error in resetPassword at controller');
+    res.status(500).json({status : 500})
+  }
+}
 export default {
   signupSubmit,
   verifyOtp,
@@ -212,5 +252,7 @@ export default {
   loginSubmit,
   getUser,
   updateUser,
-  getJobs
+  getJobs,
+  saveForgotOtp,
+  resetPassword
 };
