@@ -138,11 +138,14 @@ const getJobsData = async (
 const getHR = async (id: string) => {
   try {
     const getHR = await hrRepository.findHr(id);
-    if (getHR)
+    if (getHR && getHR?.password !== undefined){
+    getHR.password = ''
       return {
         data: getHR,
         message: "success",
       };
+    }
+    
     else
       return {
         data: null,
@@ -155,6 +158,28 @@ const getHR = async (id: string) => {
     };
   }
 };
+
+interface bodyData {
+    name : string,
+    company : string;
+    website : string;
+  resume : string;
+  employeesNumber : number;
+  experience : number;
+  email : string
+}
+
+const updateProfile = async (HRData : bodyData)=>{
+  try {
+    const updateUser = await hrRepository.updateProfile(HRData)
+   if (updateUser?.message) return {message : 'success'}
+   else return { message : 'failed'}
+    
+  } catch (error) {
+    console.log('error in updating profile at userservice');
+    
+  }
+}
 export default {
   saveHrData,
   saveOtp,
@@ -164,4 +189,5 @@ export default {
   saveJob,
   getJobsData,
   getHR,
+  updateProfile
 };

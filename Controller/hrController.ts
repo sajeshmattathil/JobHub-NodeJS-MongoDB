@@ -131,17 +131,31 @@ console.log(pageNumber,jobsPerPage,'----queries');
 
 const getHR = async (req : Request,res : Response)=>{
   try {
-    const id = req.params.Id
+    const id = req.params.id
 
     const response = await hrService.getHR(id)
     console.log(id,response,'resoponse & id');
     
-    if(response?.message === 'success') res.status(201).json({status :201,HR : response?.data})
+    if(response?.message === 'success'){
+      
+      res.status(201).json({status :201,HR : response?.data})
+    } 
     if(response?.message === 'error') res.status(500).json({status :500,HR : null})
     if(response?.message === 'Not found') res.status(400).json({status :400,HR : null})
     
   } catch (error) {
     console.log('Something went wrong',error)
+  }
+}
+
+const updateProfile = async (req : Request,res : Response)=>{
+  try {
+    const id = req.params.id
+    const response = await hrService.updateProfile(req.body)
+    if(response?.message === 'success') res.status(201).json({status : 201})
+    else res.status(400).json({status : 400})
+  } catch (error) {
+    res.status(500).json({status : 500})
   }
 }
 
@@ -152,5 +166,5 @@ export default {
     createJOb,
     getJobs,
     getHR,
-  
+    updateProfile
 }

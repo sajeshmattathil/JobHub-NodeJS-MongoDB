@@ -8,5 +8,7 @@ router.post('/login_submit',hrController.hrLogin)
 router.post('/createJOb',hrController.createJOb)
 router.get('/getJobs/:id',hrController.getJobs)
 router.get('/getHR/:id',hrController.getHR)
+router.post('/update/:id',hrController.updateProfile)
+
 
 export default router

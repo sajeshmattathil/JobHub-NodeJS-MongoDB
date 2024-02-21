@@ -132,6 +132,7 @@ const updateUser = async (data : userData)=>{
    else return { message : 'failed'}
     
   } catch (error) {
+    console.log('error in updating profile at userservice');
     
   }
 }

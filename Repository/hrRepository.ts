@@ -60,11 +60,39 @@ interface otpData {
        console.error('error happened in fetching job count in userrepo')
     }
   }
+  interface bodyData {
+   name : string,
+   company : string;
+   website : string;
+ resume : string;
+ employeesNumber : number;
+ experience : number;
+ email : string
+}
+
+  const updateProfile = async (data :bodyData)=>{
+   try {
+      await hr.updateOne({email : data.email},{$set :{
+          name : data.name,
+          company : data.company,
+          resume : data.resume,
+          experience : data.experience,
+         website : data.website,
+         employeesNumber : data.employeesNumber,
+
+      }})
+      return {message : 'success'}
+   } catch (error) {
+      console.log('error in update user in db',error);
+      return {message : 'failed'}
+   }
+  }
 export default {
     findHr,
     getOtp,
     findAndUpdateOtp,
     setVerifiedTrue,
     jobCount,
-    getJobsData
+    getJobsData,
+    updateProfile
 }

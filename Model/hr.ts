@@ -27,6 +27,8 @@ const hrSchema = new mongoose.Schema({
         type : String,
         required : true
     },
+    employeesNumber : Number,
+    experience : Number,
     isVerified :  {
         type : Boolean,
         default : false
