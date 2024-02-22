@@ -11,6 +11,14 @@ const findHr = async (email : string)=>{
         return null
     }
 }
+const findHrById = async (id : string)=>{
+   try {
+       return await Hr.findOne({_id:id})
+   } catch (error) {
+       return null
+   }
+}
+
 const getOtp = async (userId : string)=>{
     try {
        return await Otp.findOne({userId : userId})
@@ -41,7 +49,8 @@ interface otpData {
     try {
        return await hr.updateOne({email: userId},{$set: {isVerified : true}})
     } catch (error) {
-       
+       console.log(error,'error happened in setting true for user account in repo');
+       return
     }
   }
   const getJobsData = async (id: ObjectId,pageNumber : number,jobsPerPage : number)=>{
@@ -89,6 +98,7 @@ interface otpData {
   }
 export default {
     findHr,
+    findHrById,
     getOtp,
     findAndUpdateOtp,
     setVerifiedTrue,

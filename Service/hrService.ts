@@ -90,7 +90,15 @@ interface jobData {
   salaryTo: string;
   company: string;
   createdBy: string;
+  experience : string;
   hrObjectId: ObjectId;
+  salaryScale : string;
+  educationalQualification : string;
+  education : string;
+  course : string;
+  industry : string;
+
+
 }
 
 const saveJob = async (data: jobData) => {
@@ -166,7 +174,8 @@ interface bodyData {
   resume : string;
   employeesNumber : number;
   experience : number;
-  email : string
+  email : string;
+  
 }
 
 const updateProfile = async (HRData : bodyData)=>{

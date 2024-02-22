@@ -5,7 +5,7 @@ import { Request,Response, NextFunction } from 'express';
 const generateToken = (email : string) => {
 
     try {
-        const token = jwt.sign({ userId: email }, process.env.HR_SECRET_KEY as string,{ expiresIn: '24h' });
+        const token = jwt.sign({ HRId: email }, process.env.HR_SECRET_KEY as string,{ expiresIn: '24h' });
   return token
     } catch (error) {
     console.error('error happen in generating HR token');
@@ -14,7 +14,11 @@ const generateToken = (email : string) => {
   
  
 };
-const verifyToken = (req : Request, res : Response , next : NextFunction)  => {
+
+interface AuthenticatedRequest extends Request {
+  HRId?: string; 
+}
+const verifyToken = (req : AuthenticatedRequest, res : Response , next : NextFunction)  => {
 
     try {
         const header : string | undefined = req.headers.authorization
@@ -31,6 +35,7 @@ let token: string | null = null
 
 const decodedPayload = jwt.verify(token, process.env.HR_SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.userId,'User id');
+req.HRId = decodedPayload.HRId
 console.log('Access granted');
 
 next()

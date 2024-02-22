@@ -9,10 +9,11 @@ router.post('/resendOTP',userController.resendOTP)
 router.post('/login_submit',userController.loginSubmit)
 router.get('/getUser/:userId',userController.getUser)
 router.put('/update',jwtUser.verifyToken,userController.updateUser)
-router.get('/getJobs',jwtUser.verifyToken,userController.getJobs)
+router.get('/getJobs',userController.getJobs)
 router.post('/forgot_password',userController.saveForgotOtp)
 router.post('/verifyFortgotOtp',userController.verifyOtp)
 router.put('/resetPassword',userController.resetPassword)
+router.get('/getJobData/:id',userController.getJobData)
 
 
 export default router

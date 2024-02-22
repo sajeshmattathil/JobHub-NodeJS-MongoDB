@@ -90,7 +90,7 @@ console.log( req.body.otp,getSavedOtp.otp ,'two otps');
         currentTime < expiryTime.getTime()
       ) {
         if(!req.body.purpose){
-          const setVerifiedTrue = await userService.setVerifiedTrue(req.body.userId);
+         await userService.setVerifiedTrue(req.body.userId);
         } 
         res.status(201).json({ status: 201, message: "otp verified" });
       } else {
@@ -245,6 +245,19 @@ const resetPassword = async (req : Request,res : Response)=>{
     res.status(500).json({status : 500})
   }
 }
+
+const getJobData = async (req : Request ,res : Response)=>{
+  try {
+    const id : string = req.params.id
+    const response = await userService.getJobData(id )
+    console.log(response,'response get job data');
+    if(response && response.message === 'success') res.json({jobDataFetched : response.data,status : 201})
+    else res.json({jobDataFetched : null,status : 404})
+  } catch (error) {
+    console.log(error,'error in fetching jobdata at controller');  
+    res.json({jobDataFetched : null,status : 500})
+  }
+}
 export default {
   signupSubmit,
   verifyOtp,
@@ -254,5 +267,6 @@ export default {
   updateUser,
   getJobs,
   saveForgotOtp,
-  resetPassword
+  resetPassword,
+  getJobData
 };

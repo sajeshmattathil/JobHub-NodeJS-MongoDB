@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import User from "../Model/user";
 import userRepository from "../Repository/userRepository";
 import Otp from "../Model/otp";
+import hrRepository from "../Repository/hrRepository";
 
 try {
 } catch (error) {}
@@ -95,7 +96,9 @@ const verifyLoginUser = async (user: ReqBody) => {
 const setVerifiedTrue = async (userId: string) => {
   try {
     const setVerifiedTrue = await userRepository.setVerifiedTrue(userId);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error ,'error in set verified true at user service');    
+  }
 };
 
 const getUser = async (id : string)=>{
@@ -187,6 +190,24 @@ const resetPassword = async (body : Body)=>{
     return {message : 'failed'}
   }
 }
+
+const getJobData = async  (id : string)=>{
+  try {
+    const data = await userRepository.getJobData(id)
+    console.log(data,'data---job');
+    
+    if(data && data.length){
+      return { message : 'success',data : data}
+    }else {
+      return {
+        message : 'failed ',data : null
+      }
+    }
+  } catch (error) {
+    console.log(error,'error in fetching job data at user service');
+    
+  }
+}
 export default {
   createNewUser,
   saveOtp,
@@ -197,5 +218,6 @@ export default {
   getUser,
   updateUser,
   getJobs,
-  resetPassword
+  resetPassword,
+  getJobData
 };

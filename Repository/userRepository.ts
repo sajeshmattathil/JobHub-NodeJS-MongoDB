@@ -1,129 +1,162 @@
+import { ObjectId } from "mongodb";
 import Job from "../Model/job";
 import Otp from "../Model/otp";
-import User from "../Model/user"
+import User from "../Model/user";
+import hr from "../Model/hr";
 
-try{
+try {
+} catch (error) {}
 
-}catch(error){
+const findUser = async (email: string) => {
+  try {
+    const userDatabase = await User.findOne({ email: email });
 
-}
- 
- const findUser = async (email : string) =>{
-    try{
-      const userDatabase = await User.findOne({email : email})
+    return userDatabase;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-      return userDatabase
-
-    }catch(error){
-        console.log(error);
-        
-    }
- }
-
- const getOtp = async (userId : string)=>{
-      try {
-         return await Otp.findOne({userId : userId})
-      } catch (error) {
-         console.log('Otp not found in database',error)
-      }
- }
+const getOtp = async (userId: string) => {
+  try {
+    return await Otp.findOne({ userId: userId });
+  } catch (error) {
+    console.log("Otp not found in database", error);
+  }
+};
 interface otpData {
-   userId : string,
-   otp : string,
-   createdAt : Date
+  userId: string;
+  otp: string;
+  createdAt: Date;
 }
 
- const findAndUpdateOtp = async (data :otpData)=>{
-   try {
-      return await Otp.updateOne({userId : data.userId},{$set:{
-         createdAt :data.createdAt ,
-         otp : data.otp,
-         userId : data.userId
-        }})
-   } catch (error) {
-      console.log('Error in updating otp ');
-      return
-      
-   }
- }
+const findAndUpdateOtp = async (data: otpData) => {
+  try {
+    return await Otp.updateOne(
+      { userId: data.userId },
+      {
+        $set: {
+          createdAt: data.createdAt,
+          otp: data.otp,
+          userId: data.userId,
+        },
+      }
+    );
+  } catch (error) {
+    console.log("Error in updating otp ");
+    return;
+  }
+};
 
- const setVerifiedTrue = async (userId : string)=>{
-   try {
-      return await User.updateOne({email: userId},{$set: {isVerified : true}})
-   } catch (error) {
-      
-   }
- }
- interface userData {
-   email : string,
-   fname : string,
-   lname : string,
-   resume : string,
-   experience : string,
-  skills : [string]
- }
+const setVerifiedTrue = async (userId: string) => {
+  try {
+    return await User.updateOne(
+      { email: userId },
+      { $set: { isVerified: true } }
+    );
+  } catch (error) {}
+};
+interface userData {
+  email: string;
+  fname: string;
+  lname: string;
+  resume: string;
+  experience: string;
+  skills: [string];
+}
 
- const updateUser = async (data : userData)=>{
-   try {
-      await User.updateOne({email : data.email},{$set :{
-          email : data.email,
-          fname : data.fname,
-          lname : data.lname,
-          resume : data.resume,
-          experience : data.experience,
-         skills : data.skills
-      }})
-      return {message : 'success'}
-   } catch (error) {
-      console.log('error in update user in db',error);
-      
-   }
- }
+const updateUser = async (data: userData) => {
+  try {
+    await User.updateOne(
+      { email: data.email },
+      {
+        $set: {
+          email: data.email,
+          fname: data.fname,
+          lname: data.lname,
+          resume: data.resume,
+          experience: data.experience,
+          skills: data.skills,
+        },
+      }
+    );
+    return { message: "success" };
+  } catch (error) {
+    console.log("error in update user in db", error);
+  }
+};
 
- const getJobs = async (pageNumber : number,jobsPerPage : number)=>{
-   try {
-      return await Job.find().sort({createdAt : -1}).skip(jobsPerPage * (pageNumber-1)).limit(jobsPerPage)
-   } catch (error) {
-      console.error('error in fetching jobs from db for user')
-   }
- }
+const getJobs = async (pageNumber: number, jobsPerPage: number) => {
+  try {
+    return await Job.find()
+      .sort({ createdAt: -1 })
+      .skip(jobsPerPage * (pageNumber - 1))
+      .limit(jobsPerPage);
+  } catch (error) {
+    console.error("error in fetching jobs from db for user");
+  }
+};
 
- const jobCount = async ()=>{
-   try {
-      return await Job.countDocuments()
-   } catch (error) {
-      console.error('error happened in fetching job count in userrepo')
-   }
- }
+const jobCount = async () => {
+  try {
+    return await Job.countDocuments();
+  } catch (error) {
+    console.error("error happened in fetching job count in userrepo");
+  }
+};
 
- interface Body {
-   email : string;
-   password : string;
-   confirm : string;
- 
- }
- 
+interface Body {
+  email: string;
+  password: string;
+  confirm: string;
+}
 
- const resetPassword = async (body :Body)=>{
-   try {
-      return await User.updateOne({email:body.email},{$set:{
-         password : body.password
-      }})
-   } catch (error) {
-      console.log('error in resetPassword at repo');
-      
-   }
- }
- export default { 
-    findUser,
-    getOtp,
-    findAndUpdateOtp,
-    setVerifiedTrue,
-    updateUser,
-    getJobs,
-    jobCount,
-    resetPassword
- }
+const resetPassword = async (body: Body) => {
+  try {
+    return await User.updateOne(
+      { email: body.email },
+      {
+        $set: {
+          password: body.password,
+        },
+      }
+    );
+  } catch (error) {
+    console.log("error in resetPassword at repo");
+  }
+};
+
+const getJobData = async (id: string) => {
+  try {
+    return await Job.aggregate([
+      { $match: { _id: new ObjectId(id) } },
+      {
+         $lookup: {
+           from: 'hrs',
+           localField: 'hrObjectId',
+           foreignField: '_id',
+           as: 'jobData'
+         }
+       }
+   ]);
+
+   
+  } catch (error) {
+    console.log(error, "error in fetching job data at repo");
+  }
+};
+//  getJobData('idididi')
+export default {
+  findUser,
+  getOtp,
+  findAndUpdateOtp,
+  setVerifiedTrue,
+  updateUser,
+  getJobs,
+  jobCount,
+  resetPassword,
+  getJobData,
+};
 
 //  async (email : string) =>{
 //   try{
