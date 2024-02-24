@@ -32,6 +32,9 @@ const hrSchema = new mongoose.Schema({
     isVerified :  {
         type : Boolean,
         default : false
+    },
+    followers :{
+        type :[String]
     }
 })
 

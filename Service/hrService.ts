@@ -189,6 +189,18 @@ const updateProfile = async (HRData : bodyData)=>{
     
   }
 }
+
+const getJobDetails = async (jobId : string)=>{
+  try {
+    const getData = await hrRepository.findSelectedJobData(jobId)
+    console.log(getData,'getdata-----');
+    
+    return {message : 'success',data : getData}
+  } catch (error) {
+    console.log(error,'error happened in fetching job data at hr service');
+    return {message : 'failed',data : null}
+  }
+}
 export default {
   saveHrData,
   saveOtp,
@@ -198,5 +210,6 @@ export default {
   saveJob,
   getJobsData,
   getHR,
-  updateProfile
+  updateProfile,
+  getJobDetails,
 };

@@ -14,6 +14,7 @@ router.post('/forgot_password',userController.saveForgotOtp)
 router.post('/verifyFortgotOtp',userController.verifyOtp)
 router.put('/resetPassword',userController.resetPassword)
 router.get('/getJobData/:id',userController.getJobData)
-
+router.post('/applyJob',jwtUser.verifyToken,userController.saveAppliedJob)
+router.patch('/followAndUnfollow',jwtUser.verifyToken,userController.followAndUnfollow)
 
 export default router

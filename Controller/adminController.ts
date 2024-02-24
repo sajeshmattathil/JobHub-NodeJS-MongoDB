@@ -1,6 +1,7 @@
 import { Request , Response } from "express"
 import jwt from "../Middleware/JWT/jwtUser"
 import adminService from "../Service/adminService"
+import jwtAdmin from "../Middleware/JWT/jwtAdmin"
 
 
 interface loginBody {
@@ -23,7 +24,7 @@ const loginSubmit = async (req : Request<{}, {}, loginBody>,res : Response <logi
         console.log(verifyAdmin,'verify user');
     
         if(verifyAdmin?.adminData) {
-            const token = jwt.generateToken(verifyAdmin.adminData)
+            const token : string | undefined = jwtAdmin.generateToken(verifyAdmin.adminData)
                 res.status(201).json({
                    status : 201,
                    message : "User verification successful",

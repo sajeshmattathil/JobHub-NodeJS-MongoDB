@@ -1,50 +1,60 @@
-import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken'
-import { Request,Response, NextFunction } from 'express';
+import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import { ObjectId } from "mongodb";
 
-
-const generateToken = (email : string) => {
+const generateToken = (email: string, _id: ObjectId) => {
   try {
-  const token = jwt.sign({ userId: email }, process.env.USER_SECRET_KEY as string,{ expiresIn: '24h' });
-  return token
+    const token = jwt.sign(
+      { userId: email, _id: _id },
+      process.env.USER_SECRET_KEY as string,
+      { expiresIn: "24h" }
+    );
+    return token;
   } catch (error) {
-    console.error('error happen in generating user token');
+    console.error("error happen in generating user token");
   }
-  
- 
 };
 interface AuthenticatedRequest extends Request {
-  userId?: string; 
+  userId?: string;
+  userEmail?: ObjectId;
 }
-const verifyToken = (req : AuthenticatedRequest, res : Response , next : NextFunction)  => {
+const verifyToken = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const header : string | undefined = req.headers.authorization
-const role : string | undefined |string[] = req.headers.role
-console.log(role,'role ---user');
+    
+    const header: string | undefined = req.headers.authorization;
+    const role: string | undefined | string[] = req.headers.role;
 
+    let token: string | null = null;
+    if (header !== undefined) {
+      token = header.split(" ")[1];
+    }
 
-let token: string | null = null
-  if(header !== undefined) {
-     token = header.split(' ')[1]
-  } 
+    if (!token || role !== "user") {
+      return res.json({
+        status: 404,
+        message: "authentication or authorization failed in jwt verification",
+      });
+    }
 
-  if (!token || role !== 'user' ) {
-    return res.json({status:404 ,message :'authentication or authorization failed in jwt verification'});
-  }
+    const decodedPayload = jwt.verify(
+      token,
+      process.env.USER_SECRET_KEY as string
+    ) as JwtPayload;
+    console.log(decodedPayload.userId, "User id");
+    req.userEmail = decodedPayload.userId;
+    req.userId = decodedPayload._id;
+    console.log("Access granted");
 
-const decodedPayload = jwt.verify(token, process.env.USER_SECRET_KEY as string) as JwtPayload;
-console.log(decodedPayload.userId,'User id');
-req.userId   = decodedPayload.userId
-console.log('Access granted');
-
-next() 
-  
+    next();
   } catch (error) {
-    console.error('error happend in verifying user token and role')
+    console.error("error happend in verifying user token and role");
   }
-
-}
-export default  {
+};
+export default {
   generateToken,
   verifyToken,
-  
-}
+};

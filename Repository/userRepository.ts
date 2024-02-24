@@ -63,6 +63,7 @@ interface userData {
   resume: string;
   experience: string;
   skills: [string];
+  educationalQualification : string;
 }
 
 const updateUser = async (data: userData) => {
@@ -77,6 +78,8 @@ const updateUser = async (data: userData) => {
           resume: data.resume,
           experience: data.experience,
           skills: data.skills,
+          educationalQualification: data.educationalQualification,
+
         },
       }
     );
@@ -145,7 +148,31 @@ const getJobData = async (id: string) => {
     console.log(error, "error in fetching job data at repo");
   }
 };
-//  getJobData('idididi')
+
+const addUserEmailInJobPost = async (userEmail : string,jobObjectId : string)=>{
+   try {
+      return await Job.updateOne({_id : jobObjectId },{$push:{appliedUsers :userEmail}})
+   } catch (error) {
+      console.log(error,'error in updating user email in job post at repo');
+      return
+   }
+}
+
+const followHR = async (HRId : string,userEmail : string)=>{
+   try {
+      return await hr.updateOne({_id : HRId},{$push :{followers : userEmail }})
+   } catch (error) {
+      console.log(error,'error in follow and unfollow hr at repo');     
+   }
+}
+
+const UnfollowHR = async (HRId : string,userEmail : string)=>{
+   try {
+      return await hr.updateOne({_id : HRId},{$pull :{followers : userEmail }})
+   } catch (error) {
+      console.log(error,'error in follow and unfollow hr at repo');     
+   }
+}
 export default {
   findUser,
   getOtp,
@@ -156,6 +183,9 @@ export default {
   jobCount,
   resetPassword,
   getJobData,
+  addUserEmailInJobPost,
+  followHR,
+  UnfollowHR
 };
 
 //  async (email : string) =>{

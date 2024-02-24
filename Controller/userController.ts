@@ -56,10 +56,10 @@ const signupSubmit = async (
   }
 };
 interface verifyOtpBody {
-  userId : string  ;
+  userId: string;
   otp: string;
   createdAt: Date;
-  purpose ?: string
+  purpose?: string;
 }
 interface getOtp {
   _id: ObjectId;
@@ -83,15 +83,15 @@ const verifyOtp = async (
       expiryTime.setMinutes(expiryTime.getMinutes() + 10);
 
       const currentTime = Date.now();
-console.log( req.body.otp,getSavedOtp.otp ,'two otps');
+      console.log(req.body.otp, getSavedOtp.otp, "two otps");
 
       if (
         req.body.otp === getSavedOtp.otp &&
         currentTime < expiryTime.getTime()
       ) {
-        if(!req.body.purpose){
-         await userService.setVerifiedTrue(req.body.userId);
-        } 
+        if (!req.body.purpose) {
+          await userService.setVerifiedTrue(req.body.userId);
+        }
         res.status(201).json({ status: 201, message: "otp verified" });
       } else {
         res
@@ -107,18 +107,15 @@ console.log( req.body.otp,getSavedOtp.otp ,'two otps');
   }
 };
 
-const resendOTP =async (req : Request,res : Response)=>{
+const resendOTP = async (req: Request, res: Response) => {
   try {
     sendOTPByEmail(req.body.userId, req.body.otp);
 
     const saveOtp = await userService.saveOtp(req.body);
-    if(saveOtp?.message === 'success') res.status(200).json({status : 200})
-     res.status(400).json({status : 400})
-
-  } catch (error) {
-    
-  }
-}
+    if (saveOtp?.message === "success") res.status(200).json({ status: 200 });
+    res.status(400).json({ status: 400 });
+  } catch (error) {}
+};
 
 interface loginSubmitResponse {
   status: number;
@@ -139,7 +136,10 @@ const loginSubmit = async (
     console.log(verifyUser.userData, "verify user");
 
     if (verifyUser?.userData) {
-      const token = jwtUser.generateToken(verifyUser.userData);
+      const token = jwtUser.generateToken(
+        verifyUser.userData,
+        verifyUser.ObjectId
+      );
       res.status(201).json({
         status: 201,
         message: "User verification successful",
@@ -160,102 +160,136 @@ const loginSubmit = async (
   }
 };
 
-const getUser = async (req : Request,res : Response)=>{
+const getUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.userId
-    const response = await userService.getUser(id)
-    if(response?.message === 'success') res.status(201).json({status :201,user : response?.data})
-    if(response?.message === 'error') res.status(500).json({status :500,user : null})
-    if(response?.message === 'Not found') res.status(400).json({status :400,user : null})
-    
+    const id = req.params.userId;
+    const response = await userService.getUser(id);
+    if (response?.message === "success")
+      res.status(201).json({ status: 201, user: response?.data });
+    if (response?.message === "error")
+      res.status(500).json({ status: 500, user: null });
+    if (response?.message === "Not found")
+      res.status(400).json({ status: 400, user: null });
   } catch (error) {
-    console.log('Something went wrong',error)
+    console.log("Something went wrong", error);
   }
-}
+};
 
-const updateUser = async (req : Request,res : Response)=>{
+const updateUser = async (req: Request, res: Response) => {
   try {
-    console.log(req.body,'req.body update');
-    
-    const updateUser = await userService.updateUser(req.body)
+    console.log(req.body, "req.body update");
 
-    if(updateUser?.message === 'success') res.status(201).json({status : 201})
+    const updateUser = await userService.updateUser(req.body);
 
-    else res.status(400).json({status : 400})
-    
+    if (updateUser?.message === "success")
+      res.status(201).json({ status: 201 });
+    else res.status(400).json({ status: 400 });
+  } catch (error) {}
+};
+
+const getJobs = async (req: Request, res: Response) => {
+  try {
+    const pageNumber: string | number = req.query.page as string;
+    const jobsPerPage: string | number = req.query.jobsPerPage as string;
+
+    const getJobs = await userService.getJobs(
+      Number(pageNumber),
+      Number(jobsPerPage)
+    );
+    console.log(getJobs, "jobs---controller");
+
+    if (getJobs?.message === "success")
+      res
+        .status(201)
+        .json({
+          jobData: getJobs.data,
+          totalJobs: getJobs.totalPages,
+          status: 201,
+        });
+    if (getJobs?.message === "failed")
+      res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
+    else res.status(204).json({ jobData: null, totalJobs: null, status: 204 });
   } catch (error) {
-    
+    console.log("error happened in usercontroller for fetching jobs ");
   }
-}
+};
 
-const getJobs = async (req : Request,res : Response) =>{
+const saveForgotOtp = async (req: Request, res: Response) => {
   try {
-    const pageNumber :string | number = req.query.page  as string
-    const jobsPerPage :string | number  = req.query.jobsPerPage  as string
+    const checkUserExists = await userService.checkUserExists(req.body.userId);
 
+    console.log(checkUserExists, "checkUserExists");
 
-
-    const getJobs = await userService.getJobs(Number(pageNumber),Number(jobsPerPage))
-     console.log(getJobs,'jobs---controller');
-    
-    if(getJobs?.message === 'success') res.status(201).json({jobData : getJobs.data ,totalJobs : getJobs.totalPages, status :201})
-    if(getJobs?.message === 'failed') res.status(400).json({jobData : null,totalJobs : null, status :400})
-    else res.status(204).json({jobData : null ,totalJobs : null, status :204})
-
-  } catch (error) {
-    console.log('error happened in usercontroller for fetching jobs ');
-    
-  }
-}
-
-const saveForgotOtp = async (req : Request,res : Response)=>{
-  try {
-
-    const checkUserExists = await userService.checkUserExists(req.body.userId)
-
-    console.log(checkUserExists,'checkUserExists');
-
-    if(checkUserExists?.message == 'user exists'){
-      sendOTPByEmail(req.body.userId,req.body.otp)
+    if (checkUserExists?.message == "user exists") {
+      sendOTPByEmail(req.body.userId, req.body.otp);
       await userService.saveOtp(req.body);
 
-      res.status(201).json({status : 201})
-    }
-    else if(checkUserExists?.message == 'user not found'){
+      res.status(201).json({ status: 201 });
+    } else if (checkUserExists?.message == "user not found") {
       console.log(66144987817);
-      
-      res.status(404).json({status:404})
-    }
-    else  res.status(400).json({status : 400})
 
+      res.status(404).json({ status: 404 });
+    } else res.status(400).json({ status: 400 });
   } catch (error) {
-     res.status(500).json({status : 500})  
+    res.status(500).json({ status: 500 });
   }
-}
+};
 
-const resetPassword = async (req : Request,res : Response)=>{
+const resetPassword = async (req: Request, res: Response) => {
   try {
-     const response = await userService.resetPassword(req.body)
-     console.log(response,'resetpassword response');
-     
-     if(response.message === 'success') res.status(201).json({status : 201})
-     else res.status(404).json({status : 404})
+    const response = await userService.resetPassword(req.body);
+    console.log(response, "resetpassword response");
+
+    if (response.message === "success") res.status(201).json({ status: 201 });
+    else res.status(404).json({ status: 404 });
   } catch (error) {
-    console.log('error in resetPassword at controller');
-    res.status(500).json({status : 500})
+    console.log("error in resetPassword at controller");
+    res.status(500).json({ status: 500 });
   }
-}
+};
 
-const getJobData = async (req : Request ,res : Response)=>{
+const getJobData = async (req: Request, res: Response) => {
   try {
-    const id : string = req.params.id
-    const response = await userService.getJobData(id )
-    console.log(response,'response get job data');
-    if(response && response.message === 'success') res.json({jobDataFetched : response.data,status : 201})
-    else res.json({jobDataFetched : null,status : 404})
+    const id: string = req.params.id;
+    const response = await userService.getJobData(id);
+    console.log(response, "response get job data");
+    if (response && response.message === "success")
+      res.json({ jobDataFetched: response.data, status: 201 });
+    else res.json({ jobDataFetched: null, status: 404 });
   } catch (error) {
-    console.log(error,'error in fetching jobdata at controller');  
-    res.json({jobDataFetched : null,status : 500})
+    console.log(error, "error in fetching jobdata at controller");
+    res.json({ jobDataFetched: null, status: 500 });
+  }
+};
+
+const saveAppliedJob = async (req: Request, res: Response) => {
+  try {
+    const _id = (req as any).userId 
+    const userEmail = (req as any).userEmail 
+    console.log(req.body);
+    const updatedBody = { ...req.body, userId: _id,userEmail :userEmail };
+    const response = await userService.saveAppliedJob(updatedBody);
+    console.log(response,'response--- appliedjobs');
+    
+  } catch (error) {
+    console.log(error, "error in saving applied job at controller");
+  }
+};
+
+const followAndUnfollow = async (req : Request,res:Response)=>{
+  try {
+   
+    console.log(req.body,'value');
+    
+    const userEmail = (req as any).userEmail
+    const response = await userService.followAndUnfollow(req.body.HRId,req.body.value,userEmail)
+    console.log(response,'res---follow unfollow');
+    
+    if(response.message == 'success') res.status(200)
+    else res.status(400)
+  } catch (error) {
+    console.log(error,'error in follow and unfollow hr at controller');
+    res.status(500)
   }
 }
 export default {
@@ -268,5 +302,7 @@ export default {
   getJobs,
   saveForgotOtp,
   resetPassword,
-  getJobData
+  getJobData,
+  saveAppliedJob,
+  followAndUnfollow
 };

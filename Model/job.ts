@@ -42,14 +42,6 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // salaryFrom: {
-  //     type : String,
-  //     required : true
-  // },
-  // salaryTo :  {
-  //     type : String,
-  //     required : true
-  // },
   createdAt: {
     type: Date,
     required: true,
@@ -58,6 +50,10 @@ const jobSchema = new mongoose.Schema({
     type: ObjectId,
     required: true,
   },
+  appliedUsers :{
+    type : [String],
+    required : false
+  }
 });
 
 const Job = mongoose.model("Job", jobSchema);
