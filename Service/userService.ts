@@ -23,7 +23,9 @@ const createNewUser = async (user: ReqBody) => {
     user.password = hashedPassword;
     const checkExistingUsers = await userRepository.findUser(user.email);
     if (checkExistingUsers) return { message: "exists" };
-    await User.create(user);
+    // await User.create(user);
+    const newUser = new User(user)
+    await newUser.save()
     return { message: "User created" };
   } catch (error) {
     return { message: "User not created" };
@@ -136,9 +138,11 @@ interface userData {
 
 }
 
-const updateUser = async (data: userData) => {
+const updateUser = async (data: userData,userEmail : string) => {
   try {
-    const updateUser = await userRepository.updateUser(data);
+    const updateUser = await userRepository.updateUser(data,userEmail);
+    console.log(updateUser,'updated ---result');
+    
     if (updateUser?.message) return { message: "success" };
     else return { message: "failed" };
   } catch (error) {
@@ -216,8 +220,8 @@ const getJobData = async (id: string) => {
   }
 };
 interface appliedJobBody {
-  jobObjectId: string;
-  hrObjectId: string;
+  jobId: string;
+  hrId: string;
   appliedAt: Date;
   userId?: string;
   userEmail : string;
@@ -227,7 +231,9 @@ const saveAppliedJob = async (body: appliedJobBody) => {
     console.log(body,'bodyyyyy');
     const newJob = new appliedJobs(body);
     newJob.save();
-    await userRepository.addUserEmailInJobPost(body.userEmail,body.jobObjectId)
+   const x = await userRepository.addUserEmailInJobPost(body.userEmail,body.jobId)
+   console.log(x,'xxx');
+   
     return {message : 'success'}
   } catch (error) {
     console.log(error, "error happened in saving applied jobs at service");

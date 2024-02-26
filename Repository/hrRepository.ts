@@ -130,6 +130,14 @@ const findSelectedJobData = async (jobId: string) => {
           as: "userData",
         },
       },
+      {
+        $lookup: {
+          from: "jobs",
+          localField: "jobId",
+          foreignField: "_id",
+          as: "jobPostData",
+        },
+      },
     ]);
   } catch (error) {
     console.log(error, "error happened in fetching job data at repo");

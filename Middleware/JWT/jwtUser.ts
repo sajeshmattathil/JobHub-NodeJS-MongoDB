@@ -52,6 +52,7 @@ const verifyToken = (
     next();
   } catch (error) {
     console.error("error happend in verifying user token and role");
+    res.status(400).json({status :400,message :'Error happend in verifying user'})
   }
 };
 export default {

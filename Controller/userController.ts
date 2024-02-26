@@ -178,8 +178,8 @@ const getUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   try {
     console.log(req.body, "req.body update");
-
-    const updateUser = await userService.updateUser(req.body);
+const userEmail = (req as any).userEmail
+    const updateUser = await userService.updateUser(req.body,userEmail);
 
     if (updateUser?.message === "success")
       res.status(201).json({ status: 201 });
@@ -270,9 +270,11 @@ const saveAppliedJob = async (req: Request, res: Response) => {
     const updatedBody = { ...req.body, userId: _id,userEmail :userEmail };
     const response = await userService.saveAppliedJob(updatedBody);
     console.log(response,'response--- appliedjobs');
-    
+    if(response.message === 'success') res.json({status : 201})
+    else res.json({status : 400})
   } catch (error) {
     console.log(error, "error in saving applied job at controller");
+    res.json({status : 500})
   }
 };
 

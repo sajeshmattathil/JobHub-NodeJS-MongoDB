@@ -66,13 +66,14 @@ interface userData {
   educationalQualification : string;
 }
 
-const updateUser = async (data: userData) => {
+const updateUser = async (data: userData ,userEmail : string) => {
   try {
+    console.log(data,'newUserData----');
+    
     await User.updateOne(
-      { email: data.email },
+      { email: userEmail },
       {
         $set: {
-          email: data.email,
           fname: data.fname,
           lname: data.lname,
           resume: data.resume,
@@ -149,9 +150,11 @@ const getJobData = async (id: string) => {
   }
 };
 
-const addUserEmailInJobPost = async (userEmail : string,jobObjectId : string)=>{
+const addUserEmailInJobPost = async (userEmail : string,jobId : string)=>{
    try {
-      return await Job.updateOne({_id : jobObjectId },{$push:{appliedUsers :userEmail}})
+    console.log(userEmail,jobId);
+    
+      return await Job.updateOne({_id : jobId },{$push:{appliedUsers :userEmail}})
    } catch (error) {
       console.log(error,'error in updating user email in job post at repo');
       return
