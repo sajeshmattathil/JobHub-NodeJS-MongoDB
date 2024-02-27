@@ -14,7 +14,23 @@ const appliedJobsSchema = new mongoose.Schema({
         type: ObjectId,
         required: true,
       },
-      appliedAt : Date
+      appliedAt : Date,
+      isDeleted : {
+        type : Boolean,
+        default : false
+      },
+      isHRViewed : {
+        type : Boolean,
+        default : false
+      },
+      isShortlisted : {
+        type : Boolean,
+        default : false
+      },
+      isReplayed : {
+        type : Boolean,
+        default : false
+      },
 })
 
 const appliedJobs = mongoose.model("appliedJobs",appliedJobsSchema)

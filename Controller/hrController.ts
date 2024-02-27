@@ -85,9 +85,9 @@ const hrLogin = async (req: Request, res: Response) => {
       res.status(201).json({ status: 201, token: token });
     }
     if (response?.message === "declained")
-      res.status(400).json({ status: 400 });
-    if (response?.message == "no user found")
       res.status(401).json({ status: 401 });
+    if (response?.message == "no user found")
+      res.status(400).json({ status: 400 });
     if (response?.message === "") res.status(500).json({ status: 500 });
   } catch (error) {
     console.log("login failed ");
@@ -128,13 +128,11 @@ const getJobs = async (req: Request, res: Response) => {
     // console.log(response,'resoponsejobs');
 
     if (response?.message === "")
-      res
-        .status(201)
-        .json({
-          status: 201,
-          jobs: response?.data,
-          totalPages: response?.totalPages,
-        });
+      res.status(201).json({
+        status: 201,
+        jobs: response?.data,
+        totalPages: response?.totalPages,
+      });
     if (response?.message === "No jobs found")
       res.status(400).json({ status: 400, jobs: "", totalPages: null });
     if (response?.message === "error")
@@ -178,6 +176,7 @@ const getJobDetails = async (req: Request, res: Response) => {
   try {
     const jobId = req.params.id;
     const response = await hrService.getJobDetails(jobId);
+
     if (response.message == "success")
       res.json({ status: 201, jobData: response?.data });
     else res.json({ status: 400, jobData: null });
@@ -186,9 +185,45 @@ const getJobDetails = async (req: Request, res: Response) => {
       error,
       "error happened in fetching job details at hr controller"
     );
-    res.json({status : 500,jobData : null })
+    res.json({ status: 500, jobData: null });
   }
 };
+
+const deleteJob = async (req: Request, res: Response) => {
+  try {
+    const jobId = req.params.id;
+    const response = await hrService.deleteJob(jobId);
+    console.log(response, "response=== delete");
+    if (response.message === "success") res.status(201).json({status:201});
+    else res.status(400);
+  } catch (error) {
+    console.log(error, "error happened in deleting job at hr controller");
+    res.status(500)
+  }
+};
+
+const updateJob = async (req: Request, res: Response)=>{
+  try {
+    const response = await hrService.updateJob(req.body)
+    if( response && response.message === 'success') res.json({status : 201})
+    else res.json({status : 400})
+  } catch (error) {
+    console.log(error, "error happened in updating job at hr controller");
+    res.json({status : 500})
+  }
+}
+
+const updateJobpostHRViewed = async (req: Request, res: Response)=>{
+  try {
+    const jobId = req.params.id
+    const response = await hrService.updateJobpostHRViewed(jobId)
+    console.log(response,'res---hr viewed');
+    
+  } catch (error) {
+    console.log(error, "error happened in updating job hr viewed at hr controller");
+    
+  }
+}
 export default {
   hrSignup,
   verifyOtp,
@@ -198,4 +233,7 @@ export default {
   getHR,
   updateProfile,
   getJobDetails,
+  deleteJob,
+  updateJob,
+  updateJobpostHRViewed
 };

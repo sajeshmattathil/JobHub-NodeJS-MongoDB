@@ -72,7 +72,7 @@ const getJobsData = async (
   try {
     console.log(pageNumber, jobsPerPage, "repo ");
 
-    return await Job.find({ hrObjectId: id })
+    return await Job.find({ hrObjectId: id, isDeleted: false })
       .sort({ createdAt: -1 })
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
@@ -121,7 +121,7 @@ const findSelectedJobData = async (jobId: string) => {
   try {
     console.log(jobId, "id");
     return await appliedJobs.aggregate([
-      { $match: { jobId: new ObjectId("65d2eb83a0a5f995c8369cd4") } },
+      { $match: { jobId: new ObjectId(jobId), isDeleted: false } },
       {
         $lookup: {
           from: "users",
@@ -144,6 +144,72 @@ const findSelectedJobData = async (jobId: string) => {
     return;
   }
 };
+const deleteJob = async (jobId: string) => {
+  try {
+    const appliedJobUpdate = await appliedJobs.updateOne(
+      { jobId: jobId },
+      { $set: { isDeleted: true } }
+    );
+    const jobUpdate = await Job.updateOne(
+      { _id: jobId },
+      { $set: { isDeleted: true } }
+    );
+    return { appliedJobUpdate, jobUpdate };
+  } catch (error) {
+    console.log(error, "error happened in deleting job at repo");
+  }
+};
+interface jobData {
+  jobId?: ObjectId | undefined;
+  jobRole: string;
+  description: string;
+  qualification: string[];
+  salaryFrom: string;
+  salaryTo: string;
+  company: string;
+  experience: string;
+  salaryScale: string;
+  educationalQualification: string;
+  education: string;
+  course: string;
+  industry: string;
+  locations : String[] ;
+
+}
+const updateJob = async (body: jobData) => {
+  try {
+    const updateJob = await Job.updateOne(
+      { _id: body.jobId },
+      {
+        $set: {
+          description: body.description,
+          qualification: body.qualification,
+          company: body.company,
+          experience: body.experience,
+          salaryScale: body.salaryScale,
+          educationalQualification: body.educationalQualification,
+          industry: body.industry,
+          locations :body.locations,
+        },
+      }
+    );
+    if(updateJob) return {message : 'success'}
+    else return {message : 'failed'}
+  } catch (error) {
+    console.log(error, "error happened in updating job at repo");
+    return {message : 'failed'}
+  }
+};
+
+const updateJobpostHRViewed = async (jobId : string)=>{
+  try {
+    return await appliedJobs.updateOne({jobId : jobId },{$set:{isHRViewed : true}})
+  } catch (error) {
+    console.log(error, "error happened in updating job hr viewed at repo");
+    
+  }
+}
+
 export default {
   findHr,
   findHrById,
@@ -154,4 +220,7 @@ export default {
   getJobsData,
   updateProfile,
   findSelectedJobData,
+  deleteJob,
+  updateJob,
+  updateJobpostHRViewed
 };

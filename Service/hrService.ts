@@ -76,29 +76,29 @@ const verifyHrData = async (data: hrLoginData) => {
         verifyHrData.password
       );
       if (decryptedPassword) return { message: "verified", data: verifyHrData };
-      else return { message: "declained ", data: null };
+      else return { message: "declained", data: null };
     } else return { message: "no user found", data: null };
   } catch (error) {
     return { message: "", data: null };
   }
 };
 interface jobData {
+  jobId ?: ObjectId |undefined ;
   jobRole: string;
   description: string;
-  qualification: string;
+  qualification: string[];
   salaryFrom: string;
   salaryTo: string;
   company: string;
   createdBy: string;
-  experience : string;
+  experience: string;
   hrObjectId: ObjectId;
-  salaryScale : string;
-  educationalQualification : string;
-  education : string;
-  course : string;
-  industry : string;
-
-
+  salaryScale: string;
+  educationalQualification: string;
+  education: string;
+  course: string;
+  industry: string;
+  locations : String[]
 }
 
 const saveJob = async (data: jobData) => {
@@ -146,15 +146,13 @@ const getJobsData = async (
 const getHR = async (id: string) => {
   try {
     const getHR = await hrRepository.findHr(id);
-    if (getHR && getHR?.password !== undefined){
-    getHR.password = ''
+    if (getHR && getHR?.password !== undefined) {
+      getHR.password = "";
       return {
         data: getHR,
         message: "success",
       };
-    }
-    
-    else
+    } else
       return {
         data: null,
         message: "Not found",
@@ -168,37 +166,70 @@ const getHR = async (id: string) => {
 };
 
 interface bodyData {
-    name : string,
-    company : string;
-    website : string;
-  resume : string;
-  employeesNumber : number;
-  experience : number;
-  email : string;
-  
+  name: string;
+  company: string;
+  website: string;
+  resume: string;
+  employeesNumber: number;
+  experience: number;
+  email: string;
 }
 
-const updateProfile = async (HRData : bodyData)=>{
+const updateProfile = async (HRData: bodyData) => {
   try {
-    const updateUser = await hrRepository.updateProfile(HRData)
-   if (updateUser?.message) return {message : 'success'}
-   else return { message : 'failed'}
-    
+    const updateUser = await hrRepository.updateProfile(HRData);
+    if (updateUser?.message) return { message: "success" };
+    else return { message: "failed" };
   } catch (error) {
-    console.log('error in updating profile at userservice');
+    console.log("error in updating profile at userservice");
+  }
+};
+
+const getJobDetails = async (jobId: string) => {
+  try {
+    const getData : any = await hrRepository.findSelectedJobData(jobId);
+    console.log(getData, "getdata-----");
+
+    if ( getData && getData.length) return { message: "success", data: getData };
+    else return { messag: "failed", data: null };
+  } catch (error) {
+    console.log(error, "error happened in fetching job data at hr service");
+    return { message: "failed", data: null };
+  }
+};
+
+const deleteJob = async (jobId : string)=>{
+  try {
+    const deleteJobData = await hrRepository.deleteJob(jobId)
+    console.log(deleteJobData,'deletjondata----');
+    return {message : 'success'}
+  } catch (error) { 
+    console.log(error,'error happened in deleting job in hr service');
+    return {message : 'failed'}
     
   }
 }
 
-const getJobDetails = async (jobId : string)=>{
+const updateJob = async (body : jobData)=>{
   try {
-    const getData = await hrRepository.findSelectedJobData(jobId)
-    console.log(getData,'getdata-----');
+    const updatedResult = await hrRepository.updateJob(body)
+    console.log(updatedResult,'result-----');
+    if(updatedResult.message == 'success') return {message : 'success'}
+    else return {message : 'failed'}
     
-    return {message : 'success',data : getData}
   } catch (error) {
-    console.log(error,'error happened in fetching job data at hr service');
-    return {message : 'failed',data : null}
+    console.log(error,'error happened in updating job in hr service');
+  }
+}
+
+const updateJobpostHRViewed = async (jobId : string)=>{
+  try {
+    const updateHRViewed = await hrRepository.updateJobpostHRViewed(jobId)
+    console.log(updateHRViewed,'updtate job service');
+    
+  } catch (error) {
+    console.log(error,'error happened in updating job hr viewed in hr service');
+    
   }
 }
 export default {
@@ -212,4 +243,7 @@ export default {
   getHR,
   updateProfile,
   getJobDetails,
+  deleteJob,
+  updateJob,
+  updateJobpostHRViewed
 };

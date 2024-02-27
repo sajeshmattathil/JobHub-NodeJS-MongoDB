@@ -266,11 +266,10 @@ const saveAppliedJob = async (req: Request, res: Response) => {
   try {
     const _id = (req as any).userId 
     const userEmail = (req as any).userEmail 
-    console.log(req.body);
     const updatedBody = { ...req.body, userId: _id,userEmail :userEmail };
     const response = await userService.saveAppliedJob(updatedBody);
     console.log(response,'response--- appliedjobs');
-    if(response.message === 'success') res.json({status : 201})
+    if(response.message === 'success') res.json({status : 201,appliedJob : response.appliedJob})
     else res.json({status : 400})
   } catch (error) {
     console.log(error, "error in saving applied job at controller");

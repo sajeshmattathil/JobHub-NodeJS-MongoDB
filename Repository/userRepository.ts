@@ -92,7 +92,7 @@ const updateUser = async (data: userData ,userEmail : string) => {
 
 const getJobs = async (pageNumber: number, jobsPerPage: number) => {
   try {
-    return await Job.find()
+    return await Job.find({isDeleted : false})
       .sort({ createdAt: -1 })
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
@@ -141,7 +141,15 @@ const getJobData = async (id: string) => {
            foreignField: '_id',
            as: 'jobData'
          }
-       }
+       },
+       {
+        $lookup: {
+          from: 'appliedjobs',
+          localField: '_id',
+          foreignField: 'jobId',
+          as: 'appliedData'
+        }
+      }
    ]);
 
    

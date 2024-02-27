@@ -50,10 +50,14 @@ const jobSchema = new mongoose.Schema({
     type: ObjectId,
     required: true,
   },
-  appliedUsers :{
-    type : [String],
-    required : false
-  }
+  appliedUsers: {
+    type: [String],
+    required: false,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Job = mongoose.model("Job", jobSchema);

@@ -234,10 +234,10 @@ const saveAppliedJob = async (body: appliedJobBody) => {
    const x = await userRepository.addUserEmailInJobPost(body.userEmail,body.jobId)
    console.log(x,'xxx');
    
-    return {message : 'success'}
+    return {message : 'success',appliedJob : newJob}
   } catch (error) {
     console.log(error, "error happened in saving applied jobs at service");
-    return {message : 'failed'}
+    return {message : 'failed',appliedJob : null}
   }
 };
 const followAndUnfollow = async (HRId : string,value : string,userEmail : string)=>{
