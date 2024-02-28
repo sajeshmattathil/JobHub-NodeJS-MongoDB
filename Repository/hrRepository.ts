@@ -201,9 +201,11 @@ const updateJob = async (body: jobData) => {
   }
 };
 
-const updateJobpostHRViewed = async (jobId : string)=>{
+const updateJobpostHRViewed = async (jobId : string , HRId : string)=>{
   try {
-    return await appliedJobs.updateOne({jobId : jobId },{$set:{isHRViewed : true}})
+    console.log(jobId,HRId,'job id---->');
+    
+    return await appliedJobs.updateOne({jobId : jobId  ,hrId : HRId},{$set:{isHRViewed : true}})
   } catch (error) {
     console.log(error, "error happened in updating job hr viewed at repo");
     

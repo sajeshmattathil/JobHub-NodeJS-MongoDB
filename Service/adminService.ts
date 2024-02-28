@@ -1,111 +1,149 @@
-import bcrypt from 'bcrypt'
-import { ObjectId } from 'mongodb'
-import adminRepository from '../Repository/adminRepository'
-try{
-
-}catch(error){
-
-}
+import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
+import adminRepository from "../Repository/adminRepository";
+try {
+} catch (error) {}
 
 interface loginBody {
-    email : string,
-    password : string,
+  email: string;
+  password: string;
 }
 
 interface adminDetailsInterface {
-    _id : ObjectId,
-    email : string ,
-    password : string
- }
-
-const verifyLoginAdmin =async (body : loginBody)=>{
-    try{
-        const adminDetails : adminDetailsInterface | undefined | null = await adminRepository.findAdmin(body.email)
-    
-        if(adminDetails !== undefined  && adminDetails !== null){
-   
-         const comparePsw =await bcrypt.compare(body.password, adminDetails.password)
-   console.log(comparePsw,'companre');
-   
-             if(adminDetails && comparePsw ) return {adminData : adminDetails.email, message : "Admin verified"}
-             else return { adminData : null , message : 'Password is incorrect'}
-        }
-       else{
-         return { adminData : null ,message : 'No user is found in this email' }
-       } 
-        
-     }catch(error){
-       console.log(error);
-       return { adminData: null, message : 'Something went wrong ' }
-     }
+  _id: ObjectId;
+  email: string;
+  password: string;
 }
 
-const getAllUsers = async ()=>{
+const verifyLoginAdmin = async (body: loginBody) => {
   try {
-    const getAllUsers = await adminRepository.getAllUsers()
-    if(getAllUsers) return getAllUsers
-  } catch (error) {
-    console.log('Users data is not found');
-    return
-  }
-}
+    const adminDetails: adminDetailsInterface | undefined | null =
+      await adminRepository.findAdmin(body.email);
 
-const blockUblockUser = async(email : string,isBlocked : boolean)=>{
-  try {
-     const blockUblockUser = await adminRepository.blockUblockUser(email,isBlocked)
-     console.log(blockUblockUser,'blockUblockUser') 
-     if(blockUblockUser) return {message : true}
-     else return {message : null}
-  } catch (error) {
-    console.log('Error in block n unblock',error);
-    return {message : null}
-  }
-}
-const getHiringManagers = async ()=>{
-  try {
-    const getHiringManagers = await adminRepository.getHiringManagers()
-   if(getHiringManagers !== undefined ){
-    if(getHiringManagers.length) return {
-      message : 'success',
-      data : getHiringManagers
+    if (adminDetails !== undefined && adminDetails !== null) {
+      const comparePsw = await bcrypt.compare(
+        body.password,
+        adminDetails.password
+      );
+      console.log(comparePsw, "companre");
+
+      if (adminDetails && comparePsw)
+        return { adminData: adminDetails.email, message: "Admin verified" };
+      else return { adminData: null, message: "Password is incorrect" };
+    } else {
+      return { adminData: null, message: "No user is found in this email" };
     }
-   }
-   else{
-    return {message : 'failed',
-            data : null
-  }
-   }
   } catch (error) {
-    console.log('error happened in fetching hiring managers data in adminService'); 
+    console.log(error);
+    return { adminData: null, message: "Something went wrong " };
   }
-}
-const blockUnblockHR = async (email : string,isBlocked : boolean)=>{
+};
+
+const getAllUsers = async () => {
   try {
-    const blockUblockHR = await adminRepository.blockUblockHR(email,isBlocked)
-    console.log(blockUblockHR,'blockUblockUser') 
-    if(blockUblockHR) return {message : true}
-    else return {message : null}
- } catch (error) {
-   console.log('Error in block n unblock',error);
-   return {message : null}
- }
-}
-const hrApprove = async (email : string)=>{
+    const getAllUsers = await adminRepository.getAllUsers();
+    if (getAllUsers) return getAllUsers;
+  } catch (error) {
+    console.log("Users data is not found");
+    return;
+  }
+};
+
+const blockUblockUser = async (email: string, isBlocked: boolean) => {
   try {
-    const hrApprove = await adminRepository.hrApprove(email)
-    console.log(hrApprove,'hrApprove') 
-    if(hrApprove) return {message : true}
-    else return {message : null}
- } catch (error) {
-   console.log('Error in hrApprove',error);
-   return {message : null}
- }
-}
+    const blockUblockUser = await adminRepository.blockUblockUser(
+      email,
+      isBlocked
+    );
+    console.log(blockUblockUser, "blockUblockUser");
+    if (blockUblockUser) return { message: true };
+    else return { message: null };
+  } catch (error) {
+    console.log("Error in block n unblock", error);
+    return { message: null };
+  }
+};
+const getHiringManagers = async (pageNumber: number, HRsPerPage: number) => {
+  try {
+    const HRCount = await adminRepository.HRCount();
+    console.log(HRCount, "jobCount1");
+    const getHiringManagers = await adminRepository.getHiringManagers(
+      pageNumber,
+      HRsPerPage
+    );
+    if (getHiringManagers !== undefined) {
+      if (getHiringManagers.length)
+        return {
+          message: "success",
+          data: getHiringManagers,
+          totalPages: HRCount,
+        };
+    } else {
+      return { message: "failed", data: null, totalPages: null };
+    }
+  } catch (error) {
+    console.log(
+      "error happened in fetching hiring managers data in adminService"
+    );
+  }
+};
+
+const getHiringManagersApproved = async (
+  pageNumber: number,
+  HRsPerPage: number
+) => {
+  try {
+    const HRCount = await adminRepository.HRCountApproved();
+    console.log(HRCount, "jobCount2");
+    const getHiringManagers = await adminRepository.getHiringManagersApproved(
+      pageNumber,
+      HRsPerPage
+    );
+    if (getHiringManagers !== undefined) {
+      if (getHiringManagers.length)
+        return {
+          message: "success",
+          data: getHiringManagers,
+          totalPages: HRCount,
+        };
+    } else {
+      return { message: "failed", data: null, totalPages: null };
+    }
+  } catch (error) {
+    console.log(
+      "error happened in fetching hiring managers data in adminService"
+    );
+  }
+};
+
+const blockUnblockHR = async (email: string, isBlocked: boolean) => {
+  try {
+    const blockUblockHR = await adminRepository.blockUblockHR(email, isBlocked);
+    console.log(blockUblockHR, "blockUblockUser");
+    if (blockUblockHR) return { message: true };
+    else return { message: null };
+  } catch (error) {
+    console.log("Error in block n unblock", error);
+    return { message: null };
+  }
+};
+const hrApprove = async (email: string) => {
+  try {
+    const hrApprove = await adminRepository.hrApprove(email);
+    console.log(hrApprove, "hrApprove");
+    if (hrApprove) return { message: true };
+    else return { message: null };
+  } catch (error) {
+    console.log("Error in hrApprove", error);
+    return { message: null };
+  }
+};
 export default {
-    verifyLoginAdmin,
-    getAllUsers,
-    blockUblockUser,
-    getHiringManagers,
-    blockUnblockHR,
-    hrApprove
-}
+  verifyLoginAdmin,
+  getAllUsers,
+  blockUblockUser,
+  getHiringManagers,
+  getHiringManagersApproved,
+  blockUnblockHR,
+  hrApprove,
+};

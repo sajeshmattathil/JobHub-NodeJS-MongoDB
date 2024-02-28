@@ -22,9 +22,16 @@ const createNewUser = async (user: ReqBody) => {
     const hashedPassword = await bcrypt.hash(user.password, 5);
     user.password = hashedPassword;
     const checkExistingUsers = await userRepository.findUser(user.email);
-    if (checkExistingUsers) return { message: "exists" };
+    console.log(checkExistingUsers);
+    
+    if (checkExistingUsers?.isVerified ) return { message: "exists" };
+    if (!checkExistingUsers?.isVerified ) return { message: "user data exists ,not verified" };
+
+  
     // await User.create(user);
     const newUser = new User(user)
+    console.log('user data saved');
+    
     await newUser.save()
     return { message: "User created" };
   } catch (error) {
@@ -59,7 +66,10 @@ const saveOtp = async (data: otp) => {
     }
 
     return { message: "failed" };
-  } catch (error) {}
+  } catch (error) {
+    console.log(error,'error saving otp');
+    
+  }
 };
 
 const getSavedOtp = async (userID: string) => {

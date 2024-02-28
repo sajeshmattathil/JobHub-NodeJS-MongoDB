@@ -222,14 +222,15 @@ const updateJob = async (body : jobData)=>{
   }
 }
 
-const updateJobpostHRViewed = async (jobId : string)=>{
+const updateJobpostHRViewed = async (jobId : string ,HRId : string)=>{
   try {
-    const updateHRViewed = await hrRepository.updateJobpostHRViewed(jobId)
+    const updateHRViewed = await hrRepository.updateJobpostHRViewed(jobId,HRId)
     console.log(updateHRViewed,'updtate job service');
+    return {message : 'success'}
     
   } catch (error) {
     console.log(error,'error happened in updating job hr viewed in hr service');
-    
+    return {message : 'failed'}
   }
 }
 export default {

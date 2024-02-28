@@ -15,7 +15,7 @@ const findAdmin = async (email : string) =>{
 }
 const getAllUsers = async ()=>{
     try {
-        return await User.find({})
+        return await User.find({isVerified : true})
     } catch (error) {
         console.log('Data of all users not found');
         return
@@ -30,13 +30,41 @@ const blockUblockUser = async (email : string ,isBlocked : boolean)=>{
         
     }
 }
-const getHiringManagers = async ()=>{
+const getHiringManagers = async (pageNumber: number, HRsPerPage: number)=>{
     try {
-        return await Hr.find({})
+        return await Hr.find({isApproved : false})
+        .skip(HRsPerPage * (pageNumber - 1))
+        .limit(HRsPerPage);
     } catch (error) {
         console.log('error happend in fetching hiringmanagers data in repo ');
     }
 }
+
+const HRCount = async () => {
+    try {
+      return await Hr.countDocuments({isApproved : false});
+    } catch (error) {
+      console.error("error happened in fetching job count in userrepo");
+    }
+  };
+  const getHiringManagersApproved = async (pageNumber: number, HRsPerPage: number)=>{
+    try {
+        return await Hr.find({isApproved : true})
+        .skip(HRsPerPage * (pageNumber - 1))
+        .limit(HRsPerPage);
+    } catch (error) {
+        console.log('error happend in fetching hiringmanagers data in repo ');
+    }
+}
+
+const HRCountApproved = async () => {
+    try {
+      return await Hr.countDocuments({isApproved : true});
+    } catch (error) {
+      console.error("error happened in fetching job count in userrepo");
+    }
+  };
+
 const blockUblockHR = async (email : string ,isBlocked : boolean)=>{
     try {
         return await Hr.updateOne({email : email},{$set : {isBlocked : !isBlocked}})
@@ -57,6 +85,9 @@ export default {
     getAllUsers,
     blockUblockUser,
     getHiringManagers,
+    getHiringManagersApproved,
     blockUblockHR,
-    hrApprove
+    hrApprove,
+    HRCountApproved,
+    HRCount
 }

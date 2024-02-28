@@ -80,8 +80,8 @@ const hrLogin = async (req: Request, res: Response) => {
     const response = await hrService.verifyHrData(req.body);
     console.log(response, "response");
 
-    if (response?.message === "verified") {
-      const token = jwtHR.generateToken(req.body.email);
+    if ( response.data && response?.message === "verified") {
+      const token = jwtHR.generateToken(req.body.email,response.data._id);
       res.status(201).json({ status: 201, token: token });
     }
     if (response?.message === "declained")
@@ -216,12 +216,14 @@ const updateJob = async (req: Request, res: Response)=>{
 const updateJobpostHRViewed = async (req: Request, res: Response)=>{
   try {
     const jobId = req.params.id
-    const response = await hrService.updateJobpostHRViewed(jobId)
+    const HRId = (req as any)._id
+    console.log(HRId,'id---->');
+    
+    const response = await hrService.updateJobpostHRViewed(jobId,HRId)
     console.log(response,'res---hr viewed');
     
   } catch (error) {
     console.log(error, "error happened in updating job hr viewed at hr controller");
-    
   }
 }
 export default {

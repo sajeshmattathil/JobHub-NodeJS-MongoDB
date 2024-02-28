@@ -31,7 +31,7 @@ const signupSubmit = async (
     const newUser = await userService.createNewUser(req.body);
     console.log(newUser, "$$$$");
 
-    if (newUser?.message == "User created") {
+    if (newUser?.message == "User created"  || newUser?.message == "user data exists ,not verified") {
       res
         .status(201)
         .json({ status: 201, message: "User created successfully" });
@@ -184,7 +184,10 @@ const userEmail = (req as any).userEmail
     if (updateUser?.message === "success")
       res.status(201).json({ status: 201 });
     else res.status(400).json({ status: 400 });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error,'erro in updating user data at controller');
+    
+  }
 };
 
 const getJobs = async (req: Request, res: Response) => {

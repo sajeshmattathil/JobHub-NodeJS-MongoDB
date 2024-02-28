@@ -81,18 +81,55 @@ const blockUnblockUser = async (req : Request<{}, {}, blockunblock>,res : Respon
 }
 const hiringManagers = async (req : Request,res : Response )=>{
    try {
-      const response = await adminService.getHiringManagers()
+      const pageNumber: string | number = req.query.page as string;
+      const HRsPerPage: string | number = req.query.jobsPerPage as string;
+  
+      const response = await adminService.getHiringManagers(
+         Number(pageNumber),
+         Number(HRsPerPage)
+      )
      console.log(response,'hrs response controller');
      
       if(response !== undefined){
          if(response.message === 'success'){
-            res.status(201).json({status : 201,HRData : response?.data})
+            res.status(201).json({status : 201,
+               HRData : response?.data,
+          totalJobs: response.totalPages,
+            
+            })
             }
-            else res.status(404).json({status : 404,HRData : null})
+            else res.status(404).json({status : 404,HRData : null, totalJobs:null})
       }
    } catch (error) {
       console.log('error happened in fetching HR data in admincontroller');
-      res.status(500).json({status : 500 ,HRData : null})
+      res.status(500).json({status : 500 ,HRData : null,totalJobs:null})
+   }
+}
+
+const hiringmanagersApproved = async (req : Request,res : Response )=>{
+   try {
+      const pageNumber: string | number = req.query.page as string;
+      const HRsPerPage: string | number = req.query.jobsPerPage as string;
+  
+      const response = await adminService.getHiringManagersApproved(
+         Number(pageNumber),
+         Number(HRsPerPage)
+      )
+     console.log(response,'hrs response controller');
+     
+      if(response !== undefined){
+         if(response.message === 'success'){
+            res.status(201).json({status : 201,
+               HRData : response?.data,
+          totalJobs: response.totalPages,
+            
+            })
+            }
+            else res.status(404).json({status : 404,HRData : null, totalJobs:null})
+      }
+   } catch (error) {
+      console.log('error happened in fetching HR data in admincontroller');
+      res.status(500).json({status : 500 ,HRData : null,totalJobs:null})
    }
 }
 const blockUnblockHR = async (req : Request,res : Response)=>{
@@ -132,6 +169,7 @@ export default {
     getAllUsers,
     blockUnblockUser,
     hiringManagers,
+    hiringmanagersApproved,
     blockUnblockHR,
     hrApprove
 }

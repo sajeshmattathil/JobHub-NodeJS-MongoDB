@@ -1,18 +1,18 @@
 import express from 'express'
 const router = express.Router()
 import hrController from '../Controller/hrController'
+import jwtHR from '../Middleware/JWT/jwtHR'
 
 router.post('/signup_submit',hrController.hrSignup)
 router.post('/verifyOtp',hrController.verifyOtp)
 router.post('/login_submit',hrController.hrLogin)
-router.post('/createJOb',hrController.createJOb)
-router.get('/getJobs/:id',hrController.getJobs)
-router.get('/getHR/:id',hrController.getHR)
-router.post('/update/:id',hrController.updateProfile)
-router.get('/getJobDetails/:id',hrController.getJobDetails)
-router.delete('/deleteJob/:id',hrController.deleteJob)updateJobpost
-router.post('/updateJob',hrController.updateJob)
-router.patch('/updateJobpostHRViewed/:id',hrController.updateJobpostHRViewed)
-
+router.post('/createJOb',jwtHR.verifyToken,hrController.createJOb)
+router.get('/getJobs/:id',jwtHR.verifyToken,hrController.getJobs)
+router.get('/getHR/:id',jwtHR.verifyToken,hrController.getHR)
+router.post('/update/:id',jwtHR.verifyToken,hrController.updateProfile)
+router.get('/getJobDetails/:id',jwtHR.verifyToken,hrController.getJobDetails)
+router.delete('/deleteJob/:id',jwtHR.verifyToken,hrController.deleteJob)
+router.post('/updateJob',jwtHR.verifyToken,hrController.updateJob)
+router.patch('/updateJobpostHRViewed/:id',jwtHR.verifyToken,hrController.updateJobpostHRViewed)
 
 export default router

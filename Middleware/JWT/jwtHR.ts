@@ -1,11 +1,12 @@
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken'
 import { Request,Response, NextFunction } from 'express';
+import { ObjectId } from 'mongodb';
 
 
-const generateToken = (email : string) => {
+const generateToken = (email : string, _id : ObjectId) => {
 
     try {
-        const token = jwt.sign({ HRId: email }, process.env.HR_SECRET_KEY as string,{ expiresIn: '24h' });
+        const token = jwt.sign({ HRId: email ,_id : _id}, process.env.HR_SECRET_KEY as string,{ expiresIn: '24h' });
   return token
     } catch (error) {
     console.error('error happen in generating HR token');
@@ -16,6 +17,7 @@ const generateToken = (email : string) => {
 };
 
 interface AuthenticatedRequest extends Request {
+  _id?: ObjectId;
   HRId?: string; 
 }
 const verifyToken = (req : AuthenticatedRequest, res : Response , next : NextFunction)  => {
@@ -36,6 +38,7 @@ let token: string | null = null
 const decodedPayload = jwt.verify(token, process.env.HR_SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.userId,'User id');
 req.HRId = decodedPayload.HRId
+req._id = decodedPayload._id
 console.log('Access granted');
 
 next()
