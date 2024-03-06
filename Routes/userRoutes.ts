@@ -16,5 +16,7 @@ router.put('/resetPassword',userController.resetPassword)
 router.get('/getJobData/:id',userController.getJobData)
 router.post('/applyJob',jwtUser.verifyToken,userController.saveAppliedJob)
 router.patch('/followAndUnfollow',jwtUser.verifyToken,userController.followAndUnfollow)
+router.post('/downloadFile',jwtUser.verifyToken,userController.downloadFileFromChat)
+
 
 export default router

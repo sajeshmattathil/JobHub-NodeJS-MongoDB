@@ -3,7 +3,7 @@ import userService from "../Service/userService";
 import { ObjectId } from "mongodb";
 import sendOTPByEmail from "../Utils/mailer";
 import jwtUser from "../Middleware/JWT/jwtUser";
-
+import https from "https";
 try {
 } catch (error) {}
 
@@ -31,7 +31,10 @@ const signupSubmit = async (
     const newUser = await userService.createNewUser(req.body);
     console.log(newUser, "$$$$");
 
-    if (newUser?.message == "User created"  || newUser?.message == "user data exists ,not verified") {
+    if (
+      newUser?.message == "User created" ||
+      newUser?.message == "user data exists ,not verified"
+    ) {
       res
         .status(201)
         .json({ status: 201, message: "User created successfully" });
@@ -134,7 +137,6 @@ const loginSubmit = async (
     const verifyUser = await userService.verifyLoginUser(req.body);
 
     console.log(verifyUser.userData, "verify user");
-   
 
     if (verifyUser?.userData) {
       const token = jwtUser.generateToken(
@@ -179,15 +181,14 @@ const getUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   try {
     console.log(req.body, "req.body update");
-const userEmail = (req as any).userEmail
-    const updateUser = await userService.updateUser(req.body,userEmail);
+    const userEmail = (req as any).userEmail;
+    const updateUser = await userService.updateUser(req.body, userEmail);
 
     if (updateUser?.message === "success")
       res.status(201).json({ status: 201 });
     else res.status(400).json({ status: 400 });
   } catch (error) {
-    console.log(error,'erro in updating user data at controller');
-    
+    console.log(error, "erro in updating user data at controller");
   }
 };
 
@@ -203,13 +204,11 @@ const getJobs = async (req: Request, res: Response) => {
     console.log(getJobs, "jobs---controller");
 
     if (getJobs?.message === "success")
-      res
-        .status(201)
-        .json({
-          jobData: getJobs.data,
-          totalJobs: getJobs.totalPages,
-          status: 201,
-        });
+      res.status(201).json({
+        jobData: getJobs.data,
+        totalJobs: getJobs.totalPages,
+        status: 201,
+      });
     if (getJobs?.message === "failed")
       res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
     else res.status(204).json({ jobData: null, totalJobs: null, status: 204 });
@@ -268,35 +267,66 @@ const getJobData = async (req: Request, res: Response) => {
 
 const saveAppliedJob = async (req: Request, res: Response) => {
   try {
-    const _id = (req as any).userId 
-    const userEmail = (req as any).userEmail 
-    const updatedBody = { ...req.body, userId: _id,userEmail :userEmail };
+    const _id = (req as any).userId;
+    const userEmail = (req as any).userEmail;
+    const updatedBody = { ...req.body, userId: _id, userEmail: userEmail };
     const response = await userService.saveAppliedJob(updatedBody);
-    console.log(response,'response--- appliedjobs');
-    if(response.message === 'success') res.json({status : 201,appliedJob : response.appliedJob})
-    else res.json({status : 400})
+    console.log(response, "response--- appliedjobs");
+    if (response.message === "success")
+      res.json({ status: 201, appliedJob: response.appliedJob });
+    else res.json({ status: 400 });
   } catch (error) {
     console.log(error, "error in saving applied job at controller");
-    res.json({status : 500})
+    res.json({ status: 500 });
   }
 };
 
-const followAndUnfollow = async (req : Request,res:Response)=>{
+const followAndUnfollow = async (req: Request, res: Response) => {
   try {
-   
-    console.log(req.body,'value');
-    
-    const userEmail = (req as any).userEmail
-    const response = await userService.followAndUnfollow(req.body.HRId,req.body.value,userEmail)
-    console.log(response,'res---follow unfollow');
-    
-    if(response.message == 'success') res.status(200)
-    else res.status(400)
+    console.log(req.body, "value");
+
+    const userEmail = (req as any).userEmail;
+    const response = await userService.followAndUnfollow(
+      req.body.HRId,
+      req.body.value,
+      userEmail
+    );
+    console.log(response, "res---follow unfollow");
+
+    if (response.message == "success") res.status(200);
+    else res.status(400);
   } catch (error) {
-    console.log(error,'error in follow and unfollow hr at controller');
-    res.status(500)
+    console.log(error, "error in follow and unfollow hr at controller");
+    res.status(500);
   }
-}
+};
+const downloadFileFromChat = async (req: Request, res: Response) => {
+  try {
+    console.log(req.body, "body---->>>>");
+
+    const { url: pdfHttpLink, fileName } = req.body;
+
+    https
+      .get(pdfHttpLink, (pdfResponse) => {
+        console.log(fileName, "filename");
+
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${fileName}"`
+        );
+        res.setHeader("Content-Type", "application/pdf");
+
+        pdfResponse.pipe(res);
+      })
+      .on("error", (err) => {
+        console.error("Error downloading PDF:", err);
+        res.status(500).send("Error downloading PDF");
+      });
+  } catch (error) {
+    console.log(error, "error happened in download file at hr controller");
+    res.status(500).send("Internal Server Error");
+  }
+};
 export default {
   signupSubmit,
   verifyOtp,
@@ -309,5 +339,6 @@ export default {
   resetPassword,
   getJobData,
   saveAppliedJob,
-  followAndUnfollow
+  followAndUnfollow,
+  downloadFileFromChat,
 };

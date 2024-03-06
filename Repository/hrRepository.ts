@@ -173,8 +173,7 @@ interface jobData {
   education: string;
   course: string;
   industry: string;
-  locations : String[] ;
-
+  locations: String[];
 }
 const updateJob = async (body: jobData) => {
   try {
@@ -189,28 +188,43 @@ const updateJob = async (body: jobData) => {
           salaryScale: body.salaryScale,
           educationalQualification: body.educationalQualification,
           industry: body.industry,
-          locations :body.locations,
+          locations: body.locations,
         },
       }
     );
-    if(updateJob) return {message : 'success'}
-    else return {message : 'failed'}
+    if (updateJob) return { message: "success" };
+    else return { message: "failed" };
   } catch (error) {
     console.log(error, "error happened in updating job at repo");
-    return {message : 'failed'}
+    return { message: "failed" };
   }
 };
 
-const updateJobpostHRViewed = async (jobId : string , HRId : string)=>{
+const updateJobpostHRViewed = async (jobId: string, HRId: string) => {
   try {
-    console.log(jobId,HRId,'job id---->');
-    
-    return await appliedJobs.updateOne({jobId : jobId  ,hrId : HRId},{$set:{isHRViewed : true}})
+    console.log(jobId, HRId, "job id---->");
+
+    return await appliedJobs.updateOne(
+      { jobId: jobId, hrId: HRId },
+      { $set: { isHRViewed: true } }
+    );
   } catch (error) {
     console.log(error, "error happened in updating job hr viewed at repo");
-    
   }
-}
+};
+
+const updateIsShortListed = async (jobId: string, userId: string) => {
+  try {
+    return await Job.updateOne(
+      { _id: jobId, "appliedUsers.email": userId },
+      {
+        $set: { "appliedUsers.isShortListed": true },
+      }
+    );
+  } catch (error) {
+    console.log(error, "error happened in shortlisting user at repo");
+  }
+};
 
 export default {
   findHr,
@@ -224,5 +238,6 @@ export default {
   findSelectedJobData,
   deleteJob,
   updateJob,
-  updateJobpostHRViewed
+  updateJobpostHRViewed,
+  updateIsShortListed,
 };

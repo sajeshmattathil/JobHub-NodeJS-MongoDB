@@ -83,7 +83,7 @@ const verifyHrData = async (data: hrLoginData) => {
   }
 };
 interface jobData {
-  jobId ?: ObjectId |undefined ;
+  jobId?: ObjectId | undefined;
   jobRole: string;
   description: string;
   qualification: string[];
@@ -98,7 +98,7 @@ interface jobData {
   education: string;
   course: string;
   industry: string;
-  locations : String[]
+  locations: String[];
 }
 
 const saveJob = async (data: jobData) => {
@@ -187,10 +187,10 @@ const updateProfile = async (HRData: bodyData) => {
 
 const getJobDetails = async (jobId: string) => {
   try {
-    const getData : any = await hrRepository.findSelectedJobData(jobId);
+    const getData: any = await hrRepository.findSelectedJobData(jobId);
     console.log(getData, "getdata-----");
 
-    if ( getData && getData.length) return { message: "success", data: getData };
+    if (getData && getData.length) return { message: "success", data: getData };
     else return { messag: "failed", data: null };
   } catch (error) {
     console.log(error, "error happened in fetching job data at hr service");
@@ -198,39 +198,65 @@ const getJobDetails = async (jobId: string) => {
   }
 };
 
-const deleteJob = async (jobId : string)=>{
+const deleteJob = async (jobId: string) => {
   try {
-    const deleteJobData = await hrRepository.deleteJob(jobId)
-    console.log(deleteJobData,'deletjondata----');
-    return {message : 'success'}
-  } catch (error) { 
-    console.log(error,'error happened in deleting job in hr service');
-    return {message : 'failed'}
-    
+    const deleteJobData = await hrRepository.deleteJob(jobId);
+    console.log(deleteJobData, "deletjondata----");
+    return { message: "success" };
+  } catch (error) {
+    console.log(error, "error happened in deleting job in hr service");
+    return { message: "failed" };
   }
-}
+};
 
-const updateJob = async (body : jobData)=>{
+const updateJob = async (body: jobData) => {
   try {
-    const updatedResult = await hrRepository.updateJob(body)
-    console.log(updatedResult,'result-----');
-    if(updatedResult.message == 'success') return {message : 'success'}
-    else return {message : 'failed'}
+    const updatedResult = await hrRepository.updateJob(body);
+    console.log(updatedResult, "result-----");
+    if (updatedResult.message == "success") return { message: "success" };
+    else return { message: "failed" };
+  } catch (error) {
+    console.log(error, "error happened in updating job in hr service");
+  }
+};
+
+const updateJobpostHRViewed = async (jobId: string, HRId: string) => {
+  try {
+    const updateHRViewed = await hrRepository.updateJobpostHRViewed(
+      jobId,
+      HRId
+    );
+    console.log(updateHRViewed, "updtate job service");
+    return { message: "success" };
+  } catch (error) {
+    console.log(
+      error,
+      "error happened in updating job hr viewed in hr service"
+    );
+    return { message: "failed" };
+  }
+};
+
+const shortListUser = async (jobId: string, userId: string) => {
+  try {
+    const updateShortListedTrue = await hrRepository.updateIsShortListed(
+      jobId,
+      userId
+    );
+    if (updateShortListedTrue) return { message: "success" };
+    else return { message: "failed" };
+  } catch (error) {
+    console.log(error, "error happened in shortlist user in hr service");
+    return { message: "failed" };
+  }
+};
+
+const getShortListedUsers = async (jobId : string) =>{
+  try {
     
   } catch (error) {
-    console.log(error,'error happened in updating job in hr service');
-  }
-}
+    console.log(error, "error happened in gettind shortlist user in hr service");
 
-const updateJobpostHRViewed = async (jobId : string ,HRId : string)=>{
-  try {
-    const updateHRViewed = await hrRepository.updateJobpostHRViewed(jobId,HRId)
-    console.log(updateHRViewed,'updtate job service');
-    return {message : 'success'}
-    
-  } catch (error) {
-    console.log(error,'error happened in updating job hr viewed in hr service');
-    return {message : 'failed'}
   }
 }
 export default {
@@ -246,5 +272,7 @@ export default {
   getJobDetails,
   deleteJob,
   updateJob,
-  updateJobpostHRViewed
+  updateJobpostHRViewed,
+  shortListUser,
+  getShortListedUsers
 };

@@ -51,7 +51,7 @@ app.get('/download', (req, res) => {
     const pdfHttpLink = 'https://res.cloudinary.com/dbi1vicyc/image/upload/v1708971669/resume/ewuba1owlqq6qz7ehc3d.pdf'; // Replace with your actual PDF link
 
     https.get(pdfHttpLink, (pdfResponse) => {
-        const filename = 'downloaded_file.pdf'; // Set the filename for the downloaded file
+        const filename = 'downloaded_file.pdf'; 
 console.log(filename,'filename')
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Type', 'application/pdf');

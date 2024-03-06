@@ -14,5 +14,8 @@ router.get('/getJobDetails/:id',jwtHR.verifyToken,hrController.getJobDetails)
 router.delete('/deleteJob/:id',jwtHR.verifyToken,hrController.deleteJob)
 router.post('/updateJob',jwtHR.verifyToken,hrController.updateJob)
 router.patch('/updateJobpostHRViewed/:id',jwtHR.verifyToken,hrController.updateJobpostHRViewed)
+router.post('/downloadFile',hrController.downloadFileFromChat)
+router.patch('/shortListUser',jwtHR.verifyToken,hrController.shortListUser)
+router.get('/shortListedUsers/:jobId',jwtHR.verifyToken,hrController.getShortListedUsers)
 
 export default router

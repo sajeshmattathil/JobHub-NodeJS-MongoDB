@@ -63,13 +63,13 @@ interface userData {
   resume: string;
   experience: string;
   skills: [string];
-  educationalQualification : string;
+  educationalQualification: string;
 }
 
-const updateUser = async (data: userData ,userEmail : string) => {
+const updateUser = async (data: userData, userEmail: string) => {
   try {
-    console.log(data,'newUserData----');
-    
+    console.log(data, "newUserData----");
+
     await User.updateOne(
       { email: userEmail },
       {
@@ -80,7 +80,6 @@ const updateUser = async (data: userData ,userEmail : string) => {
           experience: data.experience,
           skills: data.skills,
           educationalQualification: data.educationalQualification,
-
         },
       }
     );
@@ -92,7 +91,7 @@ const updateUser = async (data: userData ,userEmail : string) => {
 
 const getJobs = async (pageNumber: number, jobsPerPage: number) => {
   try {
-    return await Job.find({isDeleted : false})
+    return await Job.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
@@ -135,55 +134,67 @@ const getJobData = async (id: string) => {
     return await Job.aggregate([
       { $match: { _id: new ObjectId(id) } },
       {
-         $lookup: {
-           from: 'hrs',
-           localField: 'hrObjectId',
-           foreignField: '_id',
-           as: 'jobData'
-         }
-       },
-       {
         $lookup: {
-          from: 'appliedjobs',
-          localField: '_id',
-          foreignField: 'jobId',
-          as: 'appliedData'
-        }
-      }
-   ]);
-
-   
+          from: "hrs",
+          localField: "hrObjectId",
+          foreignField: "_id",
+          as: "jobData",
+        },
+      },
+      {
+        $lookup: {
+          from: "appliedjobs",
+          localField: "_id",
+          foreignField: "jobId",
+          as: "appliedData",
+        },
+      },
+    ]);
   } catch (error) {
     console.log(error, "error in fetching job data at repo");
   }
 };
 
-const addUserEmailInJobPost = async (userEmail : string,jobId : string)=>{
-   try {
-    console.log(userEmail,jobId);
-    
-      return await Job.updateOne({_id : jobId },{$push:{appliedUsers :userEmail}})
-   } catch (error) {
-      console.log(error,'error in updating user email in job post at repo');
-      return
-   }
-}
+const addUserEmailInJobPost = async (userEmail: string, jobId: string) => {
+  try {
+    console.log(userEmail, jobId);
 
-const followHR = async (HRId : string,userEmail : string)=>{
-   try {
-      return await hr.updateOne({_id : HRId},{$push :{followers : userEmail }})
-   } catch (error) {
-      console.log(error,'error in follow and unfollow hr at repo');     
-   }
-}
+    const newAppliedUser = {
+      email: userEmail,
+      isShortListed: false,
+    };
 
-const UnfollowHR = async (HRId : string,userEmail : string)=>{
-   try {
-      return await hr.updateOne({_id : HRId},{$pull :{followers : userEmail }})
-   } catch (error) {
-      console.log(error,'error in follow and unfollow hr at repo');     
-   }
-}
+    return await Job.updateOne(
+      { _id: jobId },
+      { $push: { appliedUsers: newAppliedUser } }
+    );
+  } catch (error) {
+    console.log(error, "error in updating user email in job post at repo");
+    return;
+  }
+};
+
+const followHR = async (HRId: string, userEmail: string) => {
+  try {
+    return await hr.updateOne(
+      { _id: HRId },
+      { $push: { followers: userEmail } }
+    );
+  } catch (error) {
+    console.log(error, "error in follow and unfollow hr at repo");
+  }
+};
+
+const UnfollowHR = async (HRId: string, userEmail: string) => {
+  try {
+    return await hr.updateOne(
+      { _id: HRId },
+      { $pull: { followers: userEmail } }
+    );
+  } catch (error) {
+    console.log(error, "error in follow and unfollow hr at repo");
+  }
+};
 export default {
   findUser,
   getOtp,
@@ -196,7 +207,7 @@ export default {
   getJobData,
   addUserEmailInJobPost,
   followHR,
-  UnfollowHR
+  UnfollowHR,
 };
 
 //  async (email : string) =>{

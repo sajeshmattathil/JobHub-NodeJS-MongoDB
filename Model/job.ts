@@ -1,6 +1,11 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
+const appliedAndSshortListSchema = {
+  email : String,
+  isShortlisted : Boolean
+}
+
 const jobSchema = new mongoose.Schema({
   jobRole: {
     type: String,
@@ -51,7 +56,7 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
   appliedUsers: {
-    type: [String],
+    type: [appliedAndSshortListSchema],
     required: false,
   },
   isDeleted: {

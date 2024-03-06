@@ -4,6 +4,7 @@ import sendOTPByEmail from "../Utils/mailer";
 import { ObjectId } from "mongodb";
 import hrRepository from "../Repository/hrRepository";
 import jwtHR from "../Middleware/JWT/jwtHR";
+import https from "https";
 
 const hrSignup = async (req: Request, res: Response) => {
   try {
@@ -80,8 +81,8 @@ const hrLogin = async (req: Request, res: Response) => {
     const response = await hrService.verifyHrData(req.body);
     console.log(response, "response");
 
-    if ( response.data && response?.message === "verified") {
-      const token = jwtHR.generateToken(req.body.email,response.data._id);
+    if (response.data && response?.message === "verified") {
+      const token = jwtHR.generateToken(req.body.email, response.data._id);
       res.status(201).json({ status: 201, token: token });
     }
     if (response?.message === "declained")
@@ -194,38 +195,95 @@ const deleteJob = async (req: Request, res: Response) => {
     const jobId = req.params.id;
     const response = await hrService.deleteJob(jobId);
     console.log(response, "response=== delete");
-    if (response.message === "success") res.status(201).json({status:201});
+    if (response.message === "success") res.status(201).json({ status: 201 });
     else res.status(400);
   } catch (error) {
     console.log(error, "error happened in deleting job at hr controller");
-    res.status(500)
+    res.status(500);
   }
 };
 
-const updateJob = async (req: Request, res: Response)=>{
+const updateJob = async (req: Request, res: Response) => {
   try {
-    const response = await hrService.updateJob(req.body)
-    if( response && response.message === 'success') res.json({status : 201})
-    else res.json({status : 400})
+    const response = await hrService.updateJob(req.body);
+    if (response && response.message === "success") res.json({ status: 201 });
+    else res.json({ status: 400 });
   } catch (error) {
     console.log(error, "error happened in updating job at hr controller");
-    res.json({status : 500})
+    res.json({ status: 500 });
+  }
+};
+
+const updateJobpostHRViewed = async (req: Request, res: Response) => {
+  try {
+    const jobId = req.params.id;
+    const HRId = (req as any)._id;
+    console.log(HRId, "id---->");
+
+    const response = await hrService.updateJobpostHRViewed(jobId, HRId);
+    console.log(response, "res---hr viewed");
+  } catch (error) {
+    console.log(
+      error,
+      "error happened in updating job hr viewed at hr controller"
+    );
+  }
+};
+const downloadFileFromChat = async (req: Request, res: Response) => {
+  try {
+    console.log(req.body, "body---->>>>");
+
+    const { url: pdfHttpLink, fileName } = req.body;
+
+    https
+      .get(pdfHttpLink, (pdfResponse) => {
+        console.log(fileName, "filename");
+
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${fileName}"`
+        );
+        res.setHeader("Content-Type", "application/pdf");
+
+        pdfResponse.pipe(res);
+      })
+      .on("error", (err) => {
+        console.error("Error downloading PDF:", err);
+        res.status(500).send("Error downloading PDF");
+      });
+  } catch (error) {
+    console.log(error, "error happened in download file at hr controller");
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+const shortListUser = async (req: Request, res: Response) => {
+  try {
+    console.log(req.body, "body----shortlist");
+    const response = await hrService.shortListUser(
+      req.body.jobId,
+      req.body.userId
+    );
+    console.log(response, "res----shortlist");
+    if (response.message === "success") res.json({ status: 200 });
+    else res.json({ status: 400 });
+  } catch (error) {
+    console.log(error, "error happened in short list user at hr controller");
+    res.json({ status: 500 });
+  }
+};
+const getShortListedUsers = async (req: Request, res: Response) => {
+  try {
+const jobId = req.params.jobId
+    const response = await hrService.getShortListedUsers(jobId)
+    console.log(response,'res get shortlist--->>>');
+    
+  } catch (error) {
+    console.log(error, "error happened in  getting short list  at hr controller");
+
   }
 }
 
-const updateJobpostHRViewed = async (req: Request, res: Response)=>{
-  try {
-    const jobId = req.params.id
-    const HRId = (req as any)._id
-    console.log(HRId,'id---->');
-    
-    const response = await hrService.updateJobpostHRViewed(jobId,HRId)
-    console.log(response,'res---hr viewed');
-    
-  } catch (error) {
-    console.log(error, "error happened in updating job hr viewed at hr controller");
-  }
-}
 export default {
   hrSignup,
   verifyOtp,
@@ -237,5 +295,8 @@ export default {
   getJobDetails,
   deleteJob,
   updateJob,
-  updateJobpostHRViewed
+  updateJobpostHRViewed,
+  downloadFileFromChat,
+  shortListUser,
+  getShortListedUsers
 };
