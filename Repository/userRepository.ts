@@ -88,21 +88,58 @@ const updateUser = async (data: userData, userEmail: string) => {
     console.log("error in update user in db", error);
   }
 };
+interface searchBody {
+  option: string;
+  value: string;
+}
 
-const getJobs = async (pageNumber: number, jobsPerPage: number) => {
+const getJobs = async (
+  pageNumber: number,
+  jobsPerPage: number,
+  body: searchBody
+) => {
   try {
-    return await Job.find({ isDeleted: false })
+    console.log(body,'body');
+    
+    let query: any = { isDeleted: false };
+
+    if (body.option == "location") {
+      query.locations = { $in: body.value };
+    } else if (body.option == "skills") {
+      query.qualification = { $in: body.value };
+    } else if (body.option == "jobType") {
+      query.jobType = body.value;
+    } else if (body.option == "jobRole") {
+      query.jobRole = body.value;
+    }
+console.log(query,'query');
+
+    const jobs = await Job.find(query)
       .sort({ createdAt: -1 })
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
+
+    return jobs;
   } catch (error) {
     console.error("error in fetching jobs from db for user");
   }
 };
 
-const jobCount = async () => {
+const jobCount = async (body: searchBody) => {
   try {
-    return await Job.countDocuments();
+    let query: any = { isDeleted: false };
+
+    if (body.option == "location") {
+      query.locations = { $in: body.value };
+    } else if (body.option == "skills") {
+      query.qualification = { $in: body.value };
+    } else if (body.option == "jobType") {
+      query.jobType = body.value;
+    } else if (body.option == "jobRole") {
+      query.jobRole = body.value;
+    }
+
+    return await Job.countDocuments(query);
   } catch (error) {
     console.error("error happened in fetching job count in userrepo");
   }

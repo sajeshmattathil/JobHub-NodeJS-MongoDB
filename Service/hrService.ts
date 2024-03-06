@@ -243,6 +243,8 @@ const shortListUser = async (jobId: string, userId: string) => {
       jobId,
       userId
     );
+    console.log(updateShortListedTrue,'updateShortListedTrue');
+    
     if (updateShortListedTrue) return { message: "success" };
     else return { message: "failed" };
   } catch (error) {
@@ -253,10 +255,13 @@ const shortListUser = async (jobId: string, userId: string) => {
 
 const getShortListedUsers = async (jobId : string) =>{
   try {
-    
+    const shortListedData = await hrRepository.getShortListedUsers(jobId)
+    console.log(shortListedData,'shortListedData');
+    if(shortListedData && shortListedData.length) return {message : 'success',data : shortListedData}
+    else return {message : 'failed',data : null}
   } catch (error) {
     console.log(error, "error happened in gettind shortlist user in hr service");
-
+    return {message : 'failed',data : null}
   }
 }
 export default {

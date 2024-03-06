@@ -159,13 +159,17 @@ const updateUser = async (data: userData,userEmail : string) => {
     console.log("error in updating profile at userservice");
   }
 };
+interface searchBody {
+  option : string;
+  value : string;
+}
 
-const getJobs = async (pageNumber: number, jobsPerPage: number) => {
+const getJobs = async (pageNumber: number, jobsPerPage: number,body : searchBody) => {
   try {
-    const jobCount = await userRepository.jobCount();
+    const jobCount = await userRepository.jobCount(body);
     console.log(jobCount, "jobCount");
 
-    const getJobs = await userRepository.getJobs(pageNumber, jobsPerPage);
+    const getJobs = await userRepository.getJobs(pageNumber, jobsPerPage,body);
     if (getJobs !== undefined) {
       if (getJobs.length)
         return { data: getJobs, totalPages: jobCount, message: "success" };

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const appliedAndSshortListSchema = {
   email : String,
-  isShortlisted : Boolean
+  isShortListed : Boolean
 }
 
 const jobSchema = new mongoose.Schema({

@@ -275,12 +275,15 @@ const shortListUser = async (req: Request, res: Response) => {
 const getShortListedUsers = async (req: Request, res: Response) => {
   try {
 const jobId = req.params.jobId
+console.log(jobId ,'jobiddd');
+
     const response = await hrService.getShortListedUsers(jobId)
     console.log(response,'res get shortlist--->>>');
-    
+    if(response.message === 'success') res.json({status : 200,usersData : response.data})
+    else res.json({status : 400,usersData : null})
   } catch (error) {
     console.log(error, "error happened in  getting short list  at hr controller");
-
+    res.json({status : 500,usersData : null})
   }
 }
 

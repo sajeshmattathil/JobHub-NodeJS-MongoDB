@@ -215,14 +215,39 @@ const updateJobpostHRViewed = async (jobId: string, HRId: string) => {
 
 const updateIsShortListed = async (jobId: string, userId: string) => {
   try {
+    console.log(userId,'id ---->>>>>>>>>>');
+    
     return await Job.updateOne(
       { _id: jobId, "appliedUsers.email": userId },
       {
-        $set: { "appliedUsers.isShortListed": true },
+        $set: { "appliedUsers.$.isShortListed": true },
       }
     );
   } catch (error) {
     console.log(error, "error happened in shortlisting user at repo");
+  }
+};
+
+const getShortListedUsers = async (jobId: string) => {
+  try {
+    return await Job.aggregate([
+      {
+        $match: { _id: new ObjectId(jobId),"appliedUsers.isShortListed" : true },
+      },
+      {
+        $lookup : {
+          from : 'users',
+          foreignField :'email' ,
+          localField : "appliedUsers.email",
+          as : 'shortListedUsers'
+        }
+      },
+      {
+        $unwind:'$shortListedUsers'
+      }
+    ]);
+  } catch (error) {
+    console.log(error, "error happened in getting shortlisted user at repo");
   }
 };
 
@@ -240,4 +265,5 @@ export default {
   updateJob,
   updateJobpostHRViewed,
   updateIsShortListed,
+  getShortListedUsers,
 };

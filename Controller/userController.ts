@@ -196,10 +196,13 @@ const getJobs = async (req: Request, res: Response) => {
   try {
     const pageNumber: string | number = req.query.page as string;
     const jobsPerPage: string | number = req.query.jobsPerPage as string;
+console.log(req.body,'req body');
+    
 
     const getJobs = await userService.getJobs(
       Number(pageNumber),
-      Number(jobsPerPage)
+      Number(jobsPerPage),
+      req.body
     );
     console.log(getJobs, "jobs---controller");
 
