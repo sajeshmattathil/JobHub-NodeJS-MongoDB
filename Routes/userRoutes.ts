@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 import userController from '../Controller/userController'
 import jwtUser from '../Middleware/JWT/jwtUser'
+import chatController from '../Controller/chatController'
 
 router.post('/signup_submit',userController.signupSubmit)
 router.patch('/verifyOtp',userController.verifyOtp)
@@ -17,6 +18,7 @@ router.get('/getJobData/:id',userController.getJobData)
 router.post('/applyJob',jwtUser.verifyToken,userController.saveAppliedJob)
 router.patch('/followAndUnfollow',jwtUser.verifyToken,userController.followAndUnfollow)
 router.post('/downloadFile',jwtUser.verifyToken,userController.downloadFileFromChat)
+router.get('/getChat',jwtUser.verifyToken,chatController.getChat)
 
 
 export default router

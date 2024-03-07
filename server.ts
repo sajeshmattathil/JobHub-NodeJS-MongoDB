@@ -12,6 +12,7 @@ import hrRouter from './Routes/hrRoutes'
 import adminRouter from './Routes/adminRoutes'
 import { Server ,Socket } from 'socket.io';
 import http from 'http';
+import chatService from './Service/chatService';
 
 const server = http.createServer(app);
 
@@ -29,12 +30,13 @@ app.use(express.urlencoded({ extended: true }))
 
 
 
-io.on('connection', async (socket: Socket) => {
+io.on('connection',  (socket: Socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
-    socket.on('message',(data : string)=>{
+    socket.on('message',async (data : string)=>{
         console.log(data,'data_-->'); 
        
         io.emit('messageResponse', data);
+        const saveChat = await chatService.saveChat(data)
 
     })
     socket.on('disconnect', () => {

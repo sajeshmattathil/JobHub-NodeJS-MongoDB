@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 import hrController from '../Controller/hrController'
 import jwtHR from '../Middleware/JWT/jwtHR'
+import chatController from '../Controller/chatController'
 
 router.post('/signup_submit',hrController.hrSignup)
 router.post('/verifyOtp',hrController.verifyOtp)
@@ -17,5 +18,8 @@ router.patch('/updateJobpostHRViewed/:id',jwtHR.verifyToken,hrController.updateJ
 router.post('/downloadFile',hrController.downloadFileFromChat)
 router.patch('/shortListUser',jwtHR.verifyToken,hrController.shortListUser)
 router.get('/shortListedUsers/:jobId',jwtHR.verifyToken,hrController.getShortListedUsers)
+router.get('/getChat',jwtHR.verifyToken,chatController.getChat)
+
+
 
 export default router
