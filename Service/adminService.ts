@@ -138,7 +138,29 @@ const hrApprove = async (email: string) => {
     return { message: null };
   }
 };
+const getAdmin = async (id: string) => {
+  try {
+    const adminData = await adminRepository.findAdmin(id);
+    if (adminData && adminData?.password !== undefined) {
+      adminData.password = "";
+      return {
+        data: adminData,
+        message: "success",
+      };
+    } else
+      return {
+        data: null,
+        message: "Not found",
+      };
+  } catch (error) {
+    return {
+      data: null,
+      message: "error",
+    };
+  }
+};
 export default {
+  getAdmin,
   verifyLoginAdmin,
   getAllUsers,
   blockUblockUser,

@@ -165,7 +165,7 @@ const loginSubmit = async (
 
 const getUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.userId;
+    const id = (req as any).userEmail;
     const response = await userService.getUser(id);
     if (response?.message === "success")
       res.status(201).json({ status: 201, user: response?.data });

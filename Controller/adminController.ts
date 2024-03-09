@@ -164,7 +164,27 @@ const hrApprove= async (req : Request, res : Response)=>{
       
    }
  }
+
+ const getAdmin = async (req : Request, res : Response
+   )=>{
+   try {
+      const id = (req as any).adminId ;
+      const response = await adminService.getAdmin(id);
+      console.log(id, response, "resoponse & id");
+  
+      if (response?.message === "success") {
+        res.status(201).json({ status: 201, HR: response?.data });
+      }
+      if (response?.message === "error")
+        res.status(500).json({ status: 500, HR: null });
+      if (response?.message === "Not found")
+        res.status(400).json({ status: 400, HR: null });
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+ }
 export default {
+   getAdmin,
     loginSubmit,
     getAllUsers,
     blockUnblockUser,

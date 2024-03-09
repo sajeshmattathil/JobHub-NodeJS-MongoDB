@@ -145,7 +145,7 @@ const getJobs = async (req: Request, res: Response) => {
 
 const getHR = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const id = (req as any).HRId ;
 
     const response = await hrService.getHR(id);
     console.log(id, response, "resoponse & id");
