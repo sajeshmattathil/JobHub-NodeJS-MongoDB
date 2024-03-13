@@ -25,6 +25,7 @@ const role : string | undefined |string[] = req.headers.role
 let token: string | null = null
   if(header !== undefined) {
      token = header.split(' ')[1]
+     
   } 
 
   if (!token || role !== 'admin' ) {
@@ -32,7 +33,7 @@ let token: string | null = null
   }
 
 const decodedPayload = jwt.verify(token, process.env.ADMIN_SECRET_KEY as string) as JwtPayload;
-console.log(decodedPayload.userId,'User id');
+console.log(decodedPayload.adminId,'adminId');
 req.adminId = decodedPayload.adminId
 console.log('Access granted');
 

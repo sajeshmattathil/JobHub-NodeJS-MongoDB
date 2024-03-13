@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import adminRepository from "../Repository/adminRepository";
-try {
-} catch (error) {}
+import plan from "../Model/plan";
+
 
 interface loginBody {
   email: string;
@@ -159,6 +159,118 @@ const getAdmin = async (id: string) => {
     };
   }
 };
+
+const saveNewPlan = async (body: any )=>{
+  try {
+    const newPlan = new plan(body)
+    await newPlan.save()
+    if(newPlan) return {message : 'success'}
+    else return {message : 'failed'}
+  } catch (error) {
+    console.log("Error in save new plan at adminservice", error);
+    return {message : 'failed'}
+  }
+}
+
+const getPlans = async ()=>{
+  try {
+    const getPlanDatas = await adminRepository.getPlans()
+    console.log(getPlanDatas,'data-- plan');
+    if( getPlanDatas && getPlanDatas.length){
+      return {
+        message : 'success',
+        data : getPlanDatas
+      }
+    }
+    else{
+      return {
+        message : 'failed',
+        data : null
+      }
+    }
+  } catch (error) {
+    console.log("Error in get new plan at adminservice", error);
+    return {
+      message : 'failed',
+      data : null
+    }
+  }
+}
+
+const getPlanData = async (planId : string)=>{
+  try {
+    const getPlanData = await adminRepository.getPlanData(planId)
+    console.log(getPlanData,'plandata---');
+    
+    if(getPlanData && Object.keys(getPlanData).length){
+      return {
+        message : 'success',
+        data : getPlanData
+      }
+    }
+    else  return {
+      message : 'failed',
+      data : null
+    }
+  } catch (error) {
+    console.log("Error in get  plan at adminservice", error);
+    return {
+      message : 'failed',
+      data : null
+    }
+  }
+}
+
+interface updatedPlan {
+  amount : string;
+  duration : string;
+  planName : string;
+}
+const updatePlan = async (planId : string, body : updatedPlan)=>{
+  try {
+    const getUpdatedData = await adminRepository.updatePlan(planId,body)
+    console.log(getUpdatedData,'getupdated data----');
+    
+    console.log(getUpdatedData,'plandata---');
+    
+    if(getUpdatedData ){
+      return {
+        message : 'success',
+      }
+    }
+    else  return {
+      message : 'failed',
+    }
+  } catch (error) {
+    console.log("Error in update  plan at adminservice", error);
+    return {
+      message : 'failed',
+    }
+  }
+}
+
+const deletePlan = async (id : string)=>{
+  try{
+  const getDeletedData = await adminRepository.deletePlan(id)
+    console.log(getDeletedData,'getupdated data----');
+    
+    console.log(getDeletedData,'plandata---');
+    
+    if(getDeletedData ){
+      return {
+        message : 'success',
+      }
+    }
+    else  return {
+      message : 'failed',
+    }
+  } catch (error) {
+    console.log("Error in delete  plan at adminservice", error);
+    return {
+      message : 'failed',
+    }
+  }
+}
 export default {
   getAdmin,
   verifyLoginAdmin,
@@ -168,4 +280,9 @@ export default {
   getHiringManagersApproved,
   blockUnblockHR,
   hrApprove,
+  saveNewPlan,
+  getPlans,
+  getPlanData,
+  updatePlan,
+  deletePlan
 };

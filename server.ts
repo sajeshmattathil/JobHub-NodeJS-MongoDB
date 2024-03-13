@@ -64,6 +64,11 @@ io.on("connection",(socket)=> {
 socket.to(socketId).emit('incomming-call',{from : fromEmail,offer})
 
     })
+    socket.on('call-accepted',(data)=>{
+      const {emailId,ans} = data
+      const socketId = emailToSocketMapping.get(emailId)
+      socket.to(socketId).emit("call-accepted",{ans})
+    })
 })
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
