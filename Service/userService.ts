@@ -268,6 +268,46 @@ const followAndUnfollow = async (HRId : string,value : string,userEmail : string
   }
 }
 
+const getPlans = async ()=>{
+  try {
+    const getPlanDatas = await userRepository.getPlans()
+    console.log(getPlanDatas,'data-- plan');
+    if( getPlanDatas && getPlanDatas.length){
+      return {
+        message : 'success',
+        data : getPlanDatas
+      }
+    }
+    else{
+      return {
+        message : 'failed',
+        data : null
+      }
+    }
+  } catch (error) {
+    console.log("Error in get new plan at adminservice", error);
+    return {
+      message : 'failed',
+      data : null
+    }
+  }
+}
+interface PaymentBody {
+  planName : string;
+  amount : string;
+}
+
+const savePayment = async (body: PaymentBody,id: string) =>{
+  try {
+    const updatePayment = await userRepository.savePayment(body,id)
+    console.log(updatePayment,'updated');
+    
+  } catch (error) {
+    console.log("Error in save payment adminservice", error);
+    
+  }
+}
+
 export default {
   createNewUser,
   saveOtp,
@@ -282,5 +322,6 @@ export default {
   getJobData,
   saveAppliedJob,
   followAndUnfollow,
-
+  getPlans,
+  savePayment
 };

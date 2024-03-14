@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const subscriptionSchema = new mongoose.Schema({
-  isSubscribed: Boolean,
+  isSubscribed: { type: Boolean, default: false },
   plan: String,
-  paymentType: String,
+  paymentId: String,
   startedAt: Date,
   expireAt: Date,
 });

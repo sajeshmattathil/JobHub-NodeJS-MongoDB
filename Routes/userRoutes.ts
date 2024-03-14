@@ -19,5 +19,7 @@ router.post('/applyJob',jwtUser.verifyToken,userController.saveAppliedJob)
 router.patch('/followAndUnfollow',jwtUser.verifyToken,userController.followAndUnfollow)
 router.post('/downloadFile',jwtUser.verifyToken,userController.downloadFileFromChat)
 router.get('/getChat',jwtUser.verifyToken,chatController.getChat)
+router.get('/getPlans',jwtUser.verifyToken,userController.getPlans)
+router.post('/savePayment',userController.savePayment)
 
 export default router

@@ -3,6 +3,7 @@ import Job from "../Model/job";
 import Otp from "../Model/otp";
 import User from "../Model/user";
 import hr from "../Model/hr";
+import plan from "../Model/plan";
 
 try {
 } catch (error) {}
@@ -232,6 +233,28 @@ const UnfollowHR = async (HRId: string, userEmail: string) => {
     console.log(error, "error in follow and unfollow hr at repo");
   }
 };
+
+const getPlans = async () => {
+  try {
+    return await plan.find({ isActive: true });
+  } catch (error) {
+    console.log("Error in getting plans at repo", error);
+  }
+};
+
+interface PaymentBody {
+  amount: string;
+  planName : string;
+  
+}
+const savePayment = async (body : PaymentBody,id : string)=>{
+  try {
+    return await User.updateOne({_id : id },{$set:{isSubscribed : true,plan : body.planName,paymentId :body.amount} })
+  } catch (error) {
+    console.log("Error in save payment at repo", error);
+    
+  }
+}
 export default {
   findUser,
   getOtp,
@@ -245,6 +268,8 @@ export default {
   addUserEmailInJobPost,
   followHR,
   UnfollowHR,
+  getPlans,
+  savePayment
 };
 
 //  async (email : string) =>{

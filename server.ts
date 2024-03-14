@@ -13,6 +13,7 @@ import adminRouter from "./Routes/adminRoutes";
 import { Server, Socket } from "socket.io";
 import http from "http";
 import chatService from "./Service/chatService";
+import Razorpay  from "razorpay";
 
 const io = new Server({
   cors: {
@@ -70,6 +71,27 @@ socket.to(socketId).emit('incomming-call',{from : fromEmail,offer})
       socket.to(socketId).emit("call-accepted",{ans})
     })
 })
+const razorpay = new Razorpay({
+  key_id : process.env.RAZORPAY_ID_KEY! ,
+  key_secret:process.env.RAZORPAY_SECRET_KEY! ,
+});
+app.post('/create-order', async (req, res) => {
+  try {
+    console.log(111);
+    const { amount } = req.body;
+    const options = {
+      amount,
+      currency: 'INR',
+      receipt: 'order_rcptid_11',
+      payment_capture: 1,
+    };
+    const order = await razorpay.orders.create(options);
+    res.json({ order });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create order' });
+    console.error('Error:', error);
+  }
+});
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);

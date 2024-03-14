@@ -330,6 +330,30 @@ const downloadFileFromChat = async (req: Request, res: Response) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+const getPlans = async (req: Request, res: Response) => {
+  try {
+    const response = await userService.getPlans();
+    console.log(response, "response---getplans");
+    if ((response.message = "success"))
+      res.json({ status: 201, planDatas: response.data });
+    else res.json({ status: 400, planDatas: null });
+  } catch (error) {
+    console.log("error happened in get all plan data in admincontroller");
+    res.json({ status: 500, planDatas: null });
+  }
+};
+
+const savePayment = async (req: Request, res: Response) =>{
+  try {
+    const _id = (req as any).userId;
+    const response = await userService.savePayment(req.body,_id)
+    console.log(response,'ress');
+    
+  } catch (error) {
+    console.log("error happened in save payment in admincontroller");
+  }
+}
 export default {
   signupSubmit,
   verifyOtp,
@@ -344,4 +368,6 @@ export default {
   saveAppliedJob,
   followAndUnfollow,
   downloadFileFromChat,
+  getPlans,
+  savePayment
 };
