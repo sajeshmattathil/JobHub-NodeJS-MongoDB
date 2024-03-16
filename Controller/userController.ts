@@ -204,7 +204,6 @@ console.log(req.body,'req body');
       Number(jobsPerPage),
       req.body
     );
-    console.log(getJobs, "jobs---controller");
 
     if (getJobs?.message === "success")
       res.status(201).json({
@@ -258,7 +257,6 @@ const getJobData = async (req: Request, res: Response) => {
   try {
     const id: string = req.params.id;
     const response = await userService.getJobData(id);
-    console.log(response, "response get job data");
     if (response && response.message === "success")
       res.json({ jobDataFetched: response.data, status: 201 });
     else res.json({ jobDataFetched: null, status: 404 });
@@ -274,7 +272,6 @@ const saveAppliedJob = async (req: Request, res: Response) => {
     const userEmail = (req as any).userEmail;
     const updatedBody = { ...req.body, userId: _id, userEmail: userEmail };
     const response = await userService.saveAppliedJob(updatedBody);
-    console.log(response, "response--- appliedjobs");
     if (response.message === "success")
       res.json({ status: 201, appliedJob: response.appliedJob });
     else res.json({ status: 400 });
@@ -347,6 +344,8 @@ const getPlans = async (req: Request, res: Response) => {
 const savePayment = async (req: Request, res: Response) =>{
   try {
     const _id = (req as any).userId;
+    console.log(_id,'id----payment');
+    
     const response = await userService.savePayment(req.body,_id)
     console.log(response,'ress');
     

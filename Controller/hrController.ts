@@ -148,7 +148,6 @@ const getHR = async (req: Request, res: Response) => {
     const id = (req as any).HRId ;
 
     const response = await hrService.getHR(id);
-    console.log(id, response, "resoponse & id");
 
     if (response?.message === "success") {
       res.status(201).json({ status: 201, HR: response?.data });
@@ -278,7 +277,6 @@ const jobId = req.params.jobId
 console.log(jobId ,'jobiddd');
 
     const response = await hrService.getShortListedUsers(jobId)
-    console.log(response,'res get shortlist--->>>');
     if(response.message === 'success') res.json({status : 200,usersData : response.data})
     else res.json({status : 400,usersData : null})
   } catch (error) {

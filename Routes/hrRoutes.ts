@@ -20,6 +20,4 @@ router.patch('/shortListUser',jwtHR.verifyToken,hrController.shortListUser)
 router.get('/shortListedUsers/:jobId',jwtHR.verifyToken,hrController.getShortListedUsers)
 router.get('/getChat',jwtHR.verifyToken,chatController.getChat)
 
-
-
 export default router

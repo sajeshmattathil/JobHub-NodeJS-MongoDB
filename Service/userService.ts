@@ -22,10 +22,10 @@ const createNewUser = async (user: ReqBody) => {
     const hashedPassword = await bcrypt.hash(user.password, 5);
     user.password = hashedPassword;
     const checkExistingUsers = await userRepository.findUser(user.email);
-    console.log(checkExistingUsers);
+    console.log(checkExistingUsers,'exists or not');
     
     if (checkExistingUsers?.isVerified ) return { message: "exists" };
-    if (!checkExistingUsers?.isVerified ) return { message: "user data exists ,not verified" };
+    if (checkExistingUsers?.isVerified === false ) return { message: "user data exists ,not verified" };
 
   
     // await User.create(user);
@@ -86,6 +86,7 @@ const verifyLoginUser = async (user: ReqBody) => {
   try {
     const userDetails: userDetailsInterface | undefined | null =
       await userRepository.findUser(user.email);
+console.log(userDetails,'user find');
 
     if (userDetails !== undefined && userDetails !== null) {
       const comparePsw = await bcrypt.compare(
@@ -295,6 +296,10 @@ const getPlans = async ()=>{
 interface PaymentBody {
   planName : string;
   amount : string;
+  duration: number;
+  subscribedAt: Date;
+  expireAt : Date;
+  startedAt: Date;
 }
 
 const savePayment = async (body: PaymentBody,id: string) =>{

@@ -203,7 +203,7 @@ const getPlans = async (req: Request, res: Response) => {
   try {
     const response = await adminService.getPlans();
     console.log(response, "response---getplans");
-    if ((response.message = "success"))
+    if ((response.message === "success"))
       res.json({ status: 201, planDatas: response.data });
     else res.json({ status: 400, planDatas: null });
   } catch (error) {

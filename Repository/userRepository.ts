@@ -9,10 +9,10 @@ try {
 } catch (error) {}
 
 const findUser = async (email: string) => {
+  console.log(email,'user find repo');
+  
   try {
-    const userDatabase = await User.findOne({ email: email });
-
-    return userDatabase;
+    return  await User.findOne({ email: email });
   } catch (error) {
     console.log(error);
   }
@@ -100,8 +100,8 @@ const getJobs = async (
   body: searchBody
 ) => {
   try {
-    console.log(body,'body');
-    
+    console.log(body, "body");
+
     let query: any = { isDeleted: false };
 
     if (body.option == "location") {
@@ -113,7 +113,7 @@ const getJobs = async (
     } else if (body.option == "jobRole") {
       query.jobRole = body.value;
     }
-console.log(query,'query');
+    console.log(query, "query");
 
     const jobs = await Job.find(query)
       .sort({ createdAt: -1 })
@@ -243,18 +243,39 @@ const getPlans = async () => {
 };
 
 interface PaymentBody {
+  expireAt: Date | number;
+  startedAt: Date;
+  duration: number;
+  subscribedAt: Date;
   amount: string;
-  planName : string;
-  
+  planName: string;
 }
-const savePayment = async (body : PaymentBody,id : string)=>{
+const savePayment = async (body: PaymentBody, id: string) => {
   try {
-    return await User.updateOne({_id : id },{$set:{isSubscribed : true,plan : body.planName,paymentId :body.amount} })
+    console.log(id, body, "id and body");
+    body.startedAt = body.subscribedAt;
+
+    const currentDate = body.subscribedAt;
+    const date = new Date(currentDate);
+    body.expireAt = date.setDate(date.getDate() + body.duration * 30);
+    console.log(body, "body----repo");
+
+    return await User.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "subscription.isSubscribed": true,
+          "subscription.plan": body.planName,
+          "subscription.paymentId": body.amount,
+          "subscription.startedAt": body.startedAt,
+          "subscription.expireAt": body.expireAt,
+        },
+      }
+    );
   } catch (error) {
     console.log("Error in save payment at repo", error);
-    
   }
-}
+};
 export default {
   findUser,
   getOtp,
@@ -269,7 +290,7 @@ export default {
   followHR,
   UnfollowHR,
   getPlans,
-  savePayment
+  savePayment,
 };
 
 //  async (email : string) =>{

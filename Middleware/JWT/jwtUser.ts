@@ -4,6 +4,8 @@ import { ObjectId } from "mongodb";
 
 const generateToken = (email: string, _id: ObjectId) => {
   try {
+    console.log(_id,'jwt');
+    
     const token = jwt.sign(
       { userId: email, _id: _id },
       process.env.USER_SECRET_KEY as string,
@@ -47,6 +49,8 @@ const verifyToken = (
     console.log(decodedPayload.userId, "User id");
     req.userEmail = decodedPayload.userId;
     req.userId = decodedPayload._id;
+    console.log(req.userId,'jwt-- verify');
+    
     console.log("Access granted");
 
     next();

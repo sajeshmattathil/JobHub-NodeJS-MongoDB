@@ -75,6 +75,8 @@ const verifyHrData = async (data: hrLoginData) => {
         data.password,
         verifyHrData.password
       );
+      console.log(decryptedPassword,verifyHrData,'hr datas- login');
+      
       if (decryptedPassword) return { message: "verified", data: verifyHrData };
       else return { message: "declained", data: null };
     } else return { message: "no user found", data: null };
@@ -188,7 +190,6 @@ const updateProfile = async (HRData: bodyData) => {
 const getJobDetails = async (jobId: string) => {
   try {
     const getData: any = await hrRepository.findSelectedJobData(jobId);
-    console.log(getData, "getdata-----");
 
     if (getData && getData.length) return { message: "success", data: getData };
     else return { messag: "failed", data: null };
