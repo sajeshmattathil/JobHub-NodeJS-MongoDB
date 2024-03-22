@@ -29,7 +29,7 @@ let token: string | null = null
   } 
 
   if (!token || role !== 'admin' ) {
-    return res.json({status:404});
+    return res.json({status:404,message:'Authentication failed'});
   }
 
 const decodedPayload = jwt.verify(token, process.env.ADMIN_SECRET_KEY as string) as JwtPayload;

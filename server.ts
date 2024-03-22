@@ -13,11 +13,11 @@ import adminRouter from "./Routes/adminRoutes";
 import { Server, Socket } from "socket.io";
 import http from "http";
 import chatService from "./Service/chatService";
-import Razorpay  from "razorpay";
+import Razorpay from "razorpay";
 
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:3001",
     // methods: ["GET", "POST"]
   },
 });
@@ -38,29 +38,19 @@ io.on("connection", (socket: Socket) => {
   socket.on("disconnect", () => {
     console.log("🔥: A user disconnected");
   });
-  var dataVdo
-  socket.on('vdo-call',async (data)=>{
-    console.log(data,'vdo data')
-   
-     
-    io.emit('join-vdo-call',data)
-   })
-   console.log(dataVdo,'vdo2');
-
-    // socket.emit('join-vdo-call',dataVdo)
-  
- 
+  socket.on("vdo-call", async (data) => {
+    io.emit("join-vdo-call", data);
+  });
 });
 
-const emailToSocketMapping = new Map()
-const socketToEmailMapping = new Map()
-
+// const emailToSocketMapping = new Map();
+// const socketToEmailMapping = new Map();
 
 // io.on("connection",(socket)=> {
-  // socket.on('vdo-call',(data)=>{
-  //   console.log(data,'vdo data')
-  //   socket.emit('joinVdoCall',data)
-  //  })
+// socket.on('vdo-call',(data)=>{
+//   console.log(data,'vdo data')
+//   socket.emit('joinVdoCall',data)
+//  })
 //     socket.on("join-room",(data)=>{
 //         const {roomId,emailId} = data;
 //         console.log("User",emailId,"joined room ",roomId)
@@ -74,7 +64,7 @@ const socketToEmailMapping = new Map()
 //     })
 //     socket.on('call-user',(data)=>{
 //         console.log(data,'data incoming emit ');
-        
+
 //         const {emailId,offer} = data;
 //         const socketId = emailToSocketMapping.get(emailId)
 //         const fromEmail = socketToEmailMapping.get(socket.id)
@@ -86,34 +76,34 @@ const socketToEmailMapping = new Map()
 //       const socketId = emailToSocketMapping.get(emailId)
 //       socket.to(socketId).emit("call-accepted",{ans})
 //     })
-   
+
 // })
 const razorpay = new Razorpay({
-  key_id : process.env.RAZORPAY_ID_KEY! ,
-  key_secret:process.env.RAZORPAY_SECRET_KEY! ,
+  key_id: process.env.RAZORPAY_ID_KEY!,
+  key_secret: process.env.RAZORPAY_SECRET_KEY!,
 });
-app.post('/create-order', async (req, res) => {
+app.post("/create-order", async (req, res) => {
   try {
     console.log(111);
     const { amount } = req.body;
     const options = {
       amount,
-      currency: 'INR',
-      receipt: 'order_rcptid_11',
+      currency: "INR",
+      receipt: "order_rcptid_11",
       payment_capture: 1,
     };
     const order = await razorpay.orders.create(options);
     res.json({ order });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create order' });
-    console.error('Error:', error);
+    res.status(500).json({ error: "Failed to create order" });
+    console.error("Error:", error);
   }
 });
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
 
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log(`Server is running on port 3000`);
 });
 io.listen(3001);
