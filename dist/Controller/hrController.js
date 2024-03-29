@@ -69,9 +69,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const hrLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, "req.body");
         const response = yield hrService_1.default.verifyHrData(req.body);
-        console.log(response, "response");
         if (response.data && (response === null || response === void 0 ? void 0 : response.message) === "verified") {
             const token = jwtHR_1.default.generateToken(req.body.email, response.data._id);
             res.status(201).json({ status: 201, token: token });
@@ -131,6 +129,7 @@ const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const getHR = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.HRId;
+        console.log(id, 'hr === id');
         const response = yield hrService_1.default.getHR(id);
         if ((response === null || response === void 0 ? void 0 : response.message) === "success") {
             res.status(201).json({ status: 201, HR: response === null || response === void 0 ? void 0 : response.data });
@@ -250,9 +249,9 @@ const shortListUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 const getShortListedUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const jobId = req.params.jobId;
-        console.log(jobId, 'jobiddd');
+        console.log(jobId, "jobiddd");
         const response = yield hrService_1.default.getShortListedUsers(jobId);
-        if (response.message === 'success')
+        if (response.message === "success")
             res.json({ status: 200, usersData: response.data });
         else
             res.json({ status: 400, usersData: null });
@@ -260,6 +259,21 @@ const getShortListedUsers = (req, res) => __awaiter(void 0, void 0, void 0, func
     catch (error) {
         console.log(error, "error happened in  getting short list  at hr controller");
         res.json({ status: 500, usersData: null });
+    }
+});
+const removeFromShortListed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(req.body, "body---remove");
+        const response = yield hrService_1.default.removeFromShortListed(req.body);
+        console.log(response, "ressss");
+        if (response)
+            res.status(200).send("Succefully removed from short listed");
+        else
+            res.status(400).send("Bad request");
+    }
+    catch (error) {
+        console.log(error, "error happened in  getting short list  at hr controller");
+        res.status(500).send("Interna server error");
     }
 });
 exports.default = {
@@ -276,5 +290,6 @@ exports.default = {
     updateJobpostHRViewed,
     downloadFileFromChat,
     shortListUser,
-    getShortListedUsers
+    getShortListedUsers,
+    removeFromShortListed,
 };

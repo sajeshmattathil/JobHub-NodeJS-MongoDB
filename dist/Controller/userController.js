@@ -16,9 +16,7 @@ const userService_1 = __importDefault(require("../Service/userService"));
 const mailer_1 = __importDefault(require("../Utils/mailer"));
 const jwtUser_1 = __importDefault(require("../Middleware/JWT/jwtUser"));
 const https_1 = __importDefault(require("https"));
-try {
-}
-catch (error) { }
+const razorpay_1 = __importDefault(require("razorpay"));
 const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.body);
     try {
@@ -153,7 +151,7 @@ const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pageNumber = req.query.page;
         const jobsPerPage = req.query.jobsPerPage;
-        console.log(req.body, 'req body');
+        console.log(req.body, "req body");
         const getJobs = yield userService_1.default.getJobs(Number(pageNumber), Number(jobsPerPage), req.body);
         if ((getJobs === null || getJobs === void 0 ? void 0 : getJobs.message) === "success")
             res.status(201).json({
@@ -288,12 +286,38 @@ const getPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const savePayment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const _id = req.userId;
-        console.log(_id, 'id----payment');
-        const response = yield userService_1.default.savePayment(req.body, _id);
-        console.log(response, 'ress');
+        const userEmail = req.userEmail;
+        const response = yield userService_1.default.savePayment(req.body, _id, userEmail);
+        if (response)
+            res.status(200).send("Payment saved successfully");
+        else
+            res.status(400).send("Bad Request");
     }
     catch (error) {
         console.log("error happened in save payment in admincontroller");
+        res.status(500).send("Something Went wrong,try again");
+        ;
+    }
+});
+const razorpay = new razorpay_1.default({
+    key_id: process.env.RAZORPAY_ID_KEY,
+    key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
+const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { amount } = req.body;
+        const options = {
+            amount,
+            currency: "INR",
+            receipt: "order_rcptid_11",
+            payment_capture: 1,
+        };
+        const order = yield razorpay.orders.create(options);
+        res.json({ order });
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to create order" });
+        console.error("Error:", error);
     }
 });
 exports.default = {
@@ -311,5 +335,6 @@ exports.default = {
     followAndUnfollow,
     downloadFileFromChat,
     getPlans,
-    savePayment
+    savePayment,
+    createOrder
 };

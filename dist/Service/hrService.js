@@ -72,7 +72,6 @@ const verifyHrData = (data) => __awaiter(void 0, void 0, void 0, function* () {
         const verifyHrData = yield hrRepository_1.default.findHr(data.email);
         if (verifyHrData) {
             const decryptedPassword = yield bcrypt_1.default.compare(data.password, verifyHrData.password);
-            console.log(decryptedPassword, verifyHrData, 'hr datas- login');
             if (decryptedPassword)
                 return { message: "verified", data: verifyHrData };
             else
@@ -230,6 +229,19 @@ const getShortListedUsers = (jobId) => __awaiter(void 0, void 0, void 0, functio
         return { message: 'failed', data: null };
     }
 });
+const removeFromShortListed = (body) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const removedData = yield hrRepository_1.default.removeFromShortListed(body);
+        if ((removedData === null || removedData === void 0 ? void 0 : removedData.modifiedCount) && (removedData === null || removedData === void 0 ? void 0 : removedData.modifiedCount) > 0)
+            return true;
+        else
+            return false;
+    }
+    catch (error) {
+        console.log(error, "error happened in gettind shortlist user in hr service");
+        return false;
+    }
+});
 exports.default = {
     saveHrData,
     saveOtp,
@@ -245,5 +257,6 @@ exports.default = {
     updateJob,
     updateJobpostHRViewed,
     shortListUser,
-    getShortListedUsers
+    getShortListedUsers,
+    removeFromShortListed
 };

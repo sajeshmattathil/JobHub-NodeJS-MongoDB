@@ -25,14 +25,14 @@ const createNewUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         const hashedPassword = yield bcrypt_1.default.hash(user.password, 5);
         user.password = hashedPassword;
         const checkExistingUsers = yield userRepository_1.default.findUser(user.email);
-        console.log(checkExistingUsers, 'exists or not');
+        console.log(checkExistingUsers, "exists or not");
         if (checkExistingUsers === null || checkExistingUsers === void 0 ? void 0 : checkExistingUsers.isVerified)
             return { message: "exists" };
         if ((checkExistingUsers === null || checkExistingUsers === void 0 ? void 0 : checkExistingUsers.isVerified) === false)
             return { message: "user data exists ,not verified" };
         // await User.create(user);
         const newUser = new user_1.default(user);
-        console.log('user data saved');
+        console.log("user data saved");
         yield newUser.save();
         return { message: "User created" };
     }
@@ -58,7 +58,7 @@ const saveOtp = (data) => __awaiter(void 0, void 0, void 0, function* () {
         return { message: "failed" };
     }
     catch (error) {
-        console.log(error, 'error saving otp');
+        console.log(error, "error saving otp");
     }
 });
 const getSavedOtp = (userID) => __awaiter(void 0, void 0, void 0, function* () {
@@ -76,7 +76,7 @@ const getSavedOtp = (userID) => __awaiter(void 0, void 0, void 0, function* () {
 const verifyLoginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userDetails = yield userRepository_1.default.findUser(user.email);
-        console.log(userDetails, 'user find');
+        console.log(userDetails, "user find");
         if (userDetails !== undefined && userDetails !== null) {
             const comparePsw = yield bcrypt_1.default.compare(user.password, userDetails.password);
             if (userDetails && comparePsw && !userDetails.isBlocked) {
@@ -130,7 +130,7 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updateUser = yield userRepository_1.default.updateUser(data, userEmail);
-        console.log(updateUser, 'updated ---result');
+        console.log(updateUser, "updated ---result");
         if (updateUser === null || updateUser === void 0 ? void 0 : updateUser.message)
             return { message: "success" };
         else
@@ -209,62 +209,66 @@ const getJobData = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const saveAppliedJob = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(body, 'bodyyyyy');
+        console.log(body, "bodyyyyy");
         const newJob = new appliedJobs_1.default(body);
         newJob.save();
         const x = yield userRepository_1.default.addUserEmailInJobPost(body.userEmail, body.jobId);
-        console.log(x, 'xxx');
-        return { message: 'success', appliedJob: newJob };
+        console.log(x, "xxx");
+        return { message: "success", appliedJob: newJob };
     }
     catch (error) {
         console.log(error, "error happened in saving applied jobs at service");
-        return { message: 'failed', appliedJob: null };
+        return { message: "failed", appliedJob: null };
     }
 });
 const followAndUnfollow = (HRId, value, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (value == 'follow+') {
+        if (value == "follow+") {
             yield userRepository_1.default.followHR(HRId, userEmail);
         }
         else {
             yield userRepository_1.default.UnfollowHR(HRId, userEmail);
         }
-        return { message: 'success' };
+        return { message: "success" };
     }
     catch (error) {
-        console.log(error, 'error in follow and unfollow hr at service');
-        return { message: 'failed' };
+        console.log(error, "error in follow and unfollow hr at service");
+        return { message: "failed" };
     }
 });
 const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getPlanDatas = yield userRepository_1.default.getPlans();
-        console.log(getPlanDatas, 'data-- plan');
+        console.log(getPlanDatas, "data-- plan");
         if (getPlanDatas && getPlanDatas.length) {
             return {
-                message: 'success',
-                data: getPlanDatas
+                message: "success",
+                data: getPlanDatas,
             };
         }
         else {
             return {
-                message: 'failed',
-                data: null
+                message: "failed",
+                data: null,
             };
         }
     }
     catch (error) {
         console.log("Error in get new plan at adminservice", error);
         return {
-            message: 'failed',
-            data: null
+            message: "failed",
+            data: null,
         };
     }
 });
-const savePayment = (body, id) => __awaiter(void 0, void 0, void 0, function* () {
+const savePayment = (body, id, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        yield userRepository_1.default.addUserToPlan(body.planId, userEmail);
         const updatePayment = yield userRepository_1.default.savePayment(body, id);
-        console.log(updatePayment, 'updated');
+        if (updatePayment && updatePayment.modifiedCount !== 0)
+            return true;
+        else
+            return false;
     }
     catch (error) {
         console.log("Error in save payment adminservice", error);
@@ -285,5 +289,5 @@ exports.default = {
     saveAppliedJob,
     followAndUnfollow,
     getPlans,
-    savePayment
+    savePayment,
 };

@@ -4,6 +4,7 @@ const planSchema = new mongoose.Schema({
   planName: String,
   amount: Number,
   duration : Number,
+  paymentId: String,
   expiryAt: Date,
   users: [String],
   isActive: {

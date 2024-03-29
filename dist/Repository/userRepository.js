@@ -204,24 +204,32 @@ const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 const savePayment = (body, id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(id, body, "id and body");
         body.startedAt = body.subscribedAt;
         const currentDate = body.subscribedAt;
         const date = new Date(currentDate);
         body.expireAt = date.setDate(date.getDate() + body.duration * 30);
-        console.log(body, "body----repo");
         return yield user_1.default.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
             $set: {
                 "subscription.isSubscribed": true,
                 "subscription.plan": body.planName,
-                "subscription.paymentId": body.amount,
+                "subscription.paymentId": body.razorpayId,
+                "subscription.amount": body.amount,
                 "subscription.startedAt": body.startedAt,
                 "subscription.expireAt": body.expireAt,
             },
         });
     }
     catch (error) {
-        console.log("Error in save payment at repo", error);
+        console.log("Error in save payment at repo");
+    }
+});
+const addUserToPlan = (planId, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(planId, userEmail, '>>>>>');
+        return yield plan_1.default.updateOne({ _id: planId }, { $push: { users: userEmail } });
+    }
+    catch (error) {
+        console.log("Error in save add user to plan at repo");
     }
 });
 exports.default = {
@@ -239,22 +247,5 @@ exports.default = {
     UnfollowHR,
     getPlans,
     savePayment,
+    addUserToPlan
 };
-//  async (email : string) =>{
-//   try{
-//     const userDatabase = await User.aggregate([
-//       { $match : {email : email}} ,
-//       {$project : {
-//           email : 1,
-//           "address.address" : 1,
-//           "address.city" : 1,
-//           "address.state" : 1,
-//           "address.PIN" : 1,
-//           "address.country" : 1,
-//           "subscription.isSubscribed"  : 1,
-//          "subscription.plan": 1,
-//          "subscription.paymentType" : 1,
-//          "subscription.startedAt" : 1,
-//           "subscription.expireAt" : 1
-//       }}
-//     ])

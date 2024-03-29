@@ -75,7 +75,6 @@ const verifyHrData = async (data: hrLoginData) => {
         data.password,
         verifyHrData.password
       );
-      console.log(decryptedPassword,verifyHrData,'hr datas- login');
       
       if (decryptedPassword) return { message: "verified", data: verifyHrData };
       else return { message: "declained", data: null };
@@ -265,6 +264,16 @@ const getShortListedUsers = async (jobId : string) =>{
     return {message : 'failed',data : null}
   }
 }
+const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
+  try {
+    const removedData = await hrRepository.removeFromShortListed(body)
+    if( removedData?.modifiedCount  && removedData?.modifiedCount > 0) return true
+    else return false
+  } catch (error) {
+    console.log(error, "error happened in gettind shortlist user in hr service");
+     return false
+  }
+}
 export default {
   saveHrData,
   saveOtp,
@@ -280,5 +289,6 @@ export default {
   updateJob,
   updateJobpostHRViewed,
   shortListUser,
-  getShortListedUsers
+  getShortListedUsers,
+  removeFromShortListed
 };

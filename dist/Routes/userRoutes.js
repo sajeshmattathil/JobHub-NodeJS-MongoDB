@@ -25,4 +25,5 @@ router.post('/downloadFile', jwtUser_1.default.verifyToken, userController_1.def
 router.get('/getChat', jwtUser_1.default.verifyToken, chatController_1.default.getChat);
 router.get('/getPlans', jwtUser_1.default.verifyToken, userController_1.default.getPlans);
 router.post('/savePayment', jwtUser_1.default.verifyToken, userController_1.default.savePayment);
+router.post('/create-order', jwtUser_1.default.verifyToken, userController_1.default.createOrder);
 exports.default = router;

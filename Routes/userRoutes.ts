@@ -21,5 +21,6 @@ router.post('/downloadFile',jwtUser.verifyToken,userController.downloadFileFromC
 router.get('/getChat',jwtUser.verifyToken,chatController.getChat)
 router.get('/getPlans',jwtUser.verifyToken,userController.getPlans)
 router.post('/savePayment',jwtUser.verifyToken,userController.savePayment)
+router.post('/create-order',jwtUser.verifyToken,userController.createOrder)
 
 export default router

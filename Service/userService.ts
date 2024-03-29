@@ -22,17 +22,17 @@ const createNewUser = async (user: ReqBody) => {
     const hashedPassword = await bcrypt.hash(user.password, 5);
     user.password = hashedPassword;
     const checkExistingUsers = await userRepository.findUser(user.email);
-    console.log(checkExistingUsers,'exists or not');
-    
-    if (checkExistingUsers?.isVerified ) return { message: "exists" };
-    if (checkExistingUsers?.isVerified === false ) return { message: "user data exists ,not verified" };
+    console.log(checkExistingUsers, "exists or not");
 
-  
+    if (checkExistingUsers?.isVerified) return { message: "exists" };
+    if (checkExistingUsers?.isVerified === false)
+      return { message: "user data exists ,not verified" };
+
     // await User.create(user);
-    const newUser = new User(user)
-    console.log('user data saved');
-    
-    await newUser.save()
+    const newUser = new User(user);
+    console.log("user data saved");
+
+    await newUser.save();
     return { message: "User created" };
   } catch (error) {
     return { message: "User not created" };
@@ -67,8 +67,7 @@ const saveOtp = async (data: otp) => {
 
     return { message: "failed" };
   } catch (error) {
-    console.log(error,'error saving otp');
-    
+    console.log(error, "error saving otp");
   }
 };
 
@@ -86,7 +85,7 @@ const verifyLoginUser = async (user: ReqBody) => {
   try {
     const userDetails: userDetailsInterface | undefined | null =
       await userRepository.findUser(user.email);
-console.log(userDetails,'user find');
+    console.log(userDetails, "user find");
 
     if (userDetails !== undefined && userDetails !== null) {
       const comparePsw = await bcrypt.compare(
@@ -145,15 +144,14 @@ interface userData {
   resume: string;
   experience: string;
   skills: [string];
-  educationalQualification : string;
-
+  educationalQualification: string;
 }
 
-const updateUser = async (data: userData,userEmail : string) => {
+const updateUser = async (data: userData, userEmail: string) => {
   try {
-    const updateUser = await userRepository.updateUser(data,userEmail);
-    console.log(updateUser,'updated ---result');
-    
+    const updateUser = await userRepository.updateUser(data, userEmail);
+    console.log(updateUser, "updated ---result");
+
     if (updateUser?.message) return { message: "success" };
     else return { message: "failed" };
   } catch (error) {
@@ -161,16 +159,20 @@ const updateUser = async (data: userData,userEmail : string) => {
   }
 };
 interface searchBody {
-  option : string;
-  value : string;
+  option: string;
+  value: string;
 }
 
-const getJobs = async (pageNumber: number, jobsPerPage: number,body : searchBody) => {
+const getJobs = async (
+  pageNumber: number,
+  jobsPerPage: number,
+  body: searchBody
+) => {
   try {
     const jobCount = await userRepository.jobCount(body);
     console.log(jobCount, "jobCount");
 
-    const getJobs = await userRepository.getJobs(pageNumber, jobsPerPage,body);
+    const getJobs = await userRepository.getJobs(pageNumber, jobsPerPage, body);
     if (getJobs !== undefined) {
       if (getJobs.length)
         return { data: getJobs, totalPages: jobCount, message: "success" };
@@ -239,79 +241,88 @@ interface appliedJobBody {
   hrId: string;
   appliedAt: Date;
   userId?: string;
-  userEmail : string;
+  userEmail: string;
 }
 const saveAppliedJob = async (body: appliedJobBody) => {
   try {
-    console.log(body,'bodyyyyy');
+    console.log(body, "bodyyyyy");
     const newJob = new appliedJobs(body);
     newJob.save();
-   const x = await userRepository.addUserEmailInJobPost(body.userEmail,body.jobId)
-   console.log(x,'xxx');
-   
-    return {message : 'success',appliedJob : newJob}
+    const x = await userRepository.addUserEmailInJobPost(
+      body.userEmail,
+      body.jobId
+    );
+    console.log(x, "xxx");
+
+    return { message: "success", appliedJob: newJob };
   } catch (error) {
     console.log(error, "error happened in saving applied jobs at service");
-    return {message : 'failed',appliedJob : null}
+    return { message: "failed", appliedJob: null };
   }
 };
-const followAndUnfollow = async (HRId : string,value : string,userEmail : string)=>{
+const followAndUnfollow = async (
+  HRId: string,
+  value: string,
+  userEmail: string
+) => {
   try {
-    if(value == 'follow+'){
-      await userRepository.followHR(HRId  ,userEmail )
-    }else{
-      await userRepository.UnfollowHR(HRId  ,userEmail )
-    } 
-    return {message : 'success'}
-  } catch (error) {
-    console.log(error,'error in follow and unfollow hr at service');
-    return {message : 'failed'}   
-  }
-}
-
-const getPlans = async ()=>{
-  try {
-    const getPlanDatas = await userRepository.getPlans()
-    console.log(getPlanDatas,'data-- plan');
-    if( getPlanDatas && getPlanDatas.length){
-      return {
-        message : 'success',
-        data : getPlanDatas
-      }
+    if (value == "follow+") {
+      await userRepository.followHR(HRId, userEmail);
+    } else {
+      await userRepository.UnfollowHR(HRId, userEmail);
     }
-    else{
+    return { message: "success" };
+  } catch (error) {
+    console.log(error, "error in follow and unfollow hr at service");
+    return { message: "failed" };
+  }
+};
+
+const getPlans = async () => {
+  try {
+    const getPlanDatas = await userRepository.getPlans();
+    console.log(getPlanDatas, "data-- plan");
+    if (getPlanDatas && getPlanDatas.length) {
       return {
-        message : 'failed',
-        data : null
-      }
+        message: "success",
+        data: getPlanDatas,
+      };
+    } else {
+      return {
+        message: "failed",
+        data: null,
+      };
     }
   } catch (error) {
     console.log("Error in get new plan at adminservice", error);
     return {
-      message : 'failed',
-      data : null
-    }
+      message: "failed",
+      data: null,
+    };
   }
-}
+};
 interface PaymentBody {
-  planName : string;
-  amount : string;
+  planId: string;
+  planName: string;
+  amount: string;
   duration: number;
   subscribedAt: Date;
-  expireAt : Date;
+  expireAt: Date;
   startedAt: Date;
+  razorpayId : string;
+
 }
 
-const savePayment = async (body: PaymentBody,id: string) =>{
+const savePayment = async (body: PaymentBody, id: string,userEmail : string) => {
   try {
-    const updatePayment = await userRepository.savePayment(body,id)
-    console.log(updatePayment,'updated');
-    
+    await userRepository.addUserToPlan(body.planId,userEmail)
+    const updatePayment = await userRepository.savePayment(body, id);
+    if (updatePayment && updatePayment.modifiedCount !== 0) return true;
+    else return false;
   } catch (error) {
     console.log("Error in save payment adminservice", error);
-    
   }
-}
+};
 
 export default {
   createNewUser,
@@ -328,5 +339,5 @@ export default {
   saveAppliedJob,
   followAndUnfollow,
   getPlans,
-  savePayment
+  savePayment,
 };

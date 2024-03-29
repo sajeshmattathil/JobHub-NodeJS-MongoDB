@@ -26,7 +26,7 @@ const verifyToken = (
   next: NextFunction
 ) => {
   try {
-    
+    console.log(req.headers,'header')
     const header: string | undefined = req.headers.authorization;
     const role: string | undefined | string[] = req.headers.role;
 
@@ -36,6 +36,7 @@ const verifyToken = (
     }
 
     if (!token || role !== "user") {
+      console.log('Authentication failed',token,role)
       return res.json({
         status: 404,
         message: "authentication or authorization failed in jwt verification",

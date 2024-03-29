@@ -22,7 +22,7 @@ const verifyToken = (req, res, next) => {
             token = header.split(' ')[1];
         }
         if (!token || role !== 'HR') {
-            return res.json({ status: 404 });
+            return res.json({ status: 404, message: 'Authentication failed' });
         }
         const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.HR_SECRET_KEY);
         console.log(decodedPayload.userId, 'User id');

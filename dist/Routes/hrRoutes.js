@@ -23,4 +23,5 @@ router.post('/downloadFile', hrController_1.default.downloadFileFromChat);
 router.patch('/shortListUser', jwtHR_1.default.verifyToken, hrController_1.default.shortListUser);
 router.get('/shortListedUsers/:jobId', jwtHR_1.default.verifyToken, hrController_1.default.getShortListedUsers);
 router.get('/getChat', jwtHR_1.default.verifyToken, chatController_1.default.getChat);
+router.patch('/removeFromShortListed', jwtHR_1.default.verifyToken, hrController_1.default.removeFromShortListed);
 exports.default = router;

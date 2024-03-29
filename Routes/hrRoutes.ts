@@ -19,5 +19,7 @@ router.post('/downloadFile',hrController.downloadFileFromChat)
 router.patch('/shortListUser',jwtHR.verifyToken,hrController.shortListUser)
 router.get('/shortListedUsers/:jobId',jwtHR.verifyToken,hrController.getShortListedUsers)
 router.get('/getChat',jwtHR.verifyToken,chatController.getChat)
+router.patch('/removeFromShortListed',jwtHR.verifyToken,hrController.removeFromShortListed)
+
 
 export default router

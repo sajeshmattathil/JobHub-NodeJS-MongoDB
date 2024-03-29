@@ -4,8 +4,7 @@ import { ObjectId } from "mongodb";
 import sendOTPByEmail from "../Utils/mailer";
 import jwtUser from "../Middleware/JWT/jwtUser";
 import https from "https";
-try {
-} catch (error) {}
+import Razorpay from "razorpay";
 
 interface ReqBody {
   fname: string;
@@ -196,8 +195,7 @@ const getJobs = async (req: Request, res: Response) => {
   try {
     const pageNumber: string | number = req.query.page as string;
     const jobsPerPage: string | number = req.query.jobsPerPage as string;
-console.log(req.body,'req body');
-    
+    console.log(req.body, "req body");
 
     const getJobs = await userService.getJobs(
       Number(pageNumber),
@@ -341,16 +339,38 @@ const getPlans = async (req: Request, res: Response) => {
   }
 };
 
-const savePayment = async (req: Request, res: Response) =>{
+const savePayment = async (req: Request, res: Response) => {
   try {
     const _id = (req as any).userId;
-    console.log(_id,'id----payment');
-    
-    const response = await userService.savePayment(req.body,_id)
-    console.log(response,'ress');
-    
+    const userEmail = (req as any).userEmail;
+    const response = await userService.savePayment(req.body, _id,userEmail);
+    if (response) res.status(200).send("Payment saved successfully");
+    else res.status(400).send("Bad Request");
   } catch (error) {
     console.log("error happened in save payment in admincontroller");
+    res.status(500).send("Something Went wrong,try again");;
+  }
+};
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_ID_KEY!,
+  key_secret: process.env.RAZORPAY_SECRET_KEY!,
+});
+
+const createOrder = async (req: Request, res: Response) =>{
+  try {
+    const { amount } = req.body;    
+    const options = {
+      amount,
+      currency: "INR",
+      receipt: "order_rcptid_11",
+      payment_capture: 1,
+    };
+    const order = await razorpay.orders.create(options);
+    res.json({ order });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create order" });
+    console.error("Error:", error);
   }
 }
 export default {
@@ -368,5 +388,6 @@ export default {
   followAndUnfollow,
   downloadFileFromChat,
   getPlans,
-  savePayment
+  savePayment,
+  createOrder
 };

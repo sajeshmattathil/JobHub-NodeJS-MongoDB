@@ -16,6 +16,7 @@ const generateToken = (email, _id) => {
 };
 const verifyToken = (req, res, next) => {
     try {
+        console.log(req.headers, 'header');
         const header = req.headers.authorization;
         const role = req.headers.role;
         let token = null;
@@ -23,6 +24,7 @@ const verifyToken = (req, res, next) => {
             token = header.split(" ")[1];
         }
         if (!token || role !== "user") {
+            console.log('Authentication failed', token, role);
             return res.json({
                 status: 404,
                 message: "authentication or authorization failed in jwt verification",

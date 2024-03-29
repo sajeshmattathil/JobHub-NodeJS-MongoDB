@@ -77,9 +77,7 @@ const verifyOtp = async (
 };
 const hrLogin = async (req: Request, res: Response) => {
   try {
-    console.log(req.body, "req.body");
     const response = await hrService.verifyHrData(req.body);
-    console.log(response, "response");
 
     if (response.data && response?.message === "verified") {
       const token = jwtHR.generateToken(req.body.email, response.data._id);
@@ -145,8 +143,8 @@ const getJobs = async (req: Request, res: Response) => {
 
 const getHR = async (req: Request, res: Response) => {
   try {
-    const id = (req as any).HRId ;
-
+    const id = (req as any).HRId;
+console.log(id,'hr === id')
     const response = await hrService.getHR(id);
 
     if (response?.message === "success") {
@@ -273,18 +271,37 @@ const shortListUser = async (req: Request, res: Response) => {
 };
 const getShortListedUsers = async (req: Request, res: Response) => {
   try {
-const jobId = req.params.jobId
-console.log(jobId ,'jobiddd');
+    const jobId = req.params.jobId;
+    console.log(jobId, "jobiddd");
 
-    const response = await hrService.getShortListedUsers(jobId)
-    if(response.message === 'success') res.json({status : 200,usersData : response.data})
-    else res.json({status : 400,usersData : null})
+    const response = await hrService.getShortListedUsers(jobId);
+    if (response.message === "success")
+      res.json({ status: 200, usersData: response.data });
+    else res.json({ status: 400, usersData: null });
   } catch (error) {
-    console.log(error, "error happened in  getting short list  at hr controller");
-    res.json({status : 500,usersData : null})
+    console.log(
+      error,
+      "error happened in  getting short list  at hr controller"
+    );
+    res.json({ status: 500, usersData: null });
   }
-}
+};
 
+const removeFromShortListed = async (req: Request, res: Response) => {
+  try {
+    console.log(req.body, "body---remove");
+    const response = await hrService.removeFromShortListed(req.body);
+    console.log(response, "ressss");
+    if (response) res.status(200).send("Succefully removed from short listed");
+    else res.status(400).send("Bad request");
+  } catch (error) {
+    console.log(
+      error,
+      "error happened in  getting short list  at hr controller"
+    );
+    res.status(500).send("Interna server error");
+  }
+};
 export default {
   hrSignup,
   verifyOtp,
@@ -299,5 +316,6 @@ export default {
   updateJobpostHRViewed,
   downloadFileFromChat,
   shortListUser,
-  getShortListedUsers
+  getShortListedUsers,
+  removeFromShortListed,
 };

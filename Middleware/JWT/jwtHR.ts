@@ -32,7 +32,7 @@ let token: string | null = null
   } 
 
   if (!token || role !== 'HR' ) {
-    return res.json({status:404});
+    return res.json({status:404,message:'Authentication failed'});
   }
 
 const decodedPayload = jwt.verify(token, process.env.HR_SECRET_KEY as string) as JwtPayload;

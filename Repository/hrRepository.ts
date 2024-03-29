@@ -250,6 +250,19 @@ const getShortListedUsers = async (jobId: string) => {
     console.log(error, "error happened in getting shortlisted user at repo");
   }
 };
+const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
+  try {
+    return await Job.updateOne(
+      { _id: body.jobId, "appliedUsers.email": body.email },
+      {
+        $set: { "appliedUsers.$.isShortListed": false },
+      }
+    );
+  } catch (error) {
+    console.log(error, "error happened in getting remove from shortlisted user at repo");
+    
+  }
+}
 
 export default {
   findHr,
@@ -266,4 +279,5 @@ export default {
   updateJobpostHRViewed,
   updateIsShortListed,
   getShortListedUsers,
+  removeFromShortListed
 };

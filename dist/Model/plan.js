@@ -8,6 +8,7 @@ const planSchema = new mongoose_1.default.Schema({
     planName: String,
     amount: Number,
     duration: Number,
+    paymentId: String,
     expiryAt: Date,
     users: [String],
     isActive: {
