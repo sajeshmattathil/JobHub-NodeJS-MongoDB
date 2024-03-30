@@ -25,21 +25,13 @@ const hrRoutes_1 = __importDefault(require("./Routes/hrRoutes"));
 const adminRoutes_1 = __importDefault(require("./Routes/adminRoutes"));
 const socket_io_1 = require("socket.io");
 const chatService_1 = __importDefault(require("./Service/chatService"));
-// const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
-// const io = new Server({
-//   cors: {
-//     origin:allowedOrigins,
-//     // methods: ["GET", "POST"]
-//   },
-// });
-// app.use(cors({
-//   origin: allowedOrigins
-// }));
-const io = new socket_io_1.Server({
+const http_1 = __importDefault(require("http"));
+const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
+const httpServer = http_1.default.createServer(app);
+const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: "http://localhost:5173",
-        // methods: ["GET", "POST"]
-    },
+        origin: allowedOrigins,
+    }
 });
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -62,7 +54,6 @@ io.on("connection", (socket) => {
 app.use("/", userRoutes_1.default);
 app.use("/admin", adminRoutes_1.default);
 app.use("/hr", hrRoutes_1.default);
-app.listen(3001, () => {
-    console.log(`Server is running on port 3001`);
+httpServer.listen(3000, () => {
+    console.log(`Server is running on port 3000`);
 });
-io.listen(3000);

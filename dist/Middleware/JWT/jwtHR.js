@@ -25,7 +25,7 @@ const verifyToken = (req, res, next) => {
             return res.json({ status: 404, message: 'Authentication failed' });
         }
         const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.HR_SECRET_KEY);
-        console.log(decodedPayload.userId, 'User id');
+        console.log(decodedPayload.HRId, 'User id');
         req.HRId = decodedPayload.HRId;
         req._id = decodedPayload._id;
         console.log('Access granted');

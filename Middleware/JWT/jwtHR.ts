@@ -36,7 +36,7 @@ let token: string | null = null
   }
 
 const decodedPayload = jwt.verify(token, process.env.HR_SECRET_KEY as string) as JwtPayload;
-console.log(decodedPayload.userId,'User id');
+console.log(decodedPayload.HRId,'User id');
 req.HRId = decodedPayload.HRId
 req._id = decodedPayload._id
 console.log('Access granted');

@@ -12,26 +12,13 @@ import hrRouter from "./Routes/hrRoutes";
 import adminRouter from "./Routes/adminRoutes";
 import { Server, Socket } from "socket.io";
 import chatService from "./Service/chatService";
-import Razorpay from "razorpay";
-
-// const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
-
-// const io = new Server({
-//   cors: {
-//     origin:allowedOrigins,
-//     // methods: ["GET", "POST"]
-//   },
-// });
-// app.use(cors({
-//   origin: allowedOrigins
-// }));
-
-const io = new Server({
-  cors: {
-    origin:"http://localhost:5173",
-    // methods: ["GET", "POST"]
-  },
-});
+import http from 'http'
+const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
+const httpServer = http.createServer(app);
+const io = new Server(httpServer,{
+    cors: {
+      origin:allowedOrigins,
+    }});
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -57,9 +44,7 @@ app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
 
-app.listen(3001, () => {
-  console.log(`Server is running on port 3001`);
+
+httpServer.listen(3000, () => {
+  console.log(`Server is running on port 3000`);
 });
-io.listen(3000);
-
-
