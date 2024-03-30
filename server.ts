@@ -13,13 +13,32 @@ import adminRouter from "./Routes/adminRoutes";
 import { Server, Socket } from "socket.io";
 import chatService from "./Service/chatService";
 import http from 'http'
-const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
+
+const allowedOrigins = ['https://jobshub-nine.vercel.app'];
 const httpServer = http.createServer(app);
+
 const io = new Server(httpServer,{
-    cors: {
-      origin:allowedOrigins,
-    }});
-app.use(cors());
+  cors: {
+    origin: ["https://jobshub-nine.vercel.app"],
+    methods: ["GET", "POST"],
+    credentials: false,
+  },
+  transports: ["websocket", "polling"],
+  allowEIO3: true,});
+
+app.use(cors(
+  {
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: false,
+  }
+));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -48,3 +67,5 @@ app.use("/hr", hrRouter);
 httpServer.listen(3000, () => {
   console.log(`Server is running on port 3000`);
 });
+
+ 

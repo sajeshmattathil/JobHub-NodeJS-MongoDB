@@ -26,14 +26,28 @@ const adminRoutes_1 = __importDefault(require("./Routes/adminRoutes"));
 const socket_io_1 = require("socket.io");
 const chatService_1 = __importDefault(require("./Service/chatService"));
 const http_1 = __importDefault(require("http"));
-const allowedOrigins = ['https://job-hub.online', 'www.job-hub.online'];
+const allowedOrigins = ['https://jobshub-nine.vercel.app'];
 const httpServer = http_1.default.createServer(app);
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: allowedOrigins,
-    }
+        origin: ["https://jobshub-nine.vercel.app"],
+        methods: ["GET", "POST"],
+        credentials: false,
+    },
+    transports: ["websocket", "polling"],
+    allowEIO3: true,
 });
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: false,
+}));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
