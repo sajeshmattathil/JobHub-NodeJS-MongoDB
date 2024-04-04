@@ -4,6 +4,7 @@ import Otp from "../Model/otp";
 import User from "../Model/user";
 import hr from "../Model/hr";
 import plan from "../Model/plan";
+import chat from "../Model/chat";
 
 try {
 } catch (error) {}
@@ -284,6 +285,13 @@ const addUserToPlan = async (planId : string,userEmail : string)=>{
     console.log("Error in save add user to plan at repo");
   }
 }
+const getPrevChatUsers = async (userEmail : string)=>{
+  try {
+    return await chat.distinct("recipient1",{recipient2 : userEmail})
+  } catch (error) {
+    console.log(error,'error happende in getting prev chat users in repo')
+  }
+}
 export default {
   findUser,
   getOtp,
@@ -299,7 +307,8 @@ export default {
   UnfollowHR,
   getPlans,
   savePayment,
-  addUserToPlan
+  addUserToPlan,
+  getPrevChatUsers
 };
 
 

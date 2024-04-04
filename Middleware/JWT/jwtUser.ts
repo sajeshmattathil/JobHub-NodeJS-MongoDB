@@ -26,7 +26,6 @@ const verifyToken = (
   next: NextFunction
 ) => {
   try {
-    console.log(req.headers,'header')
     const header: string | undefined = req.headers.authorization;
     const role: string | undefined | string[] = req.headers.role;
 
@@ -47,10 +46,8 @@ const verifyToken = (
       token,
       process.env.USER_SECRET_KEY as string
     ) as JwtPayload;
-    console.log(decodedPayload.userId, "User id");
     req.userEmail = decodedPayload.userId;
     req.userId = decodedPayload._id;
-    console.log(req.userId,'jwt-- verify');
     
     console.log("Access granted");
 

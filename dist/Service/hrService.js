@@ -242,6 +242,19 @@ const removeFromShortListed = (body) => __awaiter(void 0, void 0, void 0, functi
         return false;
     }
 });
+const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const usersData = yield hrRepository_1.default.getPrevChatUsers(HREmail);
+        console.log(usersData, 'users docs');
+        if (usersData && usersData.length)
+            return { success: true, data: usersData };
+        else
+            return { success: false, data: null };
+    }
+    catch (error) {
+        return { success: false, data: null };
+    }
+});
 exports.default = {
     saveHrData,
     saveOtp,
@@ -258,5 +271,6 @@ exports.default = {
     updateJobpostHRViewed,
     shortListUser,
     getShortListedUsers,
-    removeFromShortListed
+    removeFromShortListed,
+    getPrevChatUsers
 };

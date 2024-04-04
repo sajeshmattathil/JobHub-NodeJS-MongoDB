@@ -24,4 +24,5 @@ router.patch('/shortListUser', jwtHR_1.default.verifyToken, hrController_1.defau
 router.get('/shortListedUsers/:jobId', jwtHR_1.default.verifyToken, hrController_1.default.getShortListedUsers);
 router.get('/getChat', jwtHR_1.default.verifyToken, chatController_1.default.getChat);
 router.patch('/removeFromShortListed', jwtHR_1.default.verifyToken, hrController_1.default.removeFromShortListed);
+router.get('/getPrevChatUsers', jwtHR_1.default.verifyToken, hrController_1.default.getPrevChatUsers);
 exports.default = router;

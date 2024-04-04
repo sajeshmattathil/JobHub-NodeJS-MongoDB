@@ -310,7 +310,6 @@ interface PaymentBody {
   expireAt: Date;
   startedAt: Date;
   razorpayId : string;
-
 }
 
 const savePayment = async (body: PaymentBody, id: string,userEmail : string) => {
@@ -323,6 +322,15 @@ const savePayment = async (body: PaymentBody, id: string,userEmail : string) => 
     console.log("Error in save payment adminservice", error);
   }
 };
+const getPrevChatUsers = async (userEmail  : string)=>{
+  try {
+    const usersData = await userRepository.getPrevChatUsers(userEmail)
+    if(usersData && usersData.length) return {success : true,data: usersData}
+    else return {success : false,data: null}
+  } catch (error) {
+    return {success : false,data: null}
+  }
+}
 
 export default {
   createNewUser,
@@ -340,4 +348,5 @@ export default {
   followAndUnfollow,
   getPlans,
   savePayment,
+  getPrevChatUsers
 };

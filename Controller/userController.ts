@@ -343,12 +343,12 @@ const savePayment = async (req: Request, res: Response) => {
   try {
     const _id = (req as any).userId;
     const userEmail = (req as any).userEmail;
-    const response = await userService.savePayment(req.body, _id,userEmail);
+    const response = await userService.savePayment(req.body, _id, userEmail);
     if (response) res.status(200).send("Payment saved successfully");
     else res.status(400).send("Bad Request");
   } catch (error) {
     console.log("error happened in save payment in admincontroller");
-    res.status(500).send("Something Went wrong,try again");;
+    res.status(500).send("Something Went wrong,try again");
   }
 };
 
@@ -357,9 +357,9 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET_KEY!,
 });
 
-const createOrder = async (req: Request, res: Response) =>{
+const createOrder = async (req: Request, res: Response) => {
   try {
-    const { amount } = req.body;    
+    const { amount } = req.body;
     const options = {
       amount,
       currency: "INR",
@@ -372,7 +372,21 @@ const createOrder = async (req: Request, res: Response) =>{
     res.status(500).json({ error: "Failed to create order" });
     console.error("Error:", error);
   }
-}
+};
+
+const getPrevChatUsers = async (req: Request, res: Response) => {
+  try {
+    const userEmail = (req as any).userEmail;
+    const response = await userService.getPrevChatUsers(userEmail);
+    console.log(response,'res')
+    if (response.success === true)
+      res.status(201).json({ chatData: response.data });
+    else res.status(404).json({ chatData: null });
+  } catch (error) {
+    res.status(500).json({ chatData: null });
+  }
+};
+
 export default {
   signupSubmit,
   verifyOtp,
@@ -389,5 +403,6 @@ export default {
   downloadFileFromChat,
   getPlans,
   savePayment,
-  createOrder
+  createOrder,
+  getPrevChatUsers,
 };

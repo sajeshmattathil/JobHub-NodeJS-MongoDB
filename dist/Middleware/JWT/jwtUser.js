@@ -16,7 +16,6 @@ const generateToken = (email, _id) => {
 };
 const verifyToken = (req, res, next) => {
     try {
-        console.log(req.headers, 'header');
         const header = req.headers.authorization;
         const role = req.headers.role;
         let token = null;
@@ -31,10 +30,8 @@ const verifyToken = (req, res, next) => {
             });
         }
         const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.USER_SECRET_KEY);
-        console.log(decodedPayload.userId, "User id");
         req.userEmail = decodedPayload.userId;
         req.userId = decodedPayload._id;
-        console.log(req.userId, 'jwt-- verify');
         console.log("Access granted");
         next();
     }

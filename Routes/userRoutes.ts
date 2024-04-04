@@ -22,5 +22,6 @@ router.get('/getChat',jwtUser.verifyToken,chatController.getChat)
 router.get('/getPlans',jwtUser.verifyToken,userController.getPlans)
 router.post('/savePayment',jwtUser.verifyToken,userController.savePayment)
 router.post('/create-order',jwtUser.verifyToken,userController.createOrder)
+router.get('/getPrevChatUsers',jwtUser.verifyToken,userController.getPrevChatUsers)
 
 export default router

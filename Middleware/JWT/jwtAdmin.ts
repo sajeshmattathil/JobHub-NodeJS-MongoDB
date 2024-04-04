@@ -35,7 +35,6 @@ let token: string | null = null
 const decodedPayload = jwt.verify(token, process.env.ADMIN_SECRET_KEY as string) as JwtPayload;
 console.log(decodedPayload.adminId,'adminId');
 req.adminId = decodedPayload.adminId
-console.log('Access granted');
 
 next()
 

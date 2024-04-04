@@ -302,6 +302,18 @@ const removeFromShortListed = async (req: Request, res: Response) => {
     res.status(500).send("Interna server error");
   }
 };
+const getPrevChatUsers = async (req: Request, res: Response) => {
+  try {
+    const HREmail = (req as any).HRId;
+    const response = await hrService.getPrevChatUsers(HREmail);
+    console.log(response,'res')
+    if (response.success === true)
+      res.status(201).json({ chatData: response.data });
+    else res.status(404).json({ chatData: null });
+  } catch (error) {
+    res.status(500).json({ chatData: null });
+  }
+};
 export default {
   hrSignup,
   verifyOtp,
@@ -318,4 +330,5 @@ export default {
   shortListUser,
   getShortListedUsers,
   removeFromShortListed,
+  getPrevChatUsers
 };

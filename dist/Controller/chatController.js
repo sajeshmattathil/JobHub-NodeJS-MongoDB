@@ -19,7 +19,6 @@ const getChat = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const recipient2 = req.query.recipient2;
         if (recipient1 !== undefined) {
             const response = yield chatService_1.default.getChat(String(recipient1), String(recipient2));
-            console.log(response, "res---chat");
             if (response.message === "success")
                 res.json({ status: 201, chatData: response.data });
             else

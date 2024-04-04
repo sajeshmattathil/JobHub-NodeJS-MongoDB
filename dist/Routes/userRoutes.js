@@ -26,4 +26,5 @@ router.get('/getChat', jwtUser_1.default.verifyToken, chatController_1.default.g
 router.get('/getPlans', jwtUser_1.default.verifyToken, userController_1.default.getPlans);
 router.post('/savePayment', jwtUser_1.default.verifyToken, userController_1.default.savePayment);
 router.post('/create-order', jwtUser_1.default.verifyToken, userController_1.default.createOrder);
+router.get('/getPrevChatUsers', jwtUser_1.default.verifyToken, userController_1.default.getPrevChatUsers);
 exports.default = router;

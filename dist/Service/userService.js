@@ -274,6 +274,18 @@ const savePayment = (body, id, userEmail) => __awaiter(void 0, void 0, void 0, f
         console.log("Error in save payment adminservice", error);
     }
 });
+const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const usersData = yield userRepository_1.default.getPrevChatUsers(userEmail);
+        if (usersData && usersData.length)
+            return { success: true, data: usersData };
+        else
+            return { success: false, data: null };
+    }
+    catch (error) {
+        return { success: false, data: null };
+    }
+});
 exports.default = {
     createNewUser,
     saveOtp,
@@ -290,4 +302,5 @@ exports.default = {
     followAndUnfollow,
     getPlans,
     savePayment,
+    getPrevChatUsers
 };

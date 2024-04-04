@@ -12,22 +12,26 @@ import hrRouter from "./Routes/hrRoutes";
 import adminRouter from "./Routes/adminRoutes";
 import { Server, Socket } from "socket.io";
 import chatService from "./Service/chatService";
-import http from 'http'
+import http from "http";
 
-const allowedOrigins = ['https://jobshub-nine.vercel.app'];
+const allowedOrigins = [
+  "https://jobshub-nine.vercel.app",
+  "http://localhost:5173",
+];
+
 const httpServer = http.createServer(app);
-
-const io = new Server(httpServer,{
+const io = new Server(httpServer, {
   cors: {
-    origin: ["https://jobshub-nine.vercel.app"],
+    origin: ["https://jobshub-nine.vercel.app", "http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: false,
   },
   transports: ["websocket", "polling"],
-  allowEIO3: true,});
+  allowEIO3: true,
+});
 
-app.use(cors(
-  {
+app.use(
+  cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
@@ -36,8 +40,8 @@ app.use(cors(
       }
     },
     credentials: false,
-  }
-));
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -46,8 +50,6 @@ app.use(express.urlencoded({ extended: true }));
 io.on("connection", (socket: Socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
   socket.on("message", async (data: string) => {
-    console.log(data, "data_-->");
-
     io.emit("messageResponse", data);
     await chatService.saveChat(data);
   });
@@ -63,9 +65,6 @@ app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
 
-
 httpServer.listen(3000, () => {
   console.log(`Server is running on port 3000`);
 });
-
- 

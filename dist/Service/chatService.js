@@ -26,7 +26,6 @@ const saveChat = (data) => __awaiter(void 0, void 0, void 0, function* () {
 const getChat = (recipient1, recipient2) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chatData = yield chatRepository_1.default.getChat(recipient1, recipient2);
-        console.log(chatData, "chatdata");
         if (chatData && chatData.length)
             return { message: "success", data: chatData };
         else

@@ -18,6 +18,7 @@ const otp_1 = __importDefault(require("../Model/otp"));
 const user_1 = __importDefault(require("../Model/user"));
 const hr_1 = __importDefault(require("../Model/hr"));
 const plan_1 = __importDefault(require("../Model/plan"));
+const chat_1 = __importDefault(require("../Model/chat"));
 try {
 }
 catch (error) { }
@@ -232,6 +233,14 @@ const addUserToPlan = (planId, userEmail) => __awaiter(void 0, void 0, void 0, f
         console.log("Error in save add user to plan at repo");
     }
 });
+const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield chat_1.default.distinct("recipient1", { recipient2: userEmail });
+    }
+    catch (error) {
+        console.log(error, 'error happende in getting prev chat users in repo');
+    }
+});
 exports.default = {
     findUser,
     getOtp,
@@ -247,5 +256,6 @@ exports.default = {
     UnfollowHR,
     getPlans,
     savePayment,
-    addUserToPlan
+    addUserToPlan,
+    getPrevChatUsers
 };

@@ -27,7 +27,6 @@ const verifyToken = (req, res, next) => {
         const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.ADMIN_SECRET_KEY);
         console.log(decodedPayload.adminId, 'adminId');
         req.adminId = decodedPayload.adminId;
-        console.log('Access granted');
         next();
     }
     catch (error) {

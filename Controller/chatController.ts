@@ -10,7 +10,6 @@ const getChat = async (req: Request, res: Response) => {
         String(recipient1),
         String(recipient2)
       );
-      console.log(response, "res---chat");
       if (response.message === "success")
         res.json({ status: 201, chatData: response.data });
       else res.json({ status: 400, chatData: null });

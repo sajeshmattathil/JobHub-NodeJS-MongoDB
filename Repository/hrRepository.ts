@@ -4,6 +4,7 @@ import Hr from "../Model/hr";
 import Job from "../Model/job";
 import Otp from "../Model/otp";
 import appliedJobs from "../Model/appliedJobs";
+import chat from "../Model/chat";
 
 const findHr = async (email: string) => {
   try {
@@ -263,6 +264,13 @@ const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
     
   }
 }
+const getPrevChatUsers = async (HREmail : string)=>{
+  try {
+    return await chat.distinct("recipient2",{recipient1 : HREmail})
+  } catch (error) {
+    console.log(error,'error happende in getting prev chat users in repo')
+  }
+}
 
 export default {
   findHr,
@@ -279,5 +287,6 @@ export default {
   updateJobpostHRViewed,
   updateIsShortListed,
   getShortListedUsers,
-  removeFromShortListed
+  removeFromShortListed,
+  getPrevChatUsers
 };

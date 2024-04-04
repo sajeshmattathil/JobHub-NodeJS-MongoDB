@@ -26,11 +26,14 @@ const adminRoutes_1 = __importDefault(require("./Routes/adminRoutes"));
 const socket_io_1 = require("socket.io");
 const chatService_1 = __importDefault(require("./Service/chatService"));
 const http_1 = __importDefault(require("http"));
-const allowedOrigins = ['https://jobshub-nine.vercel.app'];
+const allowedOrigins = [
+    "https://jobshub-nine.vercel.app",
+    "http://localhost:5173",
+];
 const httpServer = http_1.default.createServer(app);
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: ["https://jobshub-nine.vercel.app"],
+        origin: ["https://jobshub-nine.vercel.app", "http://localhost:5173"],
         methods: ["GET", "POST"],
         credentials: false,
     },
@@ -54,7 +57,6 @@ app.use(express_1.default.urlencoded({ extended: true }));
 io.on("connection", (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     socket.on("message", (data) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(data, "data_-->");
         io.emit("messageResponse", data);
         yield chatService_1.default.saveChat(data);
     }));

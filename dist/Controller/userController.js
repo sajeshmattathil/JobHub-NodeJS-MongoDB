@@ -296,7 +296,6 @@ const savePayment = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         console.log("error happened in save payment in admincontroller");
         res.status(500).send("Something Went wrong,try again");
-        ;
     }
 });
 const razorpay = new razorpay_1.default({
@@ -320,6 +319,20 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         console.error("Error:", error);
     }
 });
+const getPrevChatUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userEmail = req.userEmail;
+        const response = yield userService_1.default.getPrevChatUsers(userEmail);
+        console.log(response, 'res');
+        if (response.success === true)
+            res.status(201).json({ chatData: response.data });
+        else
+            res.status(404).json({ chatData: null });
+    }
+    catch (error) {
+        res.status(500).json({ chatData: null });
+    }
+});
 exports.default = {
     signupSubmit,
     verifyOtp,
@@ -336,5 +349,6 @@ exports.default = {
     downloadFileFromChat,
     getPlans,
     savePayment,
-    createOrder
+    createOrder,
+    getPrevChatUsers,
 };

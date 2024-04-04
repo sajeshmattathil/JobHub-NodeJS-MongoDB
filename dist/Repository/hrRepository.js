@@ -18,6 +18,7 @@ const hr_2 = __importDefault(require("../Model/hr"));
 const job_1 = __importDefault(require("../Model/job"));
 const otp_1 = __importDefault(require("../Model/otp"));
 const appliedJobs_1 = __importDefault(require("../Model/appliedJobs"));
+const chat_1 = __importDefault(require("../Model/chat"));
 const findHr = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield hr_2.default.findOne({ email: email });
@@ -218,6 +219,14 @@ const removeFromShortListed = (body) => __awaiter(void 0, void 0, void 0, functi
         console.log(error, "error happened in getting remove from shortlisted user at repo");
     }
 });
+const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield chat_1.default.distinct("recipient2", { recipient1: HREmail });
+    }
+    catch (error) {
+        console.log(error, 'error happende in getting prev chat users in repo');
+    }
+});
 exports.default = {
     findHr,
     findHrById,
@@ -233,5 +242,6 @@ exports.default = {
     updateJobpostHRViewed,
     updateIsShortListed,
     getShortListedUsers,
-    removeFromShortListed
+    removeFromShortListed,
+    getPrevChatUsers
 };

@@ -274,6 +274,17 @@ const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
      return false
   }
 }
+const getPrevChatUsers = async (HREmail  : string)=>{
+  try {
+    const usersData = await hrRepository.getPrevChatUsers(HREmail)
+    console.log(usersData,'users docs')
+    if(usersData && usersData.length) return {success : true,data: usersData}
+    else return {success : false,data: null}
+  } catch (error) {
+    return {success : false,data: null}
+  }
+}
+
 export default {
   saveHrData,
   saveOtp,
@@ -290,5 +301,6 @@ export default {
   updateJobpostHRViewed,
   shortListUser,
   getShortListedUsers,
-  removeFromShortListed
+  removeFromShortListed,
+  getPrevChatUsers
 };
