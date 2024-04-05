@@ -291,8 +291,8 @@ const followAndUnfollow = async (req: Request, res: Response) => {
     );
     console.log(response, "res---follow unfollow");
 
-    if (response.message == "success") res.status(200);
-    else res.status(400);
+    if (response.message == "success") res.status(200).send("Changed successfully");
+    else res.status(400).send("follow unfollow failed");
   } catch (error) {
     console.log(error, "error in follow and unfollow hr at controller");
     res.status(500);

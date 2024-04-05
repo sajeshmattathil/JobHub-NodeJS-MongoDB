@@ -239,9 +239,9 @@ const followAndUnfollow = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const response = yield userService_1.default.followAndUnfollow(req.body.HRId, req.body.value, userEmail);
         console.log(response, "res---follow unfollow");
         if (response.message == "success")
-            res.status(200);
+            res.status(200).send("Changed successfully");
         else
-            res.status(400);
+            res.status(400).send("follow unfollow failed");
     }
     catch (error) {
         console.log(error, "error in follow and unfollow hr at controller");
