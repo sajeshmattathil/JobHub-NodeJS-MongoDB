@@ -167,6 +167,7 @@ const getUser = async (req: Request, res: Response) => {
     const id = (req as any).userEmail;
     const response = await userService.getUser(id);
     if (response?.message === "success")
+    console.log(response.data,'userdat>>>>>')
       res.status(201).json({ status: 201, user: response?.data });
     if (response?.message === "error")
       res.status(500).json({ status: 500, user: null });
@@ -195,25 +196,24 @@ const getJobs = async (req: Request, res: Response) => {
   try {
     const pageNumber: string | number = req.query.page as string;
     const jobsPerPage: string | number = req.query.jobsPerPage as string;
-    console.log(req.body, "req body");
-
+    let userEmail = ''
+   if((req as any).userEmail)  userEmail = (req as any).userEmail
     const getJobs = await userService.getJobs(
       Number(pageNumber),
       Number(jobsPerPage),
-      req.body
+      req.body,
+      userEmail
     );
-
+    if(getJobs && getJobs.data) console.log(getJobs.data.length,'length');
     if (getJobs?.message === "success")
       res.status(201).json({
         jobData: getJobs.data,
         totalJobs: getJobs.totalPages,
         status: 201,
       });
-    if (getJobs?.message === "failed")
-      res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
-    else res.status(204).json({ jobData: null, totalJobs: null, status: 204 });
+    else  res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
   } catch (error) {
-    console.log("error happened in usercontroller for fetching jobs ");
+    console.log("error happened in usercontroller for fetching jobs",error);
   }
 };
 

@@ -65,6 +65,7 @@ app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
 
+
 httpServer.listen(3000, () => {
   console.log(`Server is running on port 3000`);
 });

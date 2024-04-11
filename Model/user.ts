@@ -7,6 +7,12 @@ const subscriptionSchema = new mongoose.Schema({
   startedAt: Date,
   expireAt: Date,
 });
+const workExperienceSchema = new mongoose.Schema({
+  jobRole: String,
+  company: String,
+  from: Date,
+  to: Date,
+});
 
 const userSchema = new mongoose.Schema({
   fname: String,
@@ -22,7 +28,7 @@ const userSchema = new mongoose.Schema({
   mobile: Number,
   skills: [String],
   educationalQualification: String,
-  experience: String,
+  workExperience: [workExperienceSchema],
   resume: String,
   noOfJobsApplied: Number,
   subscription: subscriptionSchema,

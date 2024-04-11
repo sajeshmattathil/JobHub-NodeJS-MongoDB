@@ -13,7 +13,8 @@ const chatSchema = new mongoose.Schema({
     recipient1 : String,
     recipient2 : String,
     id : String,
-    socketID : String
+    socketID : String,
+    time : Date
 })
 
 const chat = mongoose.model('chat',chatSchema)

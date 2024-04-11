@@ -137,7 +137,14 @@ const getUser = async (id: string) => {
     };
   }
 };
+interface experienceInterface {
+  role: string;
+  company: string;
+  from: Date ;
+  to: Date ;
+}
 interface userData {
+  workExperience: experienceInterface[];
   email: string;
   fname: string;
   lname: string;
@@ -166,13 +173,24 @@ interface searchBody {
 const getJobs = async (
   pageNumber: number,
   jobsPerPage: number,
-  body: searchBody
+  body: searchBody,
+  userEmail: string
 ) => {
   try {
-    const jobCount = await userRepository.jobCount(body);
-    console.log(jobCount, "jobCount");
+    let getUser;
+    if (userEmail.trim()) getUser = await userRepository.findUser(userEmail);
+    const jobCount = await userRepository.jobCount(
+      body,
+      getUser?.skills ? getUser.skills : []
+    );
+    console.log(jobCount, "jobcount");
 
-    const getJobs = await userRepository.getJobs(pageNumber, jobsPerPage, body);
+    const getJobs = await userRepository.getJobs(
+      pageNumber,
+      jobsPerPage,
+      body,
+      getUser?.skills ? getUser.skills : []
+    );
     if (getJobs !== undefined) {
       if (getJobs.length)
         return { data: getJobs, totalPages: jobCount, message: "success" };
@@ -309,12 +327,16 @@ interface PaymentBody {
   subscribedAt: Date;
   expireAt: Date;
   startedAt: Date;
-  razorpayId : string;
+  razorpayId: string;
 }
 
-const savePayment = async (body: PaymentBody, id: string,userEmail : string) => {
+const savePayment = async (
+  body: PaymentBody,
+  id: string,
+  userEmail: string
+) => {
   try {
-    await userRepository.addUserToPlan(body.planId,userEmail)
+    await userRepository.addUserToPlan(body.planId, userEmail);
     const updatePayment = await userRepository.savePayment(body, id);
     if (updatePayment && updatePayment.modifiedCount !== 0) return true;
     else return false;
@@ -322,15 +344,36 @@ const savePayment = async (body: PaymentBody, id: string,userEmail : string) => 
     console.log("Error in save payment adminservice", error);
   }
 };
-const getPrevChatUsers = async (userEmail  : string)=>{
+const getPrevChatUsers = async (userEmail: string) => {
   try {
-    const usersData = await userRepository.getPrevChatUsers(userEmail)
-    if(usersData && usersData.length) return {success : true,data: usersData}
-    else return {success : false,data: null}
+    const usersData = await userRepository.getPrevChatUsers(userEmail);
+    console.log(usersData,'usersss>>>>>')
+    const lastChat = await userRepository.getLastMsg(usersData, userEmail);
+    console.log(lastChat,'last')
+    interface resultInterface {
+      text: string | null | undefined;
+      name: string | null | undefined;
+    }
+    let result: resultInterface[] | null = [];
+    if (usersData && lastChat) {
+      for (let user of usersData) {
+        let time = Date.now();
+        for (let chat of lastChat) {
+          if (chat.recipient1 === user) {
+            result.push({ text: chat.text, name: chat.recipient1 });
+            break;
+          }
+        }
+      }
+    }
+    console.log(result, "result");
+    if (usersData && usersData.length && result)
+      return { success: true, data: result };
+    else return { success: false, data: null };
   } catch (error) {
-    return {success : false,data: null}
+    return { success: false, data: null };
   }
-}
+};
 
 export default {
   createNewUser,
@@ -348,5 +391,5 @@ export default {
   followAndUnfollow,
   getPlans,
   savePayment,
-  getPrevChatUsers
+  getPrevChatUsers,
 };

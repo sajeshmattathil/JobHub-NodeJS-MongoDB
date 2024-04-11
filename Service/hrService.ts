@@ -75,7 +75,7 @@ const verifyHrData = async (data: hrLoginData) => {
         data.password,
         verifyHrData.password
       );
-      
+
       if (decryptedPassword) return { message: "verified", data: verifyHrData };
       else return { message: "declained", data: null };
     } else return { message: "no user found", data: null };
@@ -243,8 +243,8 @@ const shortListUser = async (jobId: string, userId: string) => {
       jobId,
       userId
     );
-    console.log(updateShortListedTrue,'updateShortListedTrue');
-    
+    console.log(updateShortListedTrue, "updateShortListedTrue");
+
     if (updateShortListedTrue) return { message: "success" };
     else return { message: "failed" };
   } catch (error) {
@@ -253,37 +253,69 @@ const shortListUser = async (jobId: string, userId: string) => {
   }
 };
 
-const getShortListedUsers = async (jobId : string) =>{
+const getShortListedUsers = async (jobId: string) => {
   try {
-    const shortListedData = await hrRepository.getShortListedUsers(jobId)
-    console.log(shortListedData,'shortListedData');
-    if(shortListedData && shortListedData.length) return {message : 'success',data : shortListedData}
-    else return {message : 'failed',data : null}
+    const shortListedData = await hrRepository.getShortListedUsers(jobId);
+    console.log(shortListedData, "shortListedData");
+    if (shortListedData && shortListedData.length)
+      return { message: "success", data: shortListedData };
+    else return { message: "failed", data: null };
   } catch (error) {
-    console.log(error, "error happened in gettind shortlist user in hr service");
-    return {message : 'failed',data : null}
+    console.log(
+      error,
+      "error happened in gettind shortlist user in hr service"
+    );
+    return { message: "failed", data: null };
   }
-}
-const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
+};
+const removeFromShortListed = async (body: {
+  email: string;
+  jobId: string;
+}) => {
   try {
-    const removedData = await hrRepository.removeFromShortListed(body)
-    if( removedData?.modifiedCount  && removedData?.modifiedCount > 0) return true
-    else return false
+    const removedData = await hrRepository.removeFromShortListed(body);
+    if (removedData?.modifiedCount && removedData?.modifiedCount > 0)
+      return true;
+    else return false;
   } catch (error) {
-    console.log(error, "error happened in gettind shortlist user in hr service");
-     return false
+    console.log(
+      error,
+      "error happened in gettind shortlist user in hr service"
+    );
+    return false;
   }
-}
-const getPrevChatUsers = async (HREmail  : string)=>{
+};
+const getPrevChatUsers = async (HREmail: string) => {
   try {
-    const usersData = await hrRepository.getPrevChatUsers(HREmail)
-    console.log(usersData,'users docs')
-    if(usersData && usersData.length) return {success : true,data: usersData}
-    else return {success : false,data: null}
+    const usersData = await hrRepository.getPrevChatUsers(HREmail);
+    console.log(usersData, "users docs");
+    const lastChat = await hrRepository.getLastMsg(usersData, HREmail);
+    console.log(lastChat, "lastchat");
+
+    interface resultInterface {
+      text: string | null | undefined;
+      name: string | null | undefined;
+    }
+    let result: resultInterface[] | null = [];
+    if (usersData && lastChat) {
+      for (let user of usersData) {
+        let time = Date.now();
+        for (let chat of lastChat) {
+          if (chat.recipient2 === user) {
+            result.push({ text: chat.text, name: chat.recipient2 ,});
+            break;
+          }
+        }
+      }
+    }
+    console.log(result,'result')
+    if (usersData && usersData.length && result)
+      return { success: true, data: result };
+    else return { success: false, data: null };
   } catch (error) {
-    return {success : false,data: null}
+    return { success: false, data: null };
   }
-}
+};
 
 export default {
   saveHrData,
@@ -302,5 +334,5 @@ export default {
   shortListUser,
   getShortListedUsers,
   removeFromShortListed,
-  getPrevChatUsers
+  getPrevChatUsers,
 };

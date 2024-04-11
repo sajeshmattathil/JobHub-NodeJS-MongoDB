@@ -272,6 +272,13 @@ const getPrevChatUsers = async (HREmail : string)=>{
   }
 }
 
+const getLastMsg = async (usersData : (string|undefined|null)[]|undefined,HREmail : string)=>{
+  try {
+    if(usersData) return await chat.find({recipient1 : HREmail ,recipient2 : {$in : [...usersData]}}).sort({time :-1})
+  } catch (error) {
+    console.log(error,'error happend in getting last msg users in repo')
+  }
+}
 export default {
   findHr,
   findHrById,
@@ -288,5 +295,6 @@ export default {
   updateIsShortListed,
   getShortListedUsers,
   removeFromShortListed,
-  getPrevChatUsers
+  getPrevChatUsers,
+  getLastMsg
 };
