@@ -164,6 +164,7 @@ console.log(query,'query')
       .sort(sortQuery)
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
+      if(body.sort === 'old') return jobs.reverse()
     return jobs;
   } catch (error) {
     console.error("error in fetching jobs from db for user", error);

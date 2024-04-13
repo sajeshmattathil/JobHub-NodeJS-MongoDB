@@ -123,6 +123,8 @@ const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, voi
             .sort(sortQuery)
             .skip(jobsPerPage * (pageNumber - 1))
             .limit(jobsPerPage);
+        if (body.sort === 'old')
+            return jobs.reverse();
         return jobs;
     }
     catch (error) {
