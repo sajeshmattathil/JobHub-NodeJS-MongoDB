@@ -61,8 +61,8 @@ const setVerifiedTrue = async (userId: string) => {
 interface experienceInterface {
   role: string;
   company: string;
-  from: Date ;
-  to: Date ;
+  from: Date;
+  to: Date;
 }
 interface userData {
   workExperience: experienceInterface[];
@@ -89,7 +89,7 @@ const updateUser = async (data: userData, userEmail: string) => {
           experience: data.experience,
           skills: data.skills,
           educationalQualification: data.educationalQualification,
-          workExperience:data.workExperience
+          workExperience: data.workExperience,
         },
       }
     );
@@ -98,91 +98,113 @@ const updateUser = async (data: userData, userEmail: string) => {
     console.log("error in update user in db", error);
   }
 };
+interface industryInterface {
+  industry ?: string;
+  createdAt ?: Date | number;
+}
 interface searchBody {
+  industry:industryInterface[]|[] ;
+  salaryPackage: number;
   option: string;
   value: string;
+  sort: string;
 }
 
 const getJobs = async (
   pageNumber: number,
   jobsPerPage: number,
   body: searchBody,
-  skills :string[] | []
+  skills: string[] | []
 ) => {
   try {
-    let query: any;
+    let query: any = { isDeleted: false,"salaryPackage.max": { $lte: (body.salaryPackage)?(body.salaryPackage):10 } };
 
-    if (Object.keys(body).length ) {
+    if (Object.keys(body).length && body.industry.length ) {
       query = {
+        ...query,
         $or: [
           {
-            isDeleted: false,
+            $or: body.industry,
             locations: { $in: [new RegExp(body.value, "i")] },
           },
           {
-            isDeleted: false,
+            $or: body.industry,
             qualification: { $in: [new RegExp(body.value, "i")] },
           },
           {
-            isDeleted: false,
+            $or: body.industry,
             jobType: { $regex: `${body.value}`, $options: "i" },
           },
           {
-            isDeleted: false,
+            $or: body.industry,
             jobRole: { $regex: `${body.value}`, $options: "i" },
           },
         ],
       };
-    } else if (!Object.keys(body).length && skills.length){
-      query = { isDeleted: false,qualification :{$in :[...skills]} };
-    } else {
-      query = { isDeleted: false };
-
+    } else if (Object.keys(body).length ) {
+      query = {
+        ...query,
+        $or: [
+          { locations: { $in: [new RegExp(body.value, "i")] } },
+          { qualification: { $in: [new RegExp(body.value, "i")] } },
+          { jobType: { $regex: `${body.value}`, $options: "i" } },
+          { jobRole: { $regex: `${body.value}`, $options: "i" } },
+        ],
+      };
+    } else if (skills.length) {
+      query = { ...query, qualification: { $in: skills } };
     }
 
-    console.log(query, "query");
-
+    let sortQuery: any = { createdAt: -1 };
+    if (body.sort === "relevance") {
+      sortQuery = { createdAt: 1 };
+    }
+console.log(query,'query')
     const jobs = await Job.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortQuery)
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
     return jobs;
   } catch (error) {
     console.error("error in fetching jobs from db for user", error);
-    return;
+    return [];
   }
 };
 
-  const jobCount = async (body: searchBody, skills :string[] | []) => {
+
+const jobCount = async (body: searchBody, skills: string[] | []) => {
   try {
-    let query: any
+    let query: any;
 
     if (Object.keys(body).length) {
       query = {
         $or: [
           {
             isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             locations: { $in: [new RegExp(body.value, "i")] },
           },
           {
             isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             qualification: { $in: [new RegExp(body.value, "i")] },
           },
           {
             isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             jobType: { $regex: `${body.value}`, $options: "i" },
           },
           {
             isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             jobRole: { $regex: `${body.value}`, $options: "i" },
           },
         ],
       };
-    }else if (!Object.keys(body).length && skills.length){
-      query = { isDeleted: false,qualification :{$in :[...skills]} };
+    } else if (!Object.keys(body).length && skills.length) {
+      query = { isDeleted: false, qualification: { $in: [...skills] } };
     } else {
       query = { isDeleted: false };
-
     }
     return await Job.countDocuments(query);
   } catch (error) {
@@ -338,15 +360,21 @@ const getPrevChatUsers = async (userEmail: string) => {
     console.log(error, "error happende in getting prev chat users in repo");
   }
 };
-const getLastMsg = async (usersData : (string|undefined|null)[]|undefined,userEmail : string)=>{
+const getLastMsg = async (
+  usersData: (string | undefined | null)[] | undefined,
+  userEmail: string
+) => {
   try {
-    console.log(usersData,userEmail,'repoooo')
-    if(usersData?.length) return await chat.find({recipient2 : userEmail ,recipient1 : {$in : usersData}}).sort({time :-1})
-    return
+    console.log(usersData, userEmail, "repoooo");
+    if (usersData?.length)
+      return await chat
+        .find({ recipient2: userEmail, recipient1: { $in: usersData } })
+        .sort({ time: -1 });
+    return;
   } catch (error) {
-    console.log(error,'error happend in getting last msg hrs in repo')
+    console.log(error, "error happend in getting last msg hrs in repo");
   }
-}
+};
 export default {
   findUser,
   getOtp,
@@ -364,5 +392,5 @@ export default {
   savePayment,
   addUserToPlan,
   getPrevChatUsers,
-  getLastMsg
+  getLastMsg,
 };

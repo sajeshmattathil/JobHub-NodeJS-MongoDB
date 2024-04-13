@@ -23,7 +23,7 @@ try {
 }
 catch (error) { }
 const findUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(email, 'user find repo');
+    console.log(email, "user find repo");
     try {
         return yield user_1.default.findOne({ email: email });
     }
@@ -71,6 +71,7 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
                 experience: data.experience,
                 skills: data.skills,
                 educationalQualification: data.educationalQualification,
+                workExperience: data.workExperience,
             },
         });
         return { message: "success" };
@@ -79,47 +80,90 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
         console.log("error in update user in db", error);
     }
 });
-const getJobs = (pageNumber, jobsPerPage, body) => __awaiter(void 0, void 0, void 0, function* () {
+const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(body, "body");
-        let query = { isDeleted: false };
-        if (body.option == "location") {
-            query.locations = { $in: body.value };
+        let query = { isDeleted: false, "salaryPackage.max": { $lte: (body.salaryPackage) ? (body.salaryPackage) : 10 } };
+        if (Object.keys(body).length && body.industry.length) {
+            query = Object.assign(Object.assign({}, query), { $or: [
+                    {
+                        $or: body.industry,
+                        locations: { $in: [new RegExp(body.value, "i")] },
+                    },
+                    {
+                        $or: body.industry,
+                        qualification: { $in: [new RegExp(body.value, "i")] },
+                    },
+                    {
+                        $or: body.industry,
+                        jobType: { $regex: `${body.value}`, $options: "i" },
+                    },
+                    {
+                        $or: body.industry,
+                        jobRole: { $regex: `${body.value}`, $options: "i" },
+                    },
+                ] });
         }
-        else if (body.option == "skills") {
-            query.qualification = { $in: body.value };
+        else if (Object.keys(body).length) {
+            query = Object.assign(Object.assign({}, query), { $or: [
+                    { locations: { $in: [new RegExp(body.value, "i")] } },
+                    { qualification: { $in: [new RegExp(body.value, "i")] } },
+                    { jobType: { $regex: `${body.value}`, $options: "i" } },
+                    { jobRole: { $regex: `${body.value}`, $options: "i" } },
+                ] });
         }
-        else if (body.option == "jobType") {
-            query.jobType = body.value;
+        else if (skills.length) {
+            query = Object.assign(Object.assign({}, query), { qualification: { $in: skills } });
         }
-        else if (body.option == "jobRole") {
-            query.jobRole = body.value;
+        let sortQuery = { createdAt: -1 };
+        if (body.sort === "relevance") {
+            sortQuery = { createdAt: 1 };
         }
-        console.log(query, "query");
+        console.log(query, 'query');
         const jobs = yield job_1.default.find(query)
-            .sort({ createdAt: -1 })
+            .sort(sortQuery)
             .skip(jobsPerPage * (pageNumber - 1))
             .limit(jobsPerPage);
         return jobs;
     }
     catch (error) {
-        console.error("error in fetching jobs from db for user");
+        console.error("error in fetching jobs from db for user", error);
+        return [];
     }
 });
-const jobCount = (body) => __awaiter(void 0, void 0, void 0, function* () {
+const jobCount = (body, skills) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let query = { isDeleted: false };
-        if (body.option == "location") {
-            query.locations = { $in: body.value };
+        let query;
+        if (Object.keys(body).length) {
+            query = {
+                $or: [
+                    {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
+                        locations: { $in: [new RegExp(body.value, "i")] },
+                    },
+                    {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
+                        qualification: { $in: [new RegExp(body.value, "i")] },
+                    },
+                    {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
+                        jobType: { $regex: `${body.value}`, $options: "i" },
+                    },
+                    {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
+                        jobRole: { $regex: `${body.value}`, $options: "i" },
+                    },
+                ],
+            };
         }
-        else if (body.option == "skills") {
-            query.qualification = { $in: body.value };
+        else if (!Object.keys(body).length && skills.length) {
+            query = { isDeleted: false, qualification: { $in: [...skills] } };
         }
-        else if (body.option == "jobType") {
-            query.jobType = body.value;
-        }
-        else if (body.option == "jobRole") {
-            query.jobRole = body.value;
+        else {
+            query = { isDeleted: false };
         }
         return yield job_1.default.countDocuments(query);
     }
@@ -226,7 +270,7 @@ const savePayment = (body, id) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const addUserToPlan = (planId, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(planId, userEmail, '>>>>>');
+        console.log(planId, userEmail, ">>>>>");
         return yield plan_1.default.updateOne({ _id: planId }, { $push: { users: userEmail } });
     }
     catch (error) {
@@ -238,7 +282,20 @@ const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, functi
         return yield chat_1.default.distinct("recipient1", { recipient2: userEmail });
     }
     catch (error) {
-        console.log(error, 'error happende in getting prev chat users in repo');
+        console.log(error, "error happende in getting prev chat users in repo");
+    }
+});
+const getLastMsg = (usersData, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(usersData, userEmail, "repoooo");
+        if (usersData === null || usersData === void 0 ? void 0 : usersData.length)
+            return yield chat_1.default
+                .find({ recipient2: userEmail, recipient1: { $in: usersData } })
+                .sort({ time: -1 });
+        return;
+    }
+    catch (error) {
+        console.log(error, "error happend in getting last msg hrs in repo");
     }
 });
 exports.default = {
@@ -257,5 +314,6 @@ exports.default = {
     getPlans,
     savePayment,
     addUserToPlan,
-    getPrevChatUsers
+    getPrevChatUsers,
+    getLastMsg,
 };

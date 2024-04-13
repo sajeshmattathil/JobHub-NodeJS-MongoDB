@@ -140,11 +140,14 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
         console.log("error in updating profile at userservice");
     }
 });
-const getJobs = (pageNumber, jobsPerPage, body) => __awaiter(void 0, void 0, void 0, function* () {
+const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const jobCount = yield userRepository_1.default.jobCount(body);
-        console.log(jobCount, "jobCount");
-        const getJobs = yield userRepository_1.default.getJobs(pageNumber, jobsPerPage, body);
+        let getUser;
+        if (userEmail.trim())
+            getUser = yield userRepository_1.default.findUser(userEmail);
+        const jobCount = yield userRepository_1.default.jobCount(body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
+        console.log(jobCount, "jobcount");
+        const getJobs = yield userRepository_1.default.getJobs(pageNumber, jobsPerPage, body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
         if (getJobs !== undefined) {
             if (getJobs.length)
                 return { data: getJobs, totalPages: jobCount, message: "success" };
@@ -277,8 +280,24 @@ const savePayment = (body, id, userEmail) => __awaiter(void 0, void 0, void 0, f
 const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const usersData = yield userRepository_1.default.getPrevChatUsers(userEmail);
-        if (usersData && usersData.length)
-            return { success: true, data: usersData };
+        console.log(usersData, 'usersss>>>>>');
+        const lastChat = yield userRepository_1.default.getLastMsg(usersData, userEmail);
+        console.log(lastChat, 'last');
+        let result = [];
+        if (usersData && lastChat) {
+            for (let user of usersData) {
+                let time = Date.now();
+                for (let chat of lastChat) {
+                    if (chat.recipient1 === user) {
+                        result.push({ text: chat.text, name: chat.recipient1 });
+                        break;
+                    }
+                }
+            }
+        }
+        console.log(result, "result");
+        if (usersData && usersData.length && result)
+            return { success: true, data: result };
         else
             return { success: false, data: null };
     }
@@ -302,5 +321,5 @@ exports.default = {
     followAndUnfollow,
     getPlans,
     savePayment,
-    getPrevChatUsers
+    getPrevChatUsers,
 };

@@ -84,6 +84,7 @@ const verifyHrData = async (data: hrLoginData) => {
   }
 };
 interface jobData {
+  salaryPackage: { min: any; max: any };
   jobId?: ObjectId | undefined;
   jobRole: string;
   description: string;
@@ -107,7 +108,10 @@ const saveJob = async (data: jobData) => {
     const hrObjectId = await hrRepository.findHr(data.createdBy);
     if (hrObjectId) data.hrObjectId = hrObjectId?._id;
     console.log(hrObjectId, "obid");
-
+    data.salaryPackage = {
+      min: Number(data.salaryScale[0] + data.salaryScale[1]) * 100000,
+      max: Number(data.salaryScale[3] + data.salaryScale[4]) * 100000,
+    };
     const job = new Job(data);
     await job.save();
     return { message: "success" };
@@ -302,13 +306,13 @@ const getPrevChatUsers = async (HREmail: string) => {
         let time = Date.now();
         for (let chat of lastChat) {
           if (chat.recipient2 === user) {
-            result.push({ text: chat.text, name: chat.recipient2 ,});
+            result.push({ text: chat.text, name: chat.recipient2 });
             break;
           }
         }
       }
     }
-    console.log(result,'result')
+    console.log(result, "result");
     if (usersData && usersData.length && result)
       return { success: true, data: result };
     else return { success: false, data: null };

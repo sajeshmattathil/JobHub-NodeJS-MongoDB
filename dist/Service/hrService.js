@@ -90,6 +90,10 @@ const saveJob = (data) => __awaiter(void 0, void 0, void 0, function* () {
         if (hrObjectId)
             data.hrObjectId = hrObjectId === null || hrObjectId === void 0 ? void 0 : hrObjectId._id;
         console.log(hrObjectId, "obid");
+        data.salaryPackage = {
+            min: Number(data.salaryScale[0] + data.salaryScale[1]) * 100000,
+            max: Number(data.salaryScale[3] + data.salaryScale[4]) * 100000,
+        };
         const job = new job_1.default(data);
         yield job.save();
         return { message: "success" };
@@ -204,7 +208,7 @@ const updateJobpostHRViewed = (jobId, HRId) => __awaiter(void 0, void 0, void 0,
 const shortListUser = (jobId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updateShortListedTrue = yield hrRepository_1.default.updateIsShortListed(jobId, userId);
-        console.log(updateShortListedTrue, 'updateShortListedTrue');
+        console.log(updateShortListedTrue, "updateShortListedTrue");
         if (updateShortListedTrue)
             return { message: "success" };
         else
@@ -218,15 +222,15 @@ const shortListUser = (jobId, userId) => __awaiter(void 0, void 0, void 0, funct
 const getShortListedUsers = (jobId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const shortListedData = yield hrRepository_1.default.getShortListedUsers(jobId);
-        console.log(shortListedData, 'shortListedData');
+        console.log(shortListedData, "shortListedData");
         if (shortListedData && shortListedData.length)
-            return { message: 'success', data: shortListedData };
+            return { message: "success", data: shortListedData };
         else
-            return { message: 'failed', data: null };
+            return { message: "failed", data: null };
     }
     catch (error) {
         console.log(error, "error happened in gettind shortlist user in hr service");
-        return { message: 'failed', data: null };
+        return { message: "failed", data: null };
     }
 });
 const removeFromShortListed = (body) => __awaiter(void 0, void 0, void 0, function* () {
@@ -245,9 +249,24 @@ const removeFromShortListed = (body) => __awaiter(void 0, void 0, void 0, functi
 const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const usersData = yield hrRepository_1.default.getPrevChatUsers(HREmail);
-        console.log(usersData, 'users docs');
-        if (usersData && usersData.length)
-            return { success: true, data: usersData };
+        console.log(usersData, "users docs");
+        const lastChat = yield hrRepository_1.default.getLastMsg(usersData, HREmail);
+        console.log(lastChat, "lastchat");
+        let result = [];
+        if (usersData && lastChat) {
+            for (let user of usersData) {
+                let time = Date.now();
+                for (let chat of lastChat) {
+                    if (chat.recipient2 === user) {
+                        result.push({ text: chat.text, name: chat.recipient2 });
+                        break;
+                    }
+                }
+            }
+        }
+        console.log(result, "result");
+        if (usersData && usersData.length && result)
+            return { success: true, data: result };
         else
             return { success: false, data: null };
     }
@@ -272,5 +291,5 @@ exports.default = {
     shortListUser,
     getShortListedUsers,
     removeFromShortListed,
-    getPrevChatUsers
+    getPrevChatUsers,
 };

@@ -35,10 +35,12 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  salaryScale: {
-    type: String,
-    required: true,
-  },
+  salaryPackage: {
+    type: {
+      min: Number,
+      max: Number
+    }
+  },  
   educationalQualification: {
     type: String,
     required: false,

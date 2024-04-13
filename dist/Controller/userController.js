@@ -123,7 +123,8 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = req.userEmail;
         const response = yield userService_1.default.getUser(id);
         if ((response === null || response === void 0 ? void 0 : response.message) === "success")
-            res.status(201).json({ status: 201, user: response === null || response === void 0 ? void 0 : response.data });
+            console.log(response.data, 'userdat>>>>>');
+        res.status(201).json({ status: 201, user: response === null || response === void 0 ? void 0 : response.data });
         if ((response === null || response === void 0 ? void 0 : response.message) === "error")
             res.status(500).json({ status: 500, user: null });
         if ((response === null || response === void 0 ? void 0 : response.message) === "Not found")
@@ -151,21 +152,23 @@ const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pageNumber = req.query.page;
         const jobsPerPage = req.query.jobsPerPage;
-        console.log(req.body, "req body");
-        const getJobs = yield userService_1.default.getJobs(Number(pageNumber), Number(jobsPerPage), req.body);
+        let userEmail = '';
+        if (req.userEmail)
+            userEmail = req.userEmail;
+        const getJobs = yield userService_1.default.getJobs(Number(pageNumber), Number(jobsPerPage), req.body, userEmail);
+        if (getJobs && getJobs.data)
+            console.log(getJobs.data.length, 'length');
         if ((getJobs === null || getJobs === void 0 ? void 0 : getJobs.message) === "success")
             res.status(201).json({
                 jobData: getJobs.data,
                 totalJobs: getJobs.totalPages,
                 status: 201,
             });
-        if ((getJobs === null || getJobs === void 0 ? void 0 : getJobs.message) === "failed")
-            res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
         else
-            res.status(204).json({ jobData: null, totalJobs: null, status: 204 });
+            res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
     }
     catch (error) {
-        console.log("error happened in usercontroller for fetching jobs ");
+        console.log("error happened in usercontroller for fetching jobs", error);
     }
 });
 const saveForgotOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

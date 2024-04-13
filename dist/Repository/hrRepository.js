@@ -227,6 +227,15 @@ const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function
         console.log(error, 'error happende in getting prev chat users in repo');
     }
 });
+const getLastMsg = (usersData, HREmail) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (usersData)
+            return yield chat_1.default.find({ recipient1: HREmail, recipient2: { $in: [...usersData] } }).sort({ time: -1 });
+    }
+    catch (error) {
+        console.log(error, 'error happend in getting last msg users in repo');
+    }
+});
 exports.default = {
     findHr,
     findHrById,
@@ -243,5 +252,6 @@ exports.default = {
     updateIsShortListed,
     getShortListedUsers,
     removeFromShortListed,
-    getPrevChatUsers
+    getPrevChatUsers,
+    getLastMsg
 };

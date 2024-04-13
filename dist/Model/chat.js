@@ -16,7 +16,8 @@ const chatSchema = new mongoose_1.default.Schema({
     recipient1: String,
     recipient2: String,
     id: String,
-    socketID: String
+    socketID: String,
+    time: Date
 });
 const chat = mongoose_1.default.model('chat', chatSchema);
 exports.default = chat;

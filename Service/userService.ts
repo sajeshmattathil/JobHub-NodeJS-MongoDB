@@ -165,16 +165,23 @@ const updateUser = async (data: userData, userEmail: string) => {
     console.log("error in updating profile at userservice");
   }
 };
+interface industryInterface {
+  industry: string;
+}
 interface searchBody {
+  industry:industryInterface[]|[] ;
   option: string;
   value: string;
+  sort : string;
+  salaryPackage: number;
+
 }
 
 const getJobs = async (
   pageNumber: number,
   jobsPerPage: number,
   body: searchBody,
-  userEmail: string
+  userEmail: string,
 ) => {
   try {
     let getUser;
