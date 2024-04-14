@@ -5,6 +5,7 @@ import userRepository from "../Repository/userRepository";
 import Otp from "../Model/otp";
 import hrRepository from "../Repository/hrRepository";
 import appliedJobs from "../Model/appliedJobs";
+import followers from "../Model/followers";
 
 try {
 } catch (error) {}
@@ -286,15 +287,16 @@ const saveAppliedJob = async (body: appliedJobBody) => {
   }
 };
 const followAndUnfollow = async (
-  HRId: string,
+  hrID: string,
   value: string,
-  userEmail: string
+  userID: string
 ) => {
   try {
     if (value == "follow+") {
-      await userRepository.followHR(HRId, userEmail);
+      const newFollower =new followers({hrID,userID})
+      newFollower.save()
     } else {
-      await userRepository.UnfollowHR(HRId, userEmail);
+      await userRepository.UnfollowHR(hrID, userID);
     }
     return { message: "success" };
   } catch (error) {

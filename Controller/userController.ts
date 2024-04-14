@@ -283,11 +283,11 @@ const followAndUnfollow = async (req: Request, res: Response) => {
   try {
     console.log(req.body, "value");
 
-    const userEmail = (req as any).userEmail;
+    const userId = (req as any).userId;
     const response = await userService.followAndUnfollow(
       req.body.HRId,
       req.body.value,
-      userEmail
+      userId
     );
     console.log(response, "res---follow unfollow");
 

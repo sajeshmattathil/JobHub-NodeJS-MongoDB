@@ -5,6 +5,7 @@ import User from "../Model/user";
 import hr from "../Model/hr";
 import plan from "../Model/plan";
 import chat from "../Model/chat";
+import followers from "../Model/followers";
 
 try {
 } catch (error) {}
@@ -279,22 +280,12 @@ const addUserEmailInJobPost = async (userEmail: string, jobId: string) => {
   }
 };
 
-const followHR = async (HRId: string, userEmail: string) => {
-  try {
-    return await hr.updateOne(
-      { _id: HRId },
-      { $push: { followers: userEmail } }
-    );
-  } catch (error) {
-    console.log(error, "error in follow and unfollow hr at repo");
-  }
-};
 
-const UnfollowHR = async (HRId: string, userEmail: string) => {
+
+const UnfollowHR = async (hrID: string, userID: string) => {
   try {
-    return await hr.updateOne(
-      { _id: HRId },
-      { $pull: { followers: userEmail } }
+    return await followers.deleteOne(
+      { hrID: hrID,userID :userID }
     );
   } catch (error) {
     console.log(error, "error in follow and unfollow hr at repo");
@@ -387,7 +378,6 @@ export default {
   resetPassword,
   getJobData,
   addUserEmailInJobPost,
-  followHR,
   UnfollowHR,
   getPlans,
   savePayment,

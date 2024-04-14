@@ -47,19 +47,58 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-io.on("connection", (socket: Socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-  socket.on("message", async (data: string) => {
-    io.emit("messageResponse", data);
-    await chatService.saveChat(data);
+// io.on("connection", (socket: Socket) => {
+//   console.log(`⚡:user just connected!`);
+//   socket.on("message",  ({recipient ,message}) => {
+//     console.log(recipient,message,'recip');
+    
+//     io.to(recipient).emit("messageResponse", message, async (acknowledgment: string) => {
+//       if (acknowledgment === "success") {
+//         console.log("Message emitted successfully");
+//       } else {
+//         console.log("Message emission failed");
+//       }
+     
+//     });
+//     // try {
+//     //   await chatService.saveChat(message);
+//     // } catch (error) {
+//     // }
+    
+//   });
+//   socket.on("disconnect", () => {
+//     console.log("A user disconnected");
+//   });
+//   socket.on("vdo-call", async (data) => {
+//     io.emit("join-vdo-call", data);
+//   });
+// });
+io.on("connection", (socket) => {
+  console.log(`⚡: User connected!`);
+
+  // Handle message emission from client
+  socket.on("message", async ({ recipient, message }) => {
+    try {
+      // Emit message response to recipient
+      io.to(recipient).emit("messageResponse", message);
+
+      // Save chat message (if needed)
+      await chatService.saveChat(message);
+
+      console.log("Message emitted successfully");
+    } catch (error) {
+      console.error("Error emitting message:", error);
+    }
   });
+
+  // Handle disconnection
   socket.on("disconnect", () => {
-    console.log("🔥: A user disconnected");
+    console.log("⚡: User disconnected");
   });
-  socket.on("vdo-call", async (data) => {
-    io.emit("join-vdo-call", data);
-  });
+
+  // Additional event handlers (if needed)
 });
+
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
