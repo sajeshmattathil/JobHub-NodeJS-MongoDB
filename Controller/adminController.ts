@@ -252,6 +252,16 @@ const deletePlan = async (req: Request, res: Response) =>{
     res.json({ status: 500 });
    }
 }
+const getDashboardData = async (req: Request, res: Response)=>{
+ try {
+  const dashboardData = await adminService.getAllDashboardData()
+  if(dashboardData.success) res.status(202).json({dashboardData : dashboardData?.data})
+    else res.status(404).json({message : dashboardData?.error})
+ } catch (error) {
+  res.status(500).json({message : "Something went wrong!"})
+ }
+}
+
 export default {
   getAdmin,
   loginSubmit,
@@ -265,5 +275,6 @@ export default {
   getPlans,
   getPlanData,
   updatePlan,
-  deletePlan
+  deletePlan,
+  getDashboardData
 };

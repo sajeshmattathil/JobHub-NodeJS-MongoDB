@@ -308,6 +308,7 @@ interface PaymentBody {
   amount: string;
   planName: string;
   razorpayId: string;
+  time ?:Date;
 }
 const savePayment = async (body: PaymentBody, id: string) => {
   try {

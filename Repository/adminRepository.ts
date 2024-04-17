@@ -3,6 +3,7 @@ import Admin from "../Model/admin";
 import Hr from "../Model/hr";
 import plan from "../Model/plan";
 import User from "../Model/user";
+import transaction from "../Model/transactions";
 
 const findAdmin = async (email: string) => {
   try {
@@ -140,6 +141,41 @@ const deletePlan = async (id: string) => {
     console.log("Error in deleting plan at repo", error);
   }
 };
+const findUsersTotal = async ()=>{
+  try {
+     return await User.countDocuments({isBlocked:false})
+  } catch (error) {
+    return null
+  }
+}
+const findHRTotal = async ()=>{
+  try {
+    return await Hr.countDocuments({isApproved:true})
+  } catch (error) {
+    return null
+  }
+}
+const findTotalActiveSubcribers = async ()=>{
+  try {
+    return await User.countDocuments({"subscription.isSubscribed":true})
+  } catch (error) {
+    return null
+  }
+}
+const findTotalRevenueGenerated = async ()=>{
+  try {
+    return await transaction.aggregate([
+{
+  $group:{
+    _id : null,
+    totalAmount : {$sum:'$amount'}
+  }
+}
+    ])
+  } catch (error) {
+    return null
+  }
+}
 export default {
   findAdmin,
   getAllUsers,
@@ -154,4 +190,8 @@ export default {
   getPlanData,
   updatePlan,
   deletePlan,
+  findUsersTotal,
+  findHRTotal,
+  findTotalActiveSubcribers,
+  findTotalRevenueGenerated
 };

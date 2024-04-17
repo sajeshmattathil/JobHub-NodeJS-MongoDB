@@ -294,7 +294,6 @@ const getPrevChatUsers = async (HREmail: string) => {
     const usersData = await hrRepository.getPrevChatUsers(HREmail);
     console.log(usersData, "users docs");
     const lastChat = await hrRepository.getLastMsg(usersData, HREmail);
-    console.log(lastChat, "lastchat");
 
     interface resultInterface {
       text: string | null | undefined;
@@ -312,7 +311,6 @@ const getPrevChatUsers = async (HREmail: string) => {
         }
       }
     }
-    console.log(result, "result");
     if (usersData && usersData.length && result)
       return { success: true, data: result };
     else return { success: false, data: null };

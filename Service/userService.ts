@@ -6,6 +6,7 @@ import Otp from "../Model/otp";
 import hrRepository from "../Repository/hrRepository";
 import appliedJobs from "../Model/appliedJobs";
 import followers from "../Model/followers";
+import transaction from "../Model/transactions";
 
 try {
 } catch (error) {}
@@ -23,20 +24,17 @@ const createNewUser = async (user: ReqBody) => {
     const hashedPassword = await bcrypt.hash(user.password, 5);
     user.password = hashedPassword;
     const checkExistingUsers = await userRepository.findUser(user.email);
-    console.log(checkExistingUsers, "exists or not");
 
-    if (checkExistingUsers?.isVerified) return { message: "exists" };
+    if (checkExistingUsers?.isVerified) return { status: 409 };
     if (checkExistingUsers?.isVerified === false)
-      return { message: "user data exists ,not verified" };
+      return { status: 201 };
 
-    // await User.create(user);
-    const newUser = new User(user);
-    console.log("user data saved");
-
+   const newUser = new User(user);
+    
     await newUser.save();
-    return { message: "User created" };
+    return { status: 201 };
   } catch (error) {
-    return { message: "User not created" };
+    return { status: 500 };
   }
 };
 
@@ -53,22 +51,21 @@ interface otp {
 }
 const saveOtp = async (data: otp) => {
   try {
-    console.log(data, "saveOtp");
 
     const checkUserExists = await userRepository.getOtp(data.userId);
-    console.log(checkUserExists, "checkUserExists");
     if (checkUserExists?.userId) {
       const updateOTP = await userRepository.findAndUpdateOtp(data);
-      if (updateOTP) return { message: "success" };
+      if (updateOTP) return { status: 201 };
     } else {
       const saveOtp = await Otp.create(data);
-      console.log(saveOtp, ">>>>");
-      return { message: "success" };
+      return {status: 201 };
     }
 
-    return { message: "failed" };
+    return { status: 406 };
   } catch (error) {
     console.log(error, "error saving otp");
+    return {status: 500 };
+
   }
 };
 
@@ -76,8 +73,9 @@ const getSavedOtp = async (userID: string) => {
   try {
     const getOtp = await userRepository.getOtp(userID);
     if (getOtp) return getOtp;
-    else return;
+    else return null
   } catch (error) {
+    return null
     console.log("Otp not found");
   }
 };
@@ -86,7 +84,6 @@ const verifyLoginUser = async (user: ReqBody) => {
   try {
     const userDetails: userDetailsInterface | undefined | null =
       await userRepository.findUser(user.email);
-    console.log(userDetails, "user find");
 
     if (userDetails !== undefined && userDetails !== null) {
       const comparePsw = await bcrypt.compare(
@@ -97,12 +94,12 @@ const verifyLoginUser = async (user: ReqBody) => {
       if (userDetails && comparePsw && !userDetails.isBlocked) {
         return {
           userData: userDetails.email,
-          message: "user verified",
+         status :201,
           ObjectId: userDetails._id,
         };
-      } else return { userData: null, message: "Password is incorrect" };
+      } else return { userData: null,status:400, message: "Password is incorrect" };
     } else {
-      return { userData: null, message: "No user is found in this email" };
+      return { userData: null,status:500, message: "No user is found in this email" };
     }
   } catch (error) {
     console.log(error);
@@ -113,8 +110,11 @@ const verifyLoginUser = async (user: ReqBody) => {
 const setVerifiedTrue = async (userId: string) => {
   try {
     const setVerifiedTrue = await userRepository.setVerifiedTrue(userId);
+    return {status:200}
   } catch (error) {
     console.log(error, "error in set verified true at user service");
+    return {status:500}
+
   }
 };
 
@@ -158,7 +158,6 @@ interface userData {
 const updateUser = async (data: userData, userEmail: string) => {
   try {
     const updateUser = await userRepository.updateUser(data, userEmail);
-    console.log(updateUser, "updated ---result");
 
     if (updateUser?.message) return { message: "success" };
     else return { message: "failed" };
@@ -337,6 +336,7 @@ interface PaymentBody {
   expireAt: Date;
   startedAt: Date;
   razorpayId: string;
+  time ?:Date
 }
 
 const savePayment = async (
@@ -347,18 +347,20 @@ const savePayment = async (
   try {
     await userRepository.addUserToPlan(body.planId, userEmail);
     const updatePayment = await userRepository.savePayment(body, id);
-    if (updatePayment && updatePayment.modifiedCount !== 0) return true;
+    body.time = body.startedAt
+    const newTransaction = new transaction(body)
+    newTransaction.save()
+    if (updatePayment && updatePayment.modifiedCount !== 0 && newTransaction?._id) return true;
     else return false;
   } catch (error) {
     console.log("Error in save payment adminservice", error);
+    return false
   }
 };
 const getPrevChatUsers = async (userEmail: string) => {
   try {
     const usersData = await userRepository.getPrevChatUsers(userEmail);
-    console.log(usersData,'usersss>>>>>')
     const lastChat = await userRepository.getLastMsg(usersData, userEmail);
-    console.log(lastChat,'last')
     interface resultInterface {
       text: string | null | undefined;
       name: string | null | undefined;
@@ -375,7 +377,6 @@ const getPrevChatUsers = async (userEmail: string) => {
         }
       }
     }
-    console.log(result, "result");
     if (usersData && usersData.length && result)
       return { success: true, data: result };
     else return { success: false, data: null };

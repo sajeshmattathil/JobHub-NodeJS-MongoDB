@@ -16,6 +16,6 @@ router.get('/getPlans',jwtAdmin.verifyToken,adminController.getPlans)
 router.get('/getPlanData/:planId',jwtAdmin.verifyToken,adminController.getPlanData)
 router.post('/updatePlan/:planId',jwtAdmin.verifyToken,adminController.updatePlan)
 router.delete('/deletePlan/:id',jwtAdmin.verifyToken,adminController.deletePlan)
-
+router.get('/getDashboardData',jwtAdmin.verifyToken,adminController.getDashboardData)
 
 export default router

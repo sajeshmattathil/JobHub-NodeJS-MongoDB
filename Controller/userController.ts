@@ -28,11 +28,9 @@ const signupSubmit = async (
   console.log(req.body);
   try {
     const newUser = await userService.createNewUser(req.body);
-    console.log(newUser, "$$$$");
 
     if (
-      newUser?.message == "User created" ||
-      newUser?.message == "user data exists ,not verified"
+      newUser?.status == 201
     ) {
       res
         .status(201)
@@ -45,7 +43,7 @@ const signupSubmit = async (
         otp: req.body.otp,
         createdAt: req.body.createdAt,
       });
-    } else if (newUser?.message == "exists") {
+    } else if (newUser?.status == 409) {
       res
         .status(409)
         .json({ status: 409, message: "User with this email already exists" });
@@ -75,7 +73,6 @@ const verifyOtp = async (
   res: Response<signupSubmitResponse>
 ) => {
   try {
-    console.log(req.body, "hello");
 
     const getSavedOtp = await userService.getSavedOtp(req.body.userId);
     console.log(getSavedOtp, "666754646");
@@ -112,11 +109,12 @@ const verifyOtp = async (
 const resendOTP = async (req: Request, res: Response) => {
   try {
     sendOTPByEmail(req.body.userId, req.body.otp);
-
     const saveOtp = await userService.saveOtp(req.body);
-    if (saveOtp?.message === "success") res.status(200).json({ status: 200 });
-    res.status(400).json({ status: 400 });
-  } catch (error) {}
+    if (saveOtp?.status === 200) res.status(200).json({ status: 200 });
+   else res.status(400).json({ status: 400 });
+  } catch (error) {
+    res.status(500).json({ status: 500 });
+  }
 };
 
 interface loginSubmitResponse {
@@ -135,11 +133,9 @@ const loginSubmit = async (
   try {
     const verifyUser = await userService.verifyLoginUser(req.body);
 
-    console.log(verifyUser.userData, "verify user");
-
-    if (verifyUser?.userData) {
+    if (verifyUser?.userData !== null && verifyUser?.status === 201) {
       const token = jwtUser.generateToken(
-        verifyUser.userData,
+        verifyUser?.userData,
         verifyUser.ObjectId
       );
       res.status(201).json({

@@ -51,20 +51,20 @@ app.use(express.urlencoded({ extended: true }));
 //   console.log(`⚡:user just connected!`);
 //   socket.on("message",  ({recipient ,message}) => {
 //     console.log(recipient,message,'recip');
-    
+
 //     io.to(recipient).emit("messageResponse", message, async (acknowledgment: string) => {
 //       if (acknowledgment === "success") {
 //         console.log("Message emitted successfully");
 //       } else {
 //         console.log("Message emission failed");
 //       }
-     
+
 //     });
 //     // try {
 //     //   await chatService.saveChat(message);
 //     // } catch (error) {
 //     // }
-    
+
 //   });
 //   socket.on("disconnect", () => {
 //     console.log("A user disconnected");
@@ -73,37 +73,65 @@ app.use(express.urlencoded({ extended: true }));
 //     io.emit("join-vdo-call", data);
 //   });
 // });
+
+let pairedUsers: [string, string][];
 io.on("connection", (socket) => {
   console.log(`⚡: User connected!`);
+  socket.on("join-chat", (userPair) => {
+    console.log(userPair,'join chat');
+    
+   if(userPair.length){
+  if(pairedUsers&&pairedUsers.length){
+    const checkNewPairExist = pairedUsers.find((user) =>
+      user.includes(userPair[0]) && userPair[1]
+  )
+  console.log(checkNewPairExist,'exist or not');
+  
+  if (!checkNewPairExist)
+   {
+    console.log('entered');
+    
+    pairedUsers = [userPair, ...pairedUsers];
+    console.log(pairedUsers,'pairedusers');
+    
+  }else  console.log(`User  is already in the allowed users list.`);
 
-  // Handle message emission from client
+  }
+  else{
+    pairedUsers = [...userPair];
+    console.log(pairedUsers,'pairedusers');
+  }
+ 
+   } 
+  });
+
   socket.on("message", async ({ recipient, message }) => {
     try {
-      // Emit message response to recipient
-      io.to(recipient).emit("messageResponse", message);
+      console.log(message,pairedUsers, "msg && arr");
+     if(pairedUsers && pairedUsers.length){
+      const checkUser = pairedUsers.find((user) => user.includes(recipient));
+      if (checkUser?.length) {
+        io.to(recipient).emit("messageResponse", message);
 
-      // Save chat message (if needed)
-      await chatService.saveChat(message);
+        await chatService.saveChat(message);
 
-      console.log("Message emitted successfully");
+        console.log("Message emitted successfully");
+      }
+     }
     } catch (error) {
       console.error("Error emitting message:", error);
     }
   });
 
-  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("⚡: User disconnected");
   });
 
-  // Additional event handlers (if needed)
 });
-
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
-
 
 httpServer.listen(3000, () => {
   console.log(`Server is running on port 3000`);
