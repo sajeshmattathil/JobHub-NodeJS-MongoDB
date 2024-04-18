@@ -314,6 +314,20 @@ const getPrevChatUsers = async (req: Request, res: Response) => {
     res.status(500).json({ chatData: null });
   }
 };
+const getFollowers = async (req:Request,res:Response)=>{
+  try {
+    const HRId = (req as any)._id
+    console.log(HRId,'id>>>>>');
+    
+    const getAllFollowers = await hrService.getFollowersData(HRId)
+    console.log(getAllFollowers,'res');
+    
+    if(getAllFollowers.status === 201) res.status(201).json({followersData:getAllFollowers.data})
+      else res.status(406).json({message:'No user found'})
+  } catch (error) {
+    res.status(500).json({error:'Internal server error'})
+  }
+}
 export default {
   hrSignup,
   verifyOtp,
@@ -330,5 +344,6 @@ export default {
   shortListUser,
   getShortListedUsers,
   removeFromShortListed,
-  getPrevChatUsers
+  getPrevChatUsers,
+  getFollowers
 };

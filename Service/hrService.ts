@@ -319,6 +319,16 @@ const getPrevChatUsers = async (HREmail: string) => {
   }
 };
 
+const getFollowersData = async (HRId: string)=>{
+  try {
+    const getFollowersData = await hrRepository.getFollowersData(HRId)
+    if(getFollowersData && getFollowersData.length) return {status:201,data:getFollowersData}
+    else return {status:400,message:'No data found'}
+  } catch (error) {
+    return {status:500,message:'Internal server error'}
+  }
+}
+
 export default {
   saveHrData,
   saveOtp,
@@ -337,4 +347,5 @@ export default {
   getShortListedUsers,
   removeFromShortListed,
   getPrevChatUsers,
+  getFollowersData
 };

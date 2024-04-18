@@ -1,10 +1,11 @@
-import { ObjectId } from "mongodb";
+import { ObjectId} from "mongodb";
 import hr from "../Model/hr";
 import Hr from "../Model/hr";
 import Job from "../Model/job";
 import Otp from "../Model/otp";
 import appliedJobs from "../Model/appliedJobs";
 import chat from "../Model/chat";
+import followers from "../Model/followers";
 
 const findHr = async (email: string) => {
   try {
@@ -216,8 +217,8 @@ const updateJobpostHRViewed = async (jobId: string, HRId: string) => {
 
 const updateIsShortListed = async (jobId: string, userId: string) => {
   try {
-    console.log(userId,'id ---->>>>>>>>>>');
-    
+    console.log(userId, "id ---->>>>>>>>>>");
+
     return await Job.updateOne(
       { _id: jobId, "appliedUsers.email": userId },
       {
@@ -233,25 +234,31 @@ const getShortListedUsers = async (jobId: string) => {
   try {
     return await Job.aggregate([
       {
-        $match: { _id: new ObjectId(jobId),"appliedUsers.isShortListed" : true },
+        $match: {
+          _id: new ObjectId(jobId),
+          "appliedUsers.isShortListed": true,
+        },
       },
       {
-        $lookup : {
-          from : 'users',
-          foreignField :'email' ,
-          localField : "appliedUsers.email",
-          as : 'shortListedUsers'
-        }
+        $lookup: {
+          from: "users",
+          foreignField: "email",
+          localField: "appliedUsers.email",
+          as: "shortListedUsers",
+        },
       },
       {
-        $unwind:'$shortListedUsers'
-      }
+        $unwind: "$shortListedUsers",
+      },
     ]);
   } catch (error) {
     console.log(error, "error happened in getting shortlisted user at repo");
   }
 };
-const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
+const removeFromShortListed = async (body: {
+  email: string;
+  jobId: string;
+}) => {
   try {
     return await Job.updateOne(
       { _id: body.jobId, "appliedUsers.email": body.email },
@@ -260,25 +267,65 @@ const removeFromShortListed = async (body : {email:string,jobId : string}) =>{
       }
     );
   } catch (error) {
-    console.log(error, "error happened in getting remove from shortlisted user at repo");
-    
+    console.log(
+      error,
+      "error happened in getting remove from shortlisted user at repo"
+    );
   }
-}
-const getPrevChatUsers = async (HREmail : string)=>{
+};
+const getPrevChatUsers = async (HREmail: string) => {
   try {
-    return await chat.distinct("recipient2",{recipient1 : HREmail})
+    return await chat.distinct("recipient2", { recipient1: HREmail });
   } catch (error) {
-    console.log(error,'error happende in getting prev chat users in repo')
+    console.log(error, "error happende in getting prev chat users in repo");
   }
-}
+};
 
-const getLastMsg = async (usersData : (string|undefined|null)[]|undefined,HREmail : string)=>{
+const getLastMsg = async (
+  usersData: (string | undefined | null)[] | undefined,
+  HREmail: string
+) => {
   try {
-    if(usersData) return await chat.find({recipient1 : HREmail ,recipient2 : {$in : [...usersData]}}).sort({time :-1})
+    if (usersData)
+      return await chat
+        .find({ recipient1: HREmail, recipient2: { $in: [...usersData] } })
+        .sort({ time: -1 });
   } catch (error) {
-    console.log(error,'error happend in getting last msg users in repo')
+    console.log(error, "error happend in getting last msg users in repo");
   }
-}
+};
+const getFollowersData = async (HRId: string) => {
+  try {
+    return await followers.aggregate([
+      {
+        $match: { hrID:new ObjectId(HRId) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userID",
+          foreignField: "_id",
+          as: "users",
+        },
+      },
+      {
+        $unwind: "$users",
+      },
+      {
+        $project: {
+          _id : 0,
+          'users._id': 1,
+          'users.fname': 1,
+          'users.lname': 1,
+          'users.resume': 1
+      }
+      ,
+      },
+    ]);
+  } catch (error) {
+    return null;
+  }
+};
 export default {
   findHr,
   findHrById,
@@ -296,5 +343,6 @@ export default {
   getShortListedUsers,
   removeFromShortListed,
   getPrevChatUsers,
-  getLastMsg
+  getLastMsg,
+  getFollowersData,
 };

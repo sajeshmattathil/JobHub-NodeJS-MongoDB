@@ -21,5 +21,6 @@ router.get('/shortListedUsers/:jobId',jwtHR.verifyToken,hrController.getShortLis
 router.get('/getChat',jwtHR.verifyToken,chatController.getChat)
 router.patch('/removeFromShortListed',jwtHR.verifyToken,hrController.removeFromShortListed)
 router.get('/getPrevChatUsers',jwtHR.verifyToken,hrController.getPrevChatUsers)
+router.get('/getFollowers',jwtHR.verifyToken,hrController.getFollowers)
 
 export default router

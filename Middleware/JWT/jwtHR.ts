@@ -31,12 +31,11 @@ let token: string | null = null
      token = header.split(' ')[1]
   } 
 
-  if (!token || role !== 'HR' ) {
+  if (!token?.trim() || role !== 'HR' ) {
     return res.json({status:404,message:'Authentication failed'});
   }
 
 const decodedPayload = jwt.verify(token, process.env.HR_SECRET_KEY as string) as JwtPayload;
-console.log(decodedPayload.HRId,'User id');
 req.HRId = decodedPayload.HRId
 req._id = decodedPayload._id
 console.log('Access granted');
