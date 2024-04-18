@@ -82,42 +82,38 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
 });
 const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let query = {
-            isDeleted: false,
-            "salaryPackage.max": {
-                $lte: body.salaryPackage ? body.salaryPackage : 10,
-            },
-        };
-        if (Object.keys(body).length) {
-            query = Object.assign(Object.assign({}, query), { $or: [
+        let query;
+        if (body.value.trim()) {
+            query = {
+                $or: [
                     {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
                         locations: { $in: [new RegExp(body.value, "i")] },
                     },
                     {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
                         qualification: { $in: [new RegExp(body.value, "i")] },
                     },
                     {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
                         jobType: { $regex: `${body.value}`, $options: "i" },
                     },
                     {
+                        isDeleted: false,
+                        "salaryPackage.max": { $lte: body.salaryPackage },
                         jobRole: { $regex: `${body.value}`, $options: "i" },
                     },
-                ] });
-        }
-        else if (Object.keys(body).length) {
-            query = Object.assign(Object.assign({}, query), { $or: [
-                    { locations: { $in: [new RegExp(body.value, "i")] } },
-                    { qualification: { $in: [new RegExp(body.value, "i")] } },
-                    { jobType: { $regex: `${body.value}`, $options: "i" } },
-                    { jobRole: { $regex: `${body.value}`, $options: "i" } },
-                ] });
+                ],
+            };
         }
         else if (skills.length) {
-            query = Object.assign(Object.assign({}, query), { qualification: { $in: skills } });
+            query = { isDeleted: false, qualification: { $in: [...skills] } };
         }
-        let sortQuery = { createdAt: -1 };
-        if (body.sort === "relevance") {
-            sortQuery = { createdAt: 1 };
+        else {
+            query = { isDeleted: false };
         }
         if (body.industry.length) {
             let orCondition = body.industry.map((item) => {
@@ -125,13 +121,15 @@ const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, voi
             });
             query = { $or: orCondition };
         }
-        console.log(query, "query");
+        let sortQuery = { createdAt: -1 };
+        if (body.sort === "relevance") {
+            sortQuery = { createdAt: 1 };
+        }
         const jobs = yield job_1.default.find(query)
             .sort(sortQuery)
             .skip(jobsPerPage * (pageNumber - 1))
             .limit(jobsPerPage);
-        if (body.sort === "old")
-            return jobs.reverse();
+        // if (body.sort === "old") return jobs.reverse();
         return jobs;
     }
     catch (error) {
@@ -168,7 +166,7 @@ const jobCount = (body, skills) => __awaiter(void 0, void 0, void 0, function* (
                 ],
             };
         }
-        else if (!Object.keys(body).length && skills.length) {
+        else if (skills.length) {
             query = { isDeleted: false, qualification: { $in: [...skills] } };
         }
         else {

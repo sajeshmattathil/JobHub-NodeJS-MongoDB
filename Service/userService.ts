@@ -190,6 +190,7 @@ const getJobs = async (
       body,
       getUser?.skills ? getUser.skills : []
     );
+    console.log(jobCount, "jobcount");
 
     const getJobs = await userRepository.getJobs(
       pageNumber,
@@ -246,6 +247,7 @@ const resetPassword = async (body: Body) => {
 const getJobData = async (id: string) => {
   try {
     const data = await userRepository.getJobData(id);
+    console.log(data, "data---job");
 
     if (data && data.length) {
       return { message: "success", data: data };

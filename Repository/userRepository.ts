@@ -118,65 +118,57 @@ const getJobs = async (
   skills: string[] | []
 ) => {
   try {
-    let query: any = {
-      isDeleted: false,
-      "salaryPackage.max": {
-        $lte: body.salaryPackage ? body.salaryPackage : 10,
-      },
-    };
+    let query: any;
 
-    if (Object.keys(body).length ) {
+    if (body.value.trim()) {
       query = {
-        ...query,
         $or: [
           {
+            isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             locations: { $in: [new RegExp(body.value, "i")] },
           },
           {
+            isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             qualification: { $in: [new RegExp(body.value, "i")] },
           },
           {
+            isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             jobType: { $regex: `${body.value}`, $options: "i" },
           },
           {
+            isDeleted: false,
+            "salaryPackage.max": { $lte: body.salaryPackage },
             jobRole: { $regex: `${body.value}`, $options: "i" },
           },
         ],
       };
-    } else if (Object.keys(body).length) {
-      query = {
-        ...query,
-        $or: [
-          { locations: { $in: [new RegExp(body.value, "i")] } },
-          { qualification: { $in: [new RegExp(body.value, "i")] } },
-          { jobType: { $regex: `${body.value}`, $options: "i" } },
-          { jobRole: { $regex: `${body.value}`, $options: "i" } },
-        ],
-      };
-    } else if (skills.length) {
-      query = { ...query, qualification: { $in: skills } };
-    }
-
-    let sortQuery: any = { createdAt: -1 };
-    if (body.sort === "relevance") {
-      sortQuery = { createdAt: 1 };
+    } else if ( skills.length) {
+      query = { isDeleted: false, qualification: { $in: [...skills] } };
+    } else {
+      query = { isDeleted: false };
     }
 
     if (body.industry.length) {
       let orCondition = body.industry.map((item) => {
         return { isDeleted: false, industry: item.industry };
       });
-
       query = { $or: orCondition };
     }
-    console.log(query, "query");
+    let sortQuery: any = { createdAt: -1 };
+    if (body.sort === "relevance") {
+      sortQuery = { createdAt: 1 };
+    }
     
     const jobs = await Job.find(query)
       .sort(sortQuery)
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
       
-    if (body.sort === "old") return jobs.reverse();
+    // if (body.sort === "old") return jobs.reverse();
+
     return jobs;
 
   } catch (error) {
@@ -214,11 +206,12 @@ const jobCount = async (body: searchBody, skills: string[] | []) => {
           },
         ],
       };
-    } else if (!Object.keys(body).length && skills.length) {
+    } else if ( skills.length) {
       query = { isDeleted: false, qualification: { $in: [...skills] } };
     } else {
       query = { isDeleted: false };
     }
+
     if (body.industry.length) {
       let orCondition = body.industry.map((item) => {
         return { isDeleted: false, industry: item.industry };

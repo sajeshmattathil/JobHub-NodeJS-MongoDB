@@ -144,6 +144,7 @@ const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, 
         if (userEmail.trim())
             getUser = yield userRepository_1.default.findUser(userEmail);
         const jobCount = yield userRepository_1.default.jobCount(body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
+        console.log(jobCount, "jobcount");
         const getJobs = yield userRepository_1.default.getJobs(pageNumber, jobsPerPage, body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
         if (getJobs !== undefined) {
             if (getJobs.length)
@@ -192,6 +193,7 @@ const resetPassword = (body) => __awaiter(void 0, void 0, void 0, function* () {
 const getJobData = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield userRepository_1.default.getJobData(id);
+        console.log(data, "data---job");
         if (data && data.length) {
             return { message: "success", data: data };
         }
