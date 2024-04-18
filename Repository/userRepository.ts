@@ -100,11 +100,11 @@ const updateUser = async (data: userData, userEmail: string) => {
   }
 };
 interface industryInterface {
-  industry ?: string;
-  createdAt ?: Date | number;
+  industry?: string;
+  createdAt?: Date | number;
 }
 interface searchBody {
-  industry:industryInterface[]|[] ;
+  industry: industryInterface[] | [];
   salaryPackage: number;
   option: string;
   value: string;
@@ -118,31 +118,32 @@ const getJobs = async (
   skills: string[] | []
 ) => {
   try {
-    let query: any = { isDeleted: false,"salaryPackage.max": { $lte: (body.salaryPackage)?(body.salaryPackage):10 } };
+    let query: any = {
+      isDeleted: false,
+      "salaryPackage.max": {
+        $lte: body.salaryPackage ? body.salaryPackage : 10,
+      },
+    };
 
-    if (Object.keys(body).length && body.industry.length ) {
+    if (Object.keys(body).length ) {
       query = {
         ...query,
         $or: [
           {
-            $or: body.industry,
             locations: { $in: [new RegExp(body.value, "i")] },
           },
           {
-            $or: body.industry,
             qualification: { $in: [new RegExp(body.value, "i")] },
           },
           {
-            $or: body.industry,
             jobType: { $regex: `${body.value}`, $options: "i" },
           },
           {
-            $or: body.industry,
             jobRole: { $regex: `${body.value}`, $options: "i" },
           },
         ],
       };
-    } else if (Object.keys(body).length ) {
+    } else if (Object.keys(body).length) {
       query = {
         ...query,
         $or: [
@@ -160,25 +161,35 @@ const getJobs = async (
     if (body.sort === "relevance") {
       sortQuery = { createdAt: 1 };
     }
-console.log(query,'query')
+
+    if (body.industry.length) {
+      let orCondition = body.industry.map((item) => {
+        return { isDeleted: false, industry: item.industry };
+      });
+
+      query = { $or: orCondition };
+    }
+    console.log(query, "query");
+    
     const jobs = await Job.find(query)
       .sort(sortQuery)
       .skip(jobsPerPage * (pageNumber - 1))
       .limit(jobsPerPage);
-      if(body.sort === 'old') return jobs.reverse()
+      
+    if (body.sort === "old") return jobs.reverse();
     return jobs;
+
   } catch (error) {
     console.error("error in fetching jobs from db for user", error);
     return [];
   }
 };
 
-
 const jobCount = async (body: searchBody, skills: string[] | []) => {
   try {
     let query: any;
 
-    if (Object.keys(body).length) {
+    if (body.value.trim()) {
       query = {
         $or: [
           {
@@ -208,6 +219,13 @@ const jobCount = async (body: searchBody, skills: string[] | []) => {
     } else {
       query = { isDeleted: false };
     }
+    if (body.industry.length) {
+      let orCondition = body.industry.map((item) => {
+        return { isDeleted: false, industry: item.industry };
+      });
+      query = { $or: orCondition };
+    }
+
     return await Job.countDocuments(query);
   } catch (error) {
     console.error("error happened in fetching job count in userrepo");
@@ -280,13 +298,9 @@ const addUserEmailInJobPost = async (userEmail: string, jobId: string) => {
   }
 };
 
-
-
 const UnfollowHR = async (hrID: string, userID: string) => {
   try {
-    return await followers.deleteOne(
-      { hrID: hrID,userID :userID }
-    );
+    return await followers.deleteOne({ hrID: hrID, userID: userID });
   } catch (error) {
     console.log(error, "error in follow and unfollow hr at repo");
   }
@@ -308,7 +322,7 @@ interface PaymentBody {
   amount: string;
   planName: string;
   razorpayId: string;
-  time ?:Date;
+  time?: Date;
 }
 const savePayment = async (body: PaymentBody, id: string) => {
   try {

@@ -190,6 +190,7 @@ const updateUser = async (req: Request, res: Response) => {
 
 const getJobs = async (req: Request, res: Response) => {
   try {
+    console.log(req.body,'body>>>controllerrr')
     const pageNumber: string | number = req.query.page as string;
     const jobsPerPage: string | number = req.query.jobsPerPage as string;
     let userEmail = ''
