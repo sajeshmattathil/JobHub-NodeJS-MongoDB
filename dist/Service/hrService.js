@@ -251,7 +251,6 @@ const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function
         const usersData = yield hrRepository_1.default.getPrevChatUsers(HREmail);
         console.log(usersData, "users docs");
         const lastChat = yield hrRepository_1.default.getLastMsg(usersData, HREmail);
-        console.log(lastChat, "lastchat");
         let result = [];
         if (usersData && lastChat) {
             for (let user of usersData) {
@@ -264,7 +263,6 @@ const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function
                 }
             }
         }
-        console.log(result, "result");
         if (usersData && usersData.length && result)
             return { success: true, data: result };
         else
@@ -272,6 +270,18 @@ const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function
     }
     catch (error) {
         return { success: false, data: null };
+    }
+});
+const getFollowersData = (HRId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const getFollowersData = yield hrRepository_1.default.getFollowersData(HRId);
+        if (getFollowersData && getFollowersData.length)
+            return { status: 201, data: getFollowersData };
+        else
+            return { status: 400, message: 'No data found' };
+    }
+    catch (error) {
+        return { status: 500, message: 'Internal server error' };
     }
 });
 exports.default = {
@@ -292,4 +302,5 @@ exports.default = {
     getShortListedUsers,
     removeFromShortListed,
     getPrevChatUsers,
+    getFollowersData
 };

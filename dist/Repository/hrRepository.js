@@ -19,6 +19,7 @@ const job_1 = __importDefault(require("../Model/job"));
 const otp_1 = __importDefault(require("../Model/otp"));
 const appliedJobs_1 = __importDefault(require("../Model/appliedJobs"));
 const chat_1 = __importDefault(require("../Model/chat"));
+const followers_1 = __importDefault(require("../Model/followers"));
 const findHr = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield hr_2.default.findOne({ email: email });
@@ -177,7 +178,7 @@ const updateJobpostHRViewed = (jobId, HRId) => __awaiter(void 0, void 0, void 0,
 });
 const updateIsShortListed = (jobId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(userId, 'id ---->>>>>>>>>>');
+        console.log(userId, "id ---->>>>>>>>>>");
         return yield job_1.default.updateOne({ _id: jobId, "appliedUsers.email": userId }, {
             $set: { "appliedUsers.$.isShortListed": true },
         });
@@ -190,19 +191,22 @@ const getShortListedUsers = (jobId) => __awaiter(void 0, void 0, void 0, functio
     try {
         return yield job_1.default.aggregate([
             {
-                $match: { _id: new mongodb_1.ObjectId(jobId), "appliedUsers.isShortListed": true },
+                $match: {
+                    _id: new mongodb_1.ObjectId(jobId),
+                    "appliedUsers.isShortListed": true,
+                },
             },
             {
                 $lookup: {
-                    from: 'users',
-                    foreignField: 'email',
+                    from: "users",
+                    foreignField: "email",
                     localField: "appliedUsers.email",
-                    as: 'shortListedUsers'
-                }
+                    as: "shortListedUsers",
+                },
             },
             {
-                $unwind: '$shortListedUsers'
-            }
+                $unwind: "$shortListedUsers",
+            },
         ]);
     }
     catch (error) {
@@ -224,16 +228,50 @@ const getPrevChatUsers = (HREmail) => __awaiter(void 0, void 0, void 0, function
         return yield chat_1.default.distinct("recipient2", { recipient1: HREmail });
     }
     catch (error) {
-        console.log(error, 'error happende in getting prev chat users in repo');
+        console.log(error, "error happende in getting prev chat users in repo");
     }
 });
 const getLastMsg = (usersData, HREmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (usersData)
-            return yield chat_1.default.find({ recipient1: HREmail, recipient2: { $in: [...usersData] } }).sort({ time: -1 });
+            return yield chat_1.default
+                .find({ recipient1: HREmail, recipient2: { $in: [...usersData] } })
+                .sort({ time: -1 });
     }
     catch (error) {
-        console.log(error, 'error happend in getting last msg users in repo');
+        console.log(error, "error happend in getting last msg users in repo");
+    }
+});
+const getFollowersData = (HRId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield followers_1.default.aggregate([
+            {
+                $match: { hrID: new mongodb_1.ObjectId(HRId) },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userID",
+                    foreignField: "_id",
+                    as: "users",
+                },
+            },
+            {
+                $unwind: "$users",
+            },
+            {
+                $project: {
+                    _id: 0,
+                    'users._id': 1,
+                    'users.fname': 1,
+                    'users.lname': 1,
+                    'users.resume': 1
+                },
+            },
+        ]);
+    }
+    catch (error) {
+        return null;
     }
 });
 exports.default = {
@@ -253,5 +291,6 @@ exports.default = {
     getShortListedUsers,
     removeFromShortListed,
     getPrevChatUsers,
-    getLastMsg
+    getLastMsg,
+    getFollowersData,
 };

@@ -16,9 +16,9 @@ const mongodb_1 = require("mongodb");
 const job_1 = __importDefault(require("../Model/job"));
 const otp_1 = __importDefault(require("../Model/otp"));
 const user_1 = __importDefault(require("../Model/user"));
-const hr_1 = __importDefault(require("../Model/hr"));
 const plan_1 = __importDefault(require("../Model/plan"));
 const chat_1 = __importDefault(require("../Model/chat"));
+const followers_1 = __importDefault(require("../Model/followers"));
 try {
 }
 catch (error) { }
@@ -82,23 +82,24 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
 });
 const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let query = { isDeleted: false, "salaryPackage.max": { $lte: (body.salaryPackage) ? (body.salaryPackage) : 10 } };
-        if (Object.keys(body).length && body.industry.length) {
+        let query = {
+            isDeleted: false,
+            "salaryPackage.max": {
+                $lte: body.salaryPackage ? body.salaryPackage : 10,
+            },
+        };
+        if (Object.keys(body).length) {
             query = Object.assign(Object.assign({}, query), { $or: [
                     {
-                        $or: body.industry,
                         locations: { $in: [new RegExp(body.value, "i")] },
                     },
                     {
-                        $or: body.industry,
                         qualification: { $in: [new RegExp(body.value, "i")] },
                     },
                     {
-                        $or: body.industry,
                         jobType: { $regex: `${body.value}`, $options: "i" },
                     },
                     {
-                        $or: body.industry,
                         jobRole: { $regex: `${body.value}`, $options: "i" },
                     },
                 ] });
@@ -118,12 +119,18 @@ const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, voi
         if (body.sort === "relevance") {
             sortQuery = { createdAt: 1 };
         }
-        console.log(query, 'query');
+        if (body.industry.length) {
+            let orCondition = body.industry.map((item) => {
+                return { isDeleted: false, industry: item.industry };
+            });
+            query = { $or: orCondition };
+        }
+        console.log(query, "query");
         const jobs = yield job_1.default.find(query)
             .sort(sortQuery)
             .skip(jobsPerPage * (pageNumber - 1))
             .limit(jobsPerPage);
-        if (body.sort === 'old')
+        if (body.sort === "old")
             return jobs.reverse();
         return jobs;
     }
@@ -135,7 +142,7 @@ const getJobs = (pageNumber, jobsPerPage, body, skills) => __awaiter(void 0, voi
 const jobCount = (body, skills) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let query;
-        if (Object.keys(body).length) {
+        if (body.value.trim()) {
             query = {
                 $or: [
                     {
@@ -166,6 +173,12 @@ const jobCount = (body, skills) => __awaiter(void 0, void 0, void 0, function* (
         }
         else {
             query = { isDeleted: false };
+        }
+        if (body.industry.length) {
+            let orCondition = body.industry.map((item) => {
+                return { isDeleted: false, industry: item.industry };
+            });
+            query = { $or: orCondition };
         }
         return yield job_1.default.countDocuments(query);
     }
@@ -225,17 +238,9 @@ const addUserEmailInJobPost = (userEmail, jobId) => __awaiter(void 0, void 0, vo
         return;
     }
 });
-const followHR = (HRId, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+const UnfollowHR = (hrID, userID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield hr_1.default.updateOne({ _id: HRId }, { $push: { followers: userEmail } });
-    }
-    catch (error) {
-        console.log(error, "error in follow and unfollow hr at repo");
-    }
-});
-const UnfollowHR = (HRId, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        return yield hr_1.default.updateOne({ _id: HRId }, { $pull: { followers: userEmail } });
+        return yield followers_1.default.deleteOne({ hrID: hrID, userID: userID });
     }
     catch (error) {
         console.log(error, "error in follow and unfollow hr at repo");
@@ -311,7 +316,6 @@ exports.default = {
     resetPassword,
     getJobData,
     addUserEmailInJobPost,
-    followHR,
     UnfollowHR,
     getPlans,
     savePayment,

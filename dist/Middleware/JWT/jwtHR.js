@@ -21,11 +21,10 @@ const verifyToken = (req, res, next) => {
         if (header !== undefined) {
             token = header.split(' ')[1];
         }
-        if (!token || role !== 'HR') {
+        if (!(token === null || token === void 0 ? void 0 : token.trim()) || role !== 'HR') {
             return res.json({ status: 404, message: 'Authentication failed' });
         }
         const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.HR_SECRET_KEY);
-        console.log(decodedPayload.HRId, 'User id');
         req.HRId = decodedPayload.HRId;
         req._id = decodedPayload._id;
         console.log('Access granted');

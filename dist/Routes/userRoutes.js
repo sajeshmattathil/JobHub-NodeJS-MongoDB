@@ -14,7 +14,7 @@ router.post('/resendOTP', userController_1.default.resendOTP);
 router.post('/login_submit', userController_1.default.loginSubmit);
 router.get('/getUser', jwtUser_1.default.verifyToken, userController_1.default.getUser);
 router.put('/update', jwtUser_1.default.verifyToken, userController_1.default.updateUser);
-router.post('/getJobs', jwtUser_1.default.verifyToken, userController_1.default.getJobs);
+router.post('/getJobs', userController_1.default.getJobs);
 router.post('/forgot_password', userController_1.default.saveForgotOtp);
 router.post('/verifyFortgotOtp', userController_1.default.verifyOtp);
 router.put('/resetPassword', userController_1.default.resetPassword);

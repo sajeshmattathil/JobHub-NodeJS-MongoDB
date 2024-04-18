@@ -21,9 +21,7 @@ const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     console.log(req.body);
     try {
         const newUser = yield userService_1.default.createNewUser(req.body);
-        console.log(newUser, "$$$$");
-        if ((newUser === null || newUser === void 0 ? void 0 : newUser.message) == "User created" ||
-            (newUser === null || newUser === void 0 ? void 0 : newUser.message) == "user data exists ,not verified") {
+        if ((newUser === null || newUser === void 0 ? void 0 : newUser.status) == 201) {
             res
                 .status(201)
                 .json({ status: 201, message: "User created successfully" });
@@ -34,7 +32,7 @@ const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 createdAt: req.body.createdAt,
             });
         }
-        else if ((newUser === null || newUser === void 0 ? void 0 : newUser.message) == "exists") {
+        else if ((newUser === null || newUser === void 0 ? void 0 : newUser.status) == 409) {
             res
                 .status(409)
                 .json({ status: 409, message: "User with this email already exists" });
@@ -50,7 +48,6 @@ const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, "hello");
         const getSavedOtp = yield userService_1.default.getSavedOtp(req.body.userId);
         console.log(getSavedOtp, "666754646");
         if (getSavedOtp) {
@@ -84,19 +81,21 @@ const resendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         (0, mailer_1.default)(req.body.userId, req.body.otp);
         const saveOtp = yield userService_1.default.saveOtp(req.body);
-        if ((saveOtp === null || saveOtp === void 0 ? void 0 : saveOtp.message) === "success")
+        if ((saveOtp === null || saveOtp === void 0 ? void 0 : saveOtp.status) === 200)
             res.status(200).json({ status: 200 });
-        res.status(400).json({ status: 400 });
+        else
+            res.status(400).json({ status: 400 });
     }
-    catch (error) { }
+    catch (error) {
+        res.status(500).json({ status: 500 });
+    }
 });
 const loginSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.body);
     try {
         const verifyUser = yield userService_1.default.verifyLoginUser(req.body);
-        console.log(verifyUser.userData, "verify user");
-        if (verifyUser === null || verifyUser === void 0 ? void 0 : verifyUser.userData) {
-            const token = jwtUser_1.default.generateToken(verifyUser.userData, verifyUser.ObjectId);
+        if ((verifyUser === null || verifyUser === void 0 ? void 0 : verifyUser.userData) !== null && (verifyUser === null || verifyUser === void 0 ? void 0 : verifyUser.status) === 201) {
+            const token = jwtUser_1.default.generateToken(verifyUser === null || verifyUser === void 0 ? void 0 : verifyUser.userData, verifyUser.ObjectId);
             res.status(201).json({
                 status: 201,
                 message: "User verification successful",
@@ -150,6 +149,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(req.body, 'body>>>controllerrr');
         const pageNumber = req.query.page;
         const jobsPerPage = req.query.jobsPerPage;
         let userEmail = '';
@@ -238,8 +238,8 @@ const saveAppliedJob = (req, res) => __awaiter(void 0, void 0, void 0, function*
 const followAndUnfollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(req.body, "value");
-        const userEmail = req.userEmail;
-        const response = yield userService_1.default.followAndUnfollow(req.body.HRId, req.body.value, userEmail);
+        const userId = req.userId;
+        const response = yield userService_1.default.followAndUnfollow(req.body.HRId, req.body.value, userId);
         console.log(response, "res---follow unfollow");
         if (response.message == "success")
             res.status(200).send("Changed successfully");

@@ -158,105 +158,142 @@ const saveNewPlan = (body) => __awaiter(void 0, void 0, void 0, function* () {
         const newPlan = new plan_1.default(body);
         yield newPlan.save();
         if (newPlan)
-            return { message: 'success' };
+            return { message: "success" };
         else
-            return { message: 'failed' };
+            return { message: "failed" };
     }
     catch (error) {
         console.log("Error in save new plan at adminservice", error);
-        return { message: 'failed' };
+        return { message: "failed" };
     }
 });
 const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getPlanDatas = yield adminRepository_1.default.getPlans();
-        console.log(getPlanDatas, 'data-- plan');
+        console.log(getPlanDatas, "data-- plan");
         if (getPlanDatas && getPlanDatas.length) {
             return {
-                message: 'success',
-                data: getPlanDatas
+                message: "success",
+                data: getPlanDatas,
             };
         }
         else {
             return {
-                message: 'failed',
-                data: null
+                message: "failed",
+                data: null,
             };
         }
     }
     catch (error) {
         console.log("Error in get new plan at adminservice", error);
         return {
-            message: 'failed',
-            data: null
+            message: "failed",
+            data: null,
         };
     }
 });
 const getPlanData = (planId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getPlanData = yield adminRepository_1.default.getPlanData(planId);
-        console.log(getPlanData, 'plandata---');
+        console.log(getPlanData, "plandata---");
         if (getPlanData && Object.keys(getPlanData).length) {
             return {
-                message: 'success',
-                data: getPlanData
+                message: "success",
+                data: getPlanData,
             };
         }
         else
             return {
-                message: 'failed',
-                data: null
+                message: "failed",
+                data: null,
             };
     }
     catch (error) {
         console.log("Error in get  plan at adminservice", error);
         return {
-            message: 'failed',
-            data: null
+            message: "failed",
+            data: null,
         };
     }
 });
 const updatePlan = (planId, body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getUpdatedData = yield adminRepository_1.default.updatePlan(planId, body);
-        console.log(getUpdatedData, 'getupdated data----');
-        console.log(getUpdatedData, 'plandata---');
+        console.log(getUpdatedData, "getupdated data----");
+        console.log(getUpdatedData, "plandata---");
         if (getUpdatedData) {
             return {
-                message: 'success',
+                message: "success",
             };
         }
         else
             return {
-                message: 'failed',
+                message: "failed",
             };
     }
     catch (error) {
         console.log("Error in update  plan at adminservice", error);
         return {
-            message: 'failed',
+            message: "failed",
         };
     }
 });
 const deletePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getDeletedData = yield adminRepository_1.default.deletePlan(id);
-        console.log(getDeletedData, 'getupdated data----');
-        console.log(getDeletedData, 'plandata---');
+        console.log(getDeletedData, "getupdated data----");
+        console.log(getDeletedData, "plandata---");
         if (getDeletedData) {
             return {
-                message: 'success',
+                message: "success",
             };
         }
         else
             return {
-                message: 'failed',
+                message: "failed",
             };
     }
     catch (error) {
         console.log("Error in delete  plan at adminservice", error);
         return {
-            message: 'failed',
+            message: "failed",
+        };
+    }
+});
+const getAllDashboardData = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const [totalNumberOfUsers, totalNumberOfHR, totalActiveSubscribers, totalRevenueGenerated,] = yield Promise.all([
+            adminRepository_1.default.findUsersTotal(),
+            adminRepository_1.default.findHRTotal(),
+            adminRepository_1.default.findTotalActiveSubcribers(),
+            adminRepository_1.default.findTotalRevenueGenerated(),
+        ]);
+        if (totalNumberOfUsers !== null &&
+            totalNumberOfHR !== null &&
+            totalActiveSubscribers !== null &&
+            totalRevenueGenerated !== null) {
+            return {
+                success: true,
+                data: {
+                    totalUsers: totalNumberOfUsers,
+                    totalHR: totalNumberOfHR,
+                    activeSubscribers: totalActiveSubscribers,
+                    totalRevenue: totalRevenueGenerated[0].totalAmount,
+                },
+            };
+        }
+        else {
+            return {
+                success: false,
+                error: "Some data could not be retrieved",
+            };
+        }
+    }
+    catch (error) {
+        console.error("Error in getAllDashboardData:", error);
+        return {
+            success: false,
+            error: "An error occurred while fetching data",
         };
     }
 });
@@ -273,5 +310,6 @@ exports.default = {
     getPlans,
     getPlanData,
     updatePlan,
-    deletePlan
+    deletePlan,
+    getAllDashboardData,
 };

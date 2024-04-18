@@ -17,6 +17,8 @@ const user_1 = __importDefault(require("../Model/user"));
 const userRepository_1 = __importDefault(require("../Repository/userRepository"));
 const otp_1 = __importDefault(require("../Model/otp"));
 const appliedJobs_1 = __importDefault(require("../Model/appliedJobs"));
+const followers_1 = __importDefault(require("../Model/followers"));
+const transactions_1 = __importDefault(require("../Model/transactions"));
 try {
 }
 catch (error) { }
@@ -25,40 +27,35 @@ const createNewUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
         const hashedPassword = yield bcrypt_1.default.hash(user.password, 5);
         user.password = hashedPassword;
         const checkExistingUsers = yield userRepository_1.default.findUser(user.email);
-        console.log(checkExistingUsers, "exists or not");
         if (checkExistingUsers === null || checkExistingUsers === void 0 ? void 0 : checkExistingUsers.isVerified)
-            return { message: "exists" };
+            return { status: 409 };
         if ((checkExistingUsers === null || checkExistingUsers === void 0 ? void 0 : checkExistingUsers.isVerified) === false)
-            return { message: "user data exists ,not verified" };
-        // await User.create(user);
+            return { status: 201 };
         const newUser = new user_1.default(user);
-        console.log("user data saved");
         yield newUser.save();
-        return { message: "User created" };
+        return { status: 201 };
     }
     catch (error) {
-        return { message: "User not created" };
+        return { status: 500 };
     }
 });
 const saveOtp = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(data, "saveOtp");
         const checkUserExists = yield userRepository_1.default.getOtp(data.userId);
-        console.log(checkUserExists, "checkUserExists");
         if (checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.userId) {
             const updateOTP = yield userRepository_1.default.findAndUpdateOtp(data);
             if (updateOTP)
-                return { message: "success" };
+                return { status: 201 };
         }
         else {
             const saveOtp = yield otp_1.default.create(data);
-            console.log(saveOtp, ">>>>");
-            return { message: "success" };
+            return { status: 201 };
         }
-        return { message: "failed" };
+        return { status: 406 };
     }
     catch (error) {
         console.log(error, "error saving otp");
+        return { status: 500 };
     }
 });
 const getSavedOtp = (userID) => __awaiter(void 0, void 0, void 0, function* () {
@@ -67,30 +64,30 @@ const getSavedOtp = (userID) => __awaiter(void 0, void 0, void 0, function* () {
         if (getOtp)
             return getOtp;
         else
-            return;
+            return null;
     }
     catch (error) {
+        return null;
         console.log("Otp not found");
     }
 });
 const verifyLoginUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userDetails = yield userRepository_1.default.findUser(user.email);
-        console.log(userDetails, "user find");
         if (userDetails !== undefined && userDetails !== null) {
             const comparePsw = yield bcrypt_1.default.compare(user.password, userDetails.password);
             if (userDetails && comparePsw && !userDetails.isBlocked) {
                 return {
                     userData: userDetails.email,
-                    message: "user verified",
+                    status: 201,
                     ObjectId: userDetails._id,
                 };
             }
             else
-                return { userData: null, message: "Password is incorrect" };
+                return { userData: null, status: 400, message: "Password is incorrect" };
         }
         else {
-            return { userData: null, message: "No user is found in this email" };
+            return { userData: null, status: 500, message: "No user is found in this email" };
         }
     }
     catch (error) {
@@ -101,9 +98,11 @@ const verifyLoginUser = (user) => __awaiter(void 0, void 0, void 0, function* ()
 const setVerifiedTrue = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const setVerifiedTrue = yield userRepository_1.default.setVerifiedTrue(userId);
+        return { status: 200 };
     }
     catch (error) {
         console.log(error, "error in set verified true at user service");
+        return { status: 500 };
     }
 });
 const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -130,14 +129,13 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updateUser = yield userRepository_1.default.updateUser(data, userEmail);
-        console.log(updateUser, "updated ---result");
         if (updateUser === null || updateUser === void 0 ? void 0 : updateUser.message)
             return { message: "success" };
         else
             return { message: "failed" };
     }
     catch (error) {
-        console.log("error in updating profile at userservice");
+        return;
     }
 });
 const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
@@ -146,7 +144,6 @@ const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, 
         if (userEmail.trim())
             getUser = yield userRepository_1.default.findUser(userEmail);
         const jobCount = yield userRepository_1.default.jobCount(body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
-        console.log(jobCount, "jobcount");
         const getJobs = yield userRepository_1.default.getJobs(pageNumber, jobsPerPage, body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
         if (getJobs !== undefined) {
             if (getJobs.length)
@@ -195,7 +192,6 @@ const resetPassword = (body) => __awaiter(void 0, void 0, void 0, function* () {
 const getJobData = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield userRepository_1.default.getJobData(id);
-        console.log(data, "data---job");
         if (data && data.length) {
             return { message: "success", data: data };
         }
@@ -224,13 +220,14 @@ const saveAppliedJob = (body) => __awaiter(void 0, void 0, void 0, function* () 
         return { message: "failed", appliedJob: null };
     }
 });
-const followAndUnfollow = (HRId, value, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+const followAndUnfollow = (hrID, value, userID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (value == "follow+") {
-            yield userRepository_1.default.followHR(HRId, userEmail);
+            const newFollower = new followers_1.default({ hrID, userID });
+            newFollower.save();
         }
         else {
-            yield userRepository_1.default.UnfollowHR(HRId, userEmail);
+            yield userRepository_1.default.UnfollowHR(hrID, userID);
         }
         return { message: "success" };
     }
@@ -268,21 +265,23 @@ const savePayment = (body, id, userEmail) => __awaiter(void 0, void 0, void 0, f
     try {
         yield userRepository_1.default.addUserToPlan(body.planId, userEmail);
         const updatePayment = yield userRepository_1.default.savePayment(body, id);
-        if (updatePayment && updatePayment.modifiedCount !== 0)
+        body.time = body.startedAt;
+        const newTransaction = new transactions_1.default(body);
+        newTransaction.save();
+        if (updatePayment && updatePayment.modifiedCount !== 0 && (newTransaction === null || newTransaction === void 0 ? void 0 : newTransaction._id))
             return true;
         else
             return false;
     }
     catch (error) {
         console.log("Error in save payment adminservice", error);
+        return false;
     }
 });
 const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const usersData = yield userRepository_1.default.getPrevChatUsers(userEmail);
-        console.log(usersData, 'usersss>>>>>');
         const lastChat = yield userRepository_1.default.getLastMsg(usersData, userEmail);
-        console.log(lastChat, 'last');
         let result = [];
         if (usersData && lastChat) {
             for (let user of usersData) {
@@ -295,7 +294,6 @@ const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, functi
                 }
             }
         }
-        console.log(result, "result");
         if (usersData && usersData.length && result)
             return { success: true, data: result };
         else

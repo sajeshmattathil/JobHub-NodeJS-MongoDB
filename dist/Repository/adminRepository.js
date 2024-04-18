@@ -17,6 +17,7 @@ const admin_1 = __importDefault(require("../Model/admin"));
 const hr_1 = __importDefault(require("../Model/hr"));
 const plan_1 = __importDefault(require("../Model/plan"));
 const user_1 = __importDefault(require("../Model/user"));
+const transactions_1 = __importDefault(require("../Model/transactions"));
 const findAdmin = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const adminData = yield admin_1.default.findOne({ email: email });
@@ -138,6 +139,45 @@ const deletePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Error in deleting plan at repo", error);
     }
 });
+const findUsersTotal = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield user_1.default.countDocuments({ isBlocked: false });
+    }
+    catch (error) {
+        return null;
+    }
+});
+const findHRTotal = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield hr_1.default.countDocuments({ isApproved: true });
+    }
+    catch (error) {
+        return null;
+    }
+});
+const findTotalActiveSubcribers = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield user_1.default.countDocuments({ "subscription.isSubscribed": true });
+    }
+    catch (error) {
+        return null;
+    }
+});
+const findTotalRevenueGenerated = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield transactions_1.default.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: '$amount' }
+                }
+            }
+        ]);
+    }
+    catch (error) {
+        return null;
+    }
+});
 exports.default = {
     findAdmin,
     getAllUsers,
@@ -152,4 +192,8 @@ exports.default = {
     getPlanData,
     updatePlan,
     deletePlan,
+    findUsersTotal,
+    findHRTotal,
+    findTotalActiveSubcribers,
+    findTotalRevenueGenerated
 };

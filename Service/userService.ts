@@ -162,7 +162,7 @@ const updateUser = async (data: userData, userEmail: string) => {
     if (updateUser?.message) return { message: "success" };
     else return { message: "failed" };
   } catch (error) {
-    console.log("error in updating profile at userservice");
+    return
   }
 };
 interface industryInterface {
@@ -190,7 +190,6 @@ const getJobs = async (
       body,
       getUser?.skills ? getUser.skills : []
     );
-    console.log(jobCount, "jobcount");
 
     const getJobs = await userRepository.getJobs(
       pageNumber,
@@ -247,7 +246,6 @@ const resetPassword = async (body: Body) => {
 const getJobData = async (id: string) => {
   try {
     const data = await userRepository.getJobData(id);
-    console.log(data, "data---job");
 
     if (data && data.length) {
       return { message: "success", data: data };

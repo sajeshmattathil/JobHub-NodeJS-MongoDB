@@ -20,4 +20,5 @@ router.get('/getPlans', jwtAdmin_1.default.verifyToken, adminController_1.defaul
 router.get('/getPlanData/:planId', jwtAdmin_1.default.verifyToken, adminController_1.default.getPlanData);
 router.post('/updatePlan/:planId', jwtAdmin_1.default.verifyToken, adminController_1.default.updatePlan);
 router.delete('/deletePlan/:id', jwtAdmin_1.default.verifyToken, adminController_1.default.deletePlan);
+router.get('/getDashboardData', jwtAdmin_1.default.verifyToken, adminController_1.default.getDashboardData);
 exports.default = router;

@@ -55,13 +55,18 @@ app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 io.on("connection", (socket) => {
-    console.log(`⚡: ${socket.id} user just connected!`);
-    socket.on("message", (data) => __awaiter(void 0, void 0, void 0, function* () {
-        io.emit("messageResponse", data);
-        yield chatService_1.default.saveChat(data);
+    console.log(`⚡:user just connected!`);
+    socket.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(message, 'recip');
+        io.emit("messageResponse", message);
+        try {
+            yield chatService_1.default.saveChat(message);
+        }
+        catch (error) {
+        }
     }));
     socket.on("disconnect", () => {
-        console.log("🔥: A user disconnected");
+        console.log("A user disconnected");
     });
     socket.on("vdo-call", (data) => __awaiter(void 0, void 0, void 0, function* () {
         io.emit("join-vdo-call", data);
