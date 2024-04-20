@@ -124,17 +124,17 @@ const getUser = async (id: string) => {
     if (getUser)
       return {
         data: getUser,
-        message: "success",
+        status : 200
       };
     else
       return {
         data: null,
-        message: "Not found",
+        status : 400,
       };
   } catch (error) {
     return {
       data: null,
-      message: "error",
+      status : 500,
     };
   }
 };
@@ -159,10 +159,10 @@ const updateUser = async (data: userData, userEmail: string) => {
   try {
     const updateUser = await userRepository.updateUser(data, userEmail);
 
-    if (updateUser?.message) return { message: "success" };
-    else return { message: "failed" };
+    if (updateUser?.message) return { status:201 };
+    else return { status:400 };
   } catch (error) {
-    return
+     return { status:400 };
   }
 };
 interface industryInterface {
@@ -190,7 +190,6 @@ const getJobs = async (
       body,
       getUser?.skills ? getUser.skills : []
     );
-    console.log(jobCount, "jobcount");
 
     const getJobs = await userRepository.getJobs(
       pageNumber,
@@ -200,12 +199,12 @@ const getJobs = async (
     );
     if (getJobs !== undefined) {
       if (getJobs.length)
-        return { data: getJobs, totalPages: jobCount, message: "success" };
-      else return { data: null, message: "no data" };
-    } else return { data: null, totalPages: null, message: "failed" };
+        return { data: getJobs, totalPages: jobCount, status:201 };
+      else return { data: null, status:400 };
+    } else return { data: null, totalPages: null, status :500 };
   } catch (error) {
-    console.log("error in fetching jobs by user");
-  }
+   return { data: null, totalPages: null, status :500 };
+}
 };
 const checkUserExists = async (userId: string) => {
   try {
@@ -213,17 +212,15 @@ const checkUserExists = async (userId: string) => {
     if (findUser !== undefined) {
       if (findUser !== null) {
         if (findUser.email) {
-          return { message: "user exists" };
+          return { status :200  };
         } else {
-          return { message: "user not found" };
+          return { status :404  };
         }
       }
     }
-    return { message: "user not found" };
+    return { status :404};
   } catch (error) {
-    console.log(
-      "error happened in verifyin userId is existing or not for forgot password in Controller"
-    );
+    return { status :500 };
   }
 };
 interface Body {
@@ -237,29 +234,28 @@ const resetPassword = async (body: Body) => {
     const hashedPassword = await bcrypt.hash(body.password, 15);
     body.password = hashedPassword;
     const resetPassword = await userRepository.resetPassword(body);
-    return { message: "success" };
+    return { status :201 };
   } catch (error) {
-    console.log("error in resetPassword at userService");
-    return { message: "failed" };
+    return { status :500 };
   }
 };
 
 const getJobData = async (id: string) => {
   try {
     const data = await userRepository.getJobData(id);
-    console.log(data, "data---job");
-
     if (data && data.length) {
-      return { message: "success", data: data };
+      return { status : 201, data: data };
     } else {
       return {
-        message: "failed ",
+        status : 404,
         data: null,
       };
     }
   } catch (error) {
-    console.log(error, "error in fetching job data at user service");
-  }
+    return {
+      status : 500,
+      data: null,
+    };  }
 };
 interface appliedJobBody {
   jobId: string;
@@ -270,19 +266,17 @@ interface appliedJobBody {
 }
 const saveAppliedJob = async (body: appliedJobBody) => {
   try {
-    console.log(body, "bodyyyyy");
     const newJob = new appliedJobs(body);
     newJob.save();
-    const x = await userRepository.addUserEmailInJobPost(
+    await userRepository.addUserEmailInJobPost(
       body.userEmail,
       body.jobId
     );
-    console.log(x, "xxx");
 
-    return { message: "success", appliedJob: newJob };
+    return { status : 201, appliedJob: newJob };
   } catch (error) {
     console.log(error, "error happened in saving applied jobs at service");
-    return { message: "failed", appliedJob: null };
+    return { status : 500, appliedJob: null };
   }
 };
 const followAndUnfollow = async (
@@ -297,32 +291,30 @@ const followAndUnfollow = async (
     } else {
       await userRepository.UnfollowHR(hrID, userID);
     }
-    return { message: "success" };
+    return {status : 200};
   } catch (error) {
     console.log(error, "error in follow and unfollow hr at service");
-    return { message: "failed" };
+    return { status : 500 };
   }
 };
 
 const getPlans = async () => {
   try {
     const getPlanDatas = await userRepository.getPlans();
-    console.log(getPlanDatas, "data-- plan");
     if (getPlanDatas && getPlanDatas.length) {
       return {
-        message: "success",
+        status : 201,
         data: getPlanDatas,
       };
     } else {
       return {
-        message: "failed",
+        status : 400,
         data: null,
       };
     }
   } catch (error) {
-    console.log("Error in get new plan at adminservice", error);
     return {
-      message: "failed",
+      status : 500,
       data: null,
     };
   }
@@ -350,11 +342,10 @@ const savePayment = async (
     body.time = body.startedAt
     const newTransaction = new transaction(body)
     newTransaction.save()
-    if (updatePayment && updatePayment.modifiedCount !== 0 && newTransaction?._id) return true;
-    else return false;
+    if (updatePayment && updatePayment.modifiedCount !== 0 && newTransaction?._id) return { status : 200};
+    else return { status : 400};
   } catch (error) {
-    console.log("Error in save payment adminservice", error);
-    return false
+    return { status : 500}
   }
 };
 const getPrevChatUsers = async (userEmail: string) => {
@@ -378,10 +369,10 @@ const getPrevChatUsers = async (userEmail: string) => {
       }
     }
     if (usersData && usersData.length && result)
-      return { success: true, data: result };
-    else return { success: false, data: null };
+      return { status :201, data: result };
+    else return { status:404, data: null };
   } catch (error) {
-    return { success: false, data: null };
+    return { status:500, data: null };
   }
 };
 

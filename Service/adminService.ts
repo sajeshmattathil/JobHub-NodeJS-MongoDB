@@ -24,27 +24,35 @@ const verifyLoginAdmin = async (body: loginBody) => {
         body.password,
         adminDetails.password
       );
-      console.log(comparePsw, "companre");
-
       if (adminDetails && comparePsw)
-        return { adminData: adminDetails.email, message: "Admin verified" };
-      else return { adminData: null, message: "Password is incorrect" };
+        return { adminData: adminDetails.email, status : 201};
+      else return { adminData: null, status : 401 };
     } else {
-      return { adminData: null, message: "No user is found in this email" };
+      return { adminData: null, status:404 };
     }
   } catch (error) {
     console.log(error);
-    return { adminData: null, message: "Something went wrong " };
+    return { adminData: null, status:500 };
   }
 };
 
 const getAllUsers = async () => {
   try {
     const getAllUsers = await adminRepository.getAllUsers();
-    if (getAllUsers) return getAllUsers;
+    if (getAllUsers?.length){ return {
+      status : 201,
+      data : getAllUsers
+    }} else{
+      return {
+        status:404,
+        data: null
+      }
+    }
   } catch (error) {
-    console.log("Users data is not found");
-    return;
+    return {
+      status:500,
+      data: null
+    }
   }
 };
 
@@ -55,17 +63,16 @@ const blockUblockUser = async (email: string, isBlocked: boolean) => {
       isBlocked
     );
     console.log(blockUblockUser, "blockUblockUser");
-    if (blockUblockUser) return { message: true };
-    else return { message: null };
+    if (blockUblockUser) return { status : 201 };
+    else return { status : 404 };
   } catch (error) {
     console.log("Error in block n unblock", error);
-    return { message: null };
+    return { status : 500 };
   }
 };
 const getHiringManagers = async (pageNumber: number, HRsPerPage: number) => {
   try {
     const HRCount = await adminRepository.HRCount();
-    console.log(HRCount, "jobCount1");
     const getHiringManagers = await adminRepository.getHiringManagers(
       pageNumber,
       HRsPerPage
@@ -73,17 +80,16 @@ const getHiringManagers = async (pageNumber: number, HRsPerPage: number) => {
     if (getHiringManagers !== undefined) {
       if (getHiringManagers.length)
         return {
-          message: "success",
+          status : 201,
           data: getHiringManagers,
           totalPages: HRCount,
         };
     } else {
-      return { message: "failed", data: null, totalPages: null };
+      return { status : 404, data: null, totalPages: null };
     }
   } catch (error) {
-    console.log(
-      "error happened in fetching hiring managers data in adminService"
-    );
+    return { status : 500, data: null, totalPages: null };
+
   }
 };
 
@@ -93,7 +99,6 @@ const getHiringManagersApproved = async (
 ) => {
   try {
     const HRCount = await adminRepository.HRCountApproved();
-    console.log(HRCount, "jobCount2");
     const getHiringManagers = await adminRepository.getHiringManagersApproved(
       pageNumber,
       HRsPerPage
@@ -101,40 +106,35 @@ const getHiringManagersApproved = async (
     if (getHiringManagers !== undefined) {
       if (getHiringManagers.length)
         return {
-          message: "success",
+          status : 201,
           data: getHiringManagers,
           totalPages: HRCount,
         };
     } else {
-      return { message: "failed", data: null, totalPages: null };
+      return { status : 404, data: null, totalPages: null };
     }
   } catch (error) {
-    console.log(
-      "error happened in fetching hiring managers data in adminService"
-    );
+    return { status : 500, data: null, totalPages: null };
+
   }
 };
 
 const blockUnblockHR = async (email: string, isBlocked: boolean) => {
   try {
     const blockUblockHR = await adminRepository.blockUblockHR(email, isBlocked);
-    console.log(blockUblockHR, "blockUblockUser");
-    if (blockUblockHR) return { message: true };
-    else return { message: null };
+    if (blockUblockHR) return { status : 201 };
+    else return { status : 404 };
   } catch (error) {
-    console.log("Error in block n unblock", error);
-    return { message: null };
+    return { status : 500};
   }
 };
 const hrApprove = async (email: string) => {
   try {
     const hrApprove = await adminRepository.hrApprove(email);
-    console.log(hrApprove, "hrApprove");
-    if (hrApprove) return { message: true };
-    else return { message: null };
+    if (hrApprove) return { status : 201};
+    else return { status : 404};
   } catch (error) {
-    console.log("Error in hrApprove", error);
-    return { message: null };
+    return { status : 500 };
   }
 };
 const getAdmin = async (id: string) => {
@@ -144,17 +144,17 @@ const getAdmin = async (id: string) => {
       adminData.password = "";
       return {
         data: adminData,
-        message: "success",
+        status : 201,
       };
     } else
       return {
         data: null,
-        message: "Not found",
+        status : 404,
       };
   } catch (error) {
     return {
       data: null,
-      message: "error",
+      status : 500,
     };
   }
 };
@@ -163,11 +163,10 @@ const saveNewPlan = async (body: any) => {
   try {
     const newPlan = new plan(body);
     await newPlan.save();
-    if (newPlan) return { message: "success" };
-    else return { message: "failed" };
+    if (newPlan) return { status : 200};
+    else return { status : 400};
   } catch (error) {
-    console.log("Error in save new plan at adminservice", error);
-    return { message: "failed" };
+    return {  status : 500 };
   }
 };
 
@@ -177,19 +176,18 @@ const getPlans = async () => {
     console.log(getPlanDatas, "data-- plan");
     if (getPlanDatas && getPlanDatas.length) {
       return {
-        message: "success",
+        status : 201,
         data: getPlanDatas,
       };
     } else {
       return {
-        message: "failed",
+        status : 404,
         data: null,
       };
     }
   } catch (error) {
-    console.log("Error in get new plan at adminservice", error);
     return {
-      message: "failed",
+      status : 500,
       data: null,
     };
   }
@@ -198,22 +196,19 @@ const getPlans = async () => {
 const getPlanData = async (planId: string) => {
   try {
     const getPlanData = await adminRepository.getPlanData(planId);
-    console.log(getPlanData, "plandata---");
-
     if (getPlanData && Object.keys(getPlanData).length) {
       return {
-        message: "success",
+        status : 201,
         data: getPlanData,
       };
     } else
       return {
-        message: "failed",
+        status : 400,
         data: null,
       };
   } catch (error) {
-    console.log("Error in get  plan at adminservice", error);
     return {
-      message: "failed",
+      status : 500,
       data: null,
     };
   }
@@ -227,22 +222,17 @@ interface updatedPlan {
 const updatePlan = async (planId: string, body: updatedPlan) => {
   try {
     const getUpdatedData = await adminRepository.updatePlan(planId, body);
-    console.log(getUpdatedData, "getupdated data----");
-
-    console.log(getUpdatedData, "plandata---");
-
     if (getUpdatedData) {
       return {
-        message: "success",
+        status : 201,
       };
     } else
       return {
-        message: "failed",
+        status : 400,
       };
   } catch (error) {
-    console.log("Error in update  plan at adminservice", error);
     return {
-      message: "failed",
+      status : 500,
     };
   }
 };
@@ -250,22 +240,17 @@ const updatePlan = async (planId: string, body: updatedPlan) => {
 const deletePlan = async (id: string) => {
   try {
     const getDeletedData = await adminRepository.deletePlan(id);
-    console.log(getDeletedData, "getupdated data----");
-
-    console.log(getDeletedData, "plandata---");
-
     if (getDeletedData) {
       return {
-        message: "success",
+        status : 201,
       };
     } else
       return {
-        message: "failed",
+        status : 400,
       };
   } catch (error) {
-    console.log("Error in delete  plan at adminservice", error);
     return {
-      message: "failed",
+      status : 500,
     };
   }
 };
@@ -290,7 +275,7 @@ const getAllDashboardData = async () => {
       totalRevenueGenerated !== null
     ) {
       return {
-        success: true,
+        status :202,
         data: {
           totalUsers: totalNumberOfUsers,
           totalHR: totalNumberOfHR,
@@ -300,19 +285,17 @@ const getAllDashboardData = async () => {
       };
     } else {
       return {
-        success: false,
+        status :404,
         error: "Some data could not be retrieved",
       };
     }
   } catch (error) {
-    console.error("Error in getAllDashboardData:", error);
     return {
       success: false,
       error: "An error occurred while fetching data",
     };
   }
 };
-
 export default {
   getAdmin,
   verifyLoginAdmin,

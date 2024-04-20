@@ -10,12 +10,11 @@ const getChat = async (req: Request, res: Response) => {
         String(recipient1),
         String(recipient2)
       );
-      if (response.message === "success")
+      if (response.status === 201)
         res.json({ status: 201, chatData: response.data });
       else res.json({ status: 400, chatData: null });
     }
   } catch (error) {
-    console.log(error, "error in fetching chat at controller");
     res.json({ status: 500, chatData: null });
   }
 };

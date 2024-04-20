@@ -19,12 +19,14 @@ const saveHrData = async (data: hrInputData) => {
     const hashedPassword = await bcrypt.hash(data.password, 5);
     data.password = hashedPassword;
     const checkExistingHr = await hrRepository.findHr(data.email);
-    if (checkExistingHr) return { message: "exists" };
+    if (checkExistingHr) return {status:200, message: "exists" };
     const hrData = new Hr(data);
     await hrData.save();
-    return { message: "saved" };
+    return { status:200 };
   } catch (error) {
     console.log(error, "");
+    return { status:500 };
+
   }
 };
 interface otp {

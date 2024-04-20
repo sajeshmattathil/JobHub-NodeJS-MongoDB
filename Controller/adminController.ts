@@ -15,16 +15,11 @@ interface loginSubmitResponse {
 }
 
 const loginSubmit = async (
-  req: Request<{}, {}, loginBody>,
-  res: Response<loginSubmitResponse>
+  req: Request,
+  res: Response
 ) => {
   try {
-    console.log(req.body, "body");
-
     const verifyAdmin = await adminService.verifyLoginAdmin(req.body);
-
-    console.log(verifyAdmin, "verify user");
-
     if (verifyAdmin?.adminData) {
       const token: string | undefined = jwtAdmin.generateToken(
         verifyAdmin.adminData
@@ -35,16 +30,22 @@ const loginSubmit = async (
         adminData: verifyAdmin.adminData,
         token: token,
       });
-    } else {
-      res.status(200).json({
-        status: 200,
+    } else if(verifyAdmin.status === 401) {
+      res.status(401).json({
+        status: 401,
+        message: "Admin login failed. Invalid credentials.",
+      });
+    }
+    else {
+      res.status(404).json({
+        status: 404,
         message: "Admin login failed. Invalid credentials.",
       });
     }
   } catch (error) {
     res.status(500).json({
       status: 500,
-      message: "Internal server error",
+      message: "Something went wrong, try again ",
     });
   }
 };
@@ -52,8 +53,8 @@ const loginSubmit = async (
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const response = await adminService.getAllUsers();
-    console.log(response, "response");
-    if (response) res.status(201).json({ usersData: response, status: 201 });
+    if (response.status === 201) res.status(201).json({ usersData: response, status: 201 });
+    else if(response.status === 500)res.status(500).json({ usersData: null, status: 500});
     else res.status(404).json({ usersData: null, status: 404 });
   } catch (error) {
     res.status(500).json({ usersData: null, status: 500 });
@@ -73,15 +74,13 @@ const blockUnblockUser = async (
       req.body.email,
       req.body.isBlocked
     );
-    console.log(response, "blockREsoponse");
-
-    if (response.message) {
+    if (response.status === 201) {
       res.status(201).json({ status: 201 });
     } else {
       res.status(404).json({ status: 404 });
     }
   } catch (error) {
-    console.log("error in block user in controller");
+    res.status(500).json({ status: 500 });
   }
 };
 const hiringManagers = async (req: Request, res: Response) => {
@@ -93,20 +92,19 @@ const hiringManagers = async (req: Request, res: Response) => {
       Number(pageNumber),
       Number(HRsPerPage)
     );
-    console.log(response, "hrs response controller");
-
     if (response !== undefined) {
-      if (response.message === "success") {
+      if (response.status === 201) {
         res.status(201).json({
           status: 201,
           HRData: response?.data,
           totalJobs: response.totalPages,
         });
-      } else
+      }
+       else if (response.status === 500) res.status(500).json({ status: 500, HRData: null, totalJobs: null });
+      else
         res.status(404).json({ status: 404, HRData: null, totalJobs: null });
     }
   } catch (error) {
-    console.log("error happened in fetching HR data in admincontroller");
     res.status(500).json({ status: 500, HRData: null, totalJobs: null });
   }
 };
@@ -120,20 +118,19 @@ const hiringmanagersApproved = async (req: Request, res: Response) => {
       Number(pageNumber),
       Number(HRsPerPage)
     );
-    console.log(response, "hrs response controller");
-
     if (response !== undefined) {
-      if (response.message === "success") {
+      if (response.status === 201) {
         res.status(201).json({
           status: 201,
           HRData: response?.data,
           totalJobs: response.totalPages,
         });
-      } else
+      }
+      else if (response.status === 500) res.status(500).json({ status: 500, HRData: null, totalJobs: null });
+      else
         res.status(404).json({ status: 404, HRData: null, totalJobs: null });
     }
   } catch (error) {
-    console.log("error happened in fetching HR data in admincontroller");
     res.status(500).json({ status: 500, HRData: null, totalJobs: null });
   }
 };
@@ -143,58 +140,52 @@ const blockUnblockHR = async (req: Request, res: Response) => {
       req.body.email,
       req.body.isBlocked
     );
-    console.log(response, "HRblockREsoponse");
-
-    if (response.message) {
+    if (response.status === 201) {
       res.status(201).json({ status: 201 });
     } else {
       res.status(404).json({ status: 404 });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ status: 500 });
+  }
 };
 const hrApprove = async (req: Request, res: Response) => {
   try {
     const response = await adminService.hrApprove(req.body.email);
-    console.log(response, "HRblockREsoponse");
 
-    if (response.message) {
+    if (response.status === 201) {
       res.status(201).json({ status: 201 });
     } else {
       res.status(404).json({ status: 404 });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ status: 500 });
+
+  }
 };
 
 const getAdmin = async (req: Request, res: Response) => {
   try {
     const id = (req as any).adminId;
-    console.log(id, "getadmin --- id");
-
     const response = await adminService.getAdmin(id);
-    console.log(response, "getadmin --- response");
-
-    if (response?.message === "success") {
+    if (response?.status === 201) {
       res.status(201).json({ status: 201, admin: response?.data });
     }
-    if (response?.message === "error")
+    if (response?.status === 500)
       res.status(500).json({ status: 500, admin: null });
-    if (response?.message === "Not found")
+    if (response?.status === 400)
       res.status(400).json({ status: 400, admin: null });
   } catch (error) {
-    console.log("Something went wrong", error);
+    res.status(500).json({ status: 500, admin: null });
   }
 };
 
 const saveNewPlan = async (req: Request, res: Response) => {
   try {
-    console.log(req.body, "req.body");
-
     const response = await adminService.saveNewPlan(req.body);
-    console.log(response, "response---plan");
-    if ((response.message = "success")) res.json({ status: 200 });
+    if ((response.status === 200)) res.json({ status: 200 });
     else res.json({ status: 400 });
   } catch (error) {
-    console.log("error happened in saving plan data in admincontroller");
     res.json({ status: 500 });
   }
 };
@@ -202,12 +193,10 @@ const saveNewPlan = async (req: Request, res: Response) => {
 const getPlans = async (req: Request, res: Response) => {
   try {
     const response = await adminService.getPlans();
-    console.log(response, "response---getplans");
-    if ((response.message === "success"))
+    if ((response.status === 201))
       res.json({ status: 201, planDatas: response.data });
     else res.json({ status: 400, planDatas: null });
   } catch (error) {
-    console.log("error happened in get all plan data in admincontroller");
     res.json({ status: 500, planDatas: null });
   }
 };
@@ -215,11 +204,8 @@ const getPlans = async (req: Request, res: Response) => {
 const getPlanData = async (req: Request, res: Response) => {
   try {
     const { planId } = req.params;
-    console.log(planId, "id----");
-
     const response = await adminService.getPlanData(String(planId));
-    console.log(response, "response--- plan one");
-    if ((response.message = "success"))
+    if ((response.status === 201))
       res.json({ status: 201, planData: response.data });
     else res.json({ status: 400, planData: null });
   } catch (error) {
@@ -231,12 +217,10 @@ const getPlanData = async (req: Request, res: Response) => {
 const updatePlan = async (req: Request, res: Response) => {
   try {
     const { planId } = req.params;
-    console.log(planId, "id----");
     const response = await adminService.updatePlan(String(planId), req.body);
-    if ((response.message = "success")) res.json({ status: 201 });
+    if ((response.status === 201)) res.json({ status: 201 });
     else res.json({ status: 400 });
   } catch (error) {
-    console.log("error happened in update plan data in admincontroller");
     res.json({ status: 500 });
   }
 };
@@ -244,9 +228,8 @@ const updatePlan = async (req: Request, res: Response) => {
 const deletePlan = async (req: Request, res: Response) =>{
    try {
       const { id } = req.params;
-      console.log(id, "id----");
       const response = await adminService.deletePlan(String(id));
-      if ((response.message = "success")) res.json({ status: 200 });
+      if ((response.status === 200)) res.json({ status: 200 });
       else res.json({ status: 400 });
    } catch (error) {
     res.json({ status: 500 });
@@ -255,7 +238,7 @@ const deletePlan = async (req: Request, res: Response) =>{
 const getDashboardData = async (req: Request, res: Response)=>{
  try {
   const dashboardData = await adminService.getAllDashboardData()
-  if(dashboardData.success) res.status(202).json({dashboardData : dashboardData?.data})
+  if(dashboardData.status === 202) res.status(202).json({dashboardData : dashboardData?.data})
     else res.status(404).json({message : dashboardData?.error})
  } catch (error) {
   res.status(500).json({message : "Something went wrong!"})
