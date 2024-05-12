@@ -27,6 +27,7 @@ const getOtp = async (userId: string) => {
     return await Otp.findOne({ userId: userId });
   } catch (error) {
     console.log("Otp not found in database", error);
+    return null
   }
 };
 interface otpData {
@@ -85,6 +86,7 @@ const jobCount = async (id: ObjectId) => {
     return await Job.countDocuments({ hrObjectId: id });
   } catch (error) {
     console.error("error happened in fetching job count in userrepo");
+    return null
   }
 };
 interface bodyData {
@@ -298,7 +300,7 @@ const getFollowersData = async (HRId: string) => {
   try {
     return await followers.aggregate([
       {
-        $match: { hrID:new ObjectId(HRId) },
+        $match: { hrID:new ObjectId(HRId),isBlocked : false },
       },
       {
         $lookup: {

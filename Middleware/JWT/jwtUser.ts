@@ -2,7 +2,7 @@ import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { ObjectId } from "mongodb";
 
-const generateToken = (email: string, _id: ObjectId) => {
+const generateToken = (email: string, _id: ObjectId | string) => {
   try {
     console.log(_id,'jwt');
     

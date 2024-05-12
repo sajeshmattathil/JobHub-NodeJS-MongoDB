@@ -8,10 +8,8 @@ import https from "https";
 
 const hrSignup = async (req: Request, res: Response) => {
   try {
-    console.log(req.body, "hrsignup");
     const saveHrData = await hrService.saveHrData(req.body);
-
-    if (saveHrData?.message === "saved") {
+    if (saveHrData?.status === 201) {
       res.status(201).json({ status: 201 });
       sendOTPByEmail(req.body.email, req.body.otp);
 
@@ -21,7 +19,7 @@ const hrSignup = async (req: Request, res: Response) => {
         createdAt: req.body.createdAt,
       });
     }
-    if (saveHrData?.message === "exists")
+    if (saveHrData?.status === 200)
       res.status(409).json({ message: "HR already exists" });
   } catch (error) {
     res.status(400).json({ status: 400 });
@@ -38,29 +36,22 @@ interface otpResponse {
   message: string;
 }
 const verifyOtp = async (
-  req: Request<{}, {}, verifyOtpBody>,
-  res: Response<otpResponse>
+  req: Request,
+  res: Response
 ) => {
   try {
-    console.log(req.body, "hello");
-
     const getSavedOtp = await hrService.getSavedOtp(req.body.userId);
-    console.log(getSavedOtp, "666754646");
-
-    if (getSavedOtp) {
-      const expiryTime = new Date(getSavedOtp.createdAt);
+    if (getSavedOtp && getSavedOtp.status === 200) {
+      const expiryTime = new Date(getSavedOtp?.data?.createdAt);
       expiryTime.setMinutes(expiryTime.getMinutes() + 10);
-
       const currentTime = Date.now();
-
       if (
-        req.body.otp === getSavedOtp.otp &&
+        req.body.otp === getSavedOtp?.data?.otp &&
         currentTime < expiryTime.getTime()
       ) {
-        console.log(1111);
-        const setVerifiedTrue = await hrRepository.setVerifiedTrue(
-          req.body.userId
-        );
+        const setVerifiedTrue = await hrService.setVerifiedTrue(req.body.userId);
+
+        if(setVerifiedTrue && setVerifiedTrue.status === 200)
         res.status(201).json({ status: 201, message: "Hr verified" });
       } else {
         res

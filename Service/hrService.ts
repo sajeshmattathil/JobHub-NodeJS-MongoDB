@@ -19,14 +19,12 @@ const saveHrData = async (data: hrInputData) => {
     const hashedPassword = await bcrypt.hash(data.password, 5);
     data.password = hashedPassword;
     const checkExistingHr = await hrRepository.findHr(data.email);
-    if (checkExistingHr) return {status:200, message: "exists" };
+    if (checkExistingHr) return { status: 200, message: "exists" };
     const hrData = new Hr(data);
     await hrData.save();
-    return { status:200 };
+    return { status: 201 };
   } catch (error) {
-    console.log(error, "");
-    return { status:500 };
-
+    return { status: 500 };
   }
 };
 interface otp {
@@ -53,16 +51,20 @@ const saveOtp = async (data: otp) => {
 const getSavedOtp = async (userID: string) => {
   try {
     const getOtp = await hrRepository.getOtp(userID);
-    if (getOtp) return getOtp;
+    if (getOtp) return { status: 200, data: getOtp };
     else return;
   } catch (error) {
     console.log("Otp not found");
+    return
   }
 };
 const setVerifiedTrue = async (userId: string) => {
   try {
     const setVerifiedTrue = await hrRepository.setVerifiedTrue(userId);
-  } catch (error) {}
+ return {status:200}
+  } catch (error) {
+    return {status:500}
+  }
 };
 
 interface hrLoginData {
@@ -321,15 +323,16 @@ const getPrevChatUsers = async (HREmail: string) => {
   }
 };
 
-const getFollowersData = async (HRId: string)=>{
+const getFollowersData = async (HRId: string) => {
   try {
-    const getFollowersData = await hrRepository.getFollowersData(HRId)
-    if(getFollowersData && getFollowersData.length) return {status:201,data:getFollowersData}
-    else return {status:400,message:'No data found'}
+    const getFollowersData = await hrRepository.getFollowersData(HRId);
+    if (getFollowersData && getFollowersData.length)
+      return { status: 201, data: getFollowersData };
+    else return { status: 400, message: "No data found" };
   } catch (error) {
-    return {status:500,message:'Internal server error'}
+    return { status: 500, message: "Internal server error" };
   }
-}
+};
 
 export default {
   saveHrData,
@@ -349,5 +352,5 @@ export default {
   getShortListedUsers,
   removeFromShortListed,
   getPrevChatUsers,
-  getFollowersData
+  getFollowersData,
 };

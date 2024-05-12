@@ -7,8 +7,7 @@ import plan from "../Model/plan";
 import chat from "../Model/chat";
 import followers from "../Model/followers";
 
-try {
-} catch (error) {}
+
 
 const findUser = async (email: string) => {
   console.log(email, "user find repo");
@@ -57,7 +56,9 @@ const setVerifiedTrue = async (userId: string) => {
       { email: userId },
       { $set: { isVerified: true } }
     );
-  } catch (error) {}
+  } catch (error) {
+    return 
+  }
 };
 interface experienceInterface {
   role: string;

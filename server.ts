@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import dotenv from "dotenv";
 dotenv.config();
 import dbConnect from "./Config/dbconnect";
@@ -8,10 +9,13 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
 import userRouter from "./Routes/userRoutes";
-import hrRouter from "./Routes/hrRoutes";
+// import hrRouter from "./Routes/hrRoutes";
 import adminRouter from "./Routes/adminRoutes";
+import hrRouter from './src/routes/hrRoutes'
+// import adminRouter from './src/routes/adminRoutes'
 import { Server, Socket } from "socket.io";
 import chatService from "./Service/chatService";
+import userRouteSample from './src/routes/userRoutes'
 import http from "http";
 
 const allowedOrigins = [
@@ -67,7 +71,8 @@ io.on("connection", (socket: Socket) => {
   });
 });
 
-app.use("/", userRouter);
+// app.use("/", userRouter);
+app.use('/',userRouteSample)
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);
 

@@ -22,8 +22,8 @@ interface signupSubmitResponse {
 }
 
 const signupSubmit = async (
-  req: Request<{}, {}, ReqBody>,
-  res: Response<signupSubmitResponse>
+  req: Request,
+  res: Response
 ) => {
   console.log(req.body);
   try {
