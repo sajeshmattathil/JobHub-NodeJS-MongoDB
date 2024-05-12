@@ -14,14 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const hrService_1 = __importDefault(require("../Service/hrService"));
 const mailer_1 = __importDefault(require("../Utils/mailer"));
-const hrRepository_1 = __importDefault(require("../Repository/hrRepository"));
 const jwtHR_1 = __importDefault(require("../Middleware/JWT/jwtHR"));
 const https_1 = __importDefault(require("https"));
 const hrSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, "hrsignup");
         const saveHrData = yield hrService_1.default.saveHrData(req.body);
-        if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.message) === "saved") {
+        if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 201) {
             res.status(201).json({ status: 201 });
             (0, mailer_1.default)(req.body.email, req.body.otp);
             const saveOtp = yield hrService_1.default.saveOtp({
@@ -30,7 +28,7 @@ const hrSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 createdAt: req.body.createdAt,
             });
         }
-        if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.message) === "exists")
+        if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 200)
             res.status(409).json({ message: "HR already exists" });
     }
     catch (error) {
@@ -38,19 +36,18 @@ const hrSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
-        console.log(req.body, "hello");
         const getSavedOtp = yield hrService_1.default.getSavedOtp(req.body.userId);
-        console.log(getSavedOtp, "666754646");
-        if (getSavedOtp) {
-            const expiryTime = new Date(getSavedOtp.createdAt);
+        if (getSavedOtp && getSavedOtp.status === 200) {
+            const expiryTime = new Date((_a = getSavedOtp === null || getSavedOtp === void 0 ? void 0 : getSavedOtp.data) === null || _a === void 0 ? void 0 : _a.createdAt);
             expiryTime.setMinutes(expiryTime.getMinutes() + 10);
             const currentTime = Date.now();
-            if (req.body.otp === getSavedOtp.otp &&
+            if (req.body.otp === ((_b = getSavedOtp === null || getSavedOtp === void 0 ? void 0 : getSavedOtp.data) === null || _b === void 0 ? void 0 : _b.otp) &&
                 currentTime < expiryTime.getTime()) {
-                console.log(1111);
-                const setVerifiedTrue = yield hrRepository_1.default.setVerifiedTrue(req.body.userId);
-                res.status(201).json({ status: 201, message: "Hr verified" });
+                const setVerifiedTrue = yield hrService_1.default.setVerifiedTrue(req.body.userId);
+                if (setVerifiedTrue && setVerifiedTrue.status === 200)
+                    res.status(201).json({ status: 201, message: "Hr verified" });
             }
             else {
                 res

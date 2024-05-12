@@ -24,13 +24,13 @@ const saveHrData = (data) => __awaiter(void 0, void 0, void 0, function* () {
         data.password = hashedPassword;
         const checkExistingHr = yield hrRepository_1.default.findHr(data.email);
         if (checkExistingHr)
-            return { message: "exists" };
+            return { status: 200, message: "exists" };
         const hrData = new hr_1.default(data);
         yield hrData.save();
-        return { message: "saved" };
+        return { status: 201 };
     }
     catch (error) {
-        console.log(error, "");
+        return { status: 500 };
     }
 });
 const saveOtp = (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,19 +53,23 @@ const getSavedOtp = (userID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getOtp = yield hrRepository_1.default.getOtp(userID);
         if (getOtp)
-            return getOtp;
+            return { status: 200, data: getOtp };
         else
             return;
     }
     catch (error) {
         console.log("Otp not found");
+        return;
     }
 });
 const setVerifiedTrue = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const setVerifiedTrue = yield hrRepository_1.default.setVerifiedTrue(userId);
+        return { status: 200 };
     }
-    catch (error) { }
+    catch (error) {
+        return { status: 500 };
+    }
 });
 const verifyHrData = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -278,10 +282,10 @@ const getFollowersData = (HRId) => __awaiter(void 0, void 0, void 0, function* (
         if (getFollowersData && getFollowersData.length)
             return { status: 201, data: getFollowersData };
         else
-            return { status: 400, message: 'No data found' };
+            return { status: 400, message: "No data found" };
     }
     catch (error) {
-        return { status: 500, message: 'Internal server error' };
+        return { status: 500, message: "Internal server error" };
     }
 });
 exports.default = {
@@ -302,5 +306,5 @@ exports.default = {
     getShortListedUsers,
     removeFromShortListed,
     getPrevChatUsers,
-    getFollowersData
+    getFollowersData,
 };

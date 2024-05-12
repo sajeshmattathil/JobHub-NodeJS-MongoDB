@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const dbconnect_1 = __importDefault(require("./Config/dbconnect"));
@@ -20,11 +21,13 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
-const userRoutes_1 = __importDefault(require("./Routes/userRoutes"));
-const hrRoutes_1 = __importDefault(require("./Routes/hrRoutes"));
+// import hrRouter from "./Routes/hrRoutes";
 const adminRoutes_1 = __importDefault(require("./Routes/adminRoutes"));
+const hrRoutes_1 = __importDefault(require("./src/routes/hrRoutes"));
+// import adminRouter from './src/routes/adminRoutes'
 const socket_io_1 = require("socket.io");
 const chatService_1 = __importDefault(require("./Service/chatService"));
+const userRoutes_1 = __importDefault(require("./src/routes/userRoutes"));
 const http_1 = __importDefault(require("http"));
 const allowedOrigins = [
     "https://jobshub-nine.vercel.app",
@@ -72,7 +75,8 @@ io.on("connection", (socket) => {
         io.emit("join-vdo-call", data);
     }));
 });
-app.use("/", userRoutes_1.default);
+// app.use("/", userRouter);
+app.use('/', userRoutes_1.default);
 app.use("/admin", adminRoutes_1.default);
 app.use("/hr", hrRoutes_1.default);
 httpServer.listen(3000, () => {

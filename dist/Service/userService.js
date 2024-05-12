@@ -111,18 +111,18 @@ const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
         if (getUser)
             return {
                 data: getUser,
-                message: "success",
+                status: 200
             };
         else
             return {
                 data: null,
-                message: "Not found",
+                status: 400,
             };
     }
     catch (error) {
         return {
             data: null,
-            message: "error",
+            status: 500,
         };
     }
 });
@@ -130,12 +130,12 @@ const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, functi
     try {
         const updateUser = yield userRepository_1.default.updateUser(data, userEmail);
         if (updateUser === null || updateUser === void 0 ? void 0 : updateUser.message)
-            return { message: "success" };
+            return { status: 201 };
         else
-            return { message: "failed" };
+            return { status: 400 };
     }
     catch (error) {
-        return;
+        return { status: 400 };
     }
 });
 const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
@@ -144,19 +144,18 @@ const getJobs = (pageNumber, jobsPerPage, body, userEmail) => __awaiter(void 0, 
         if (userEmail.trim())
             getUser = yield userRepository_1.default.findUser(userEmail);
         const jobCount = yield userRepository_1.default.jobCount(body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
-        console.log(jobCount, "jobcount");
         const getJobs = yield userRepository_1.default.getJobs(pageNumber, jobsPerPage, body, (getUser === null || getUser === void 0 ? void 0 : getUser.skills) ? getUser.skills : []);
         if (getJobs !== undefined) {
             if (getJobs.length)
-                return { data: getJobs, totalPages: jobCount, message: "success" };
+                return { data: getJobs, totalPages: jobCount, status: 201 };
             else
-                return { data: null, message: "no data" };
+                return { data: null, status: 400 };
         }
         else
-            return { data: null, totalPages: null, message: "failed" };
+            return { data: null, totalPages: null, status: 500 };
     }
     catch (error) {
-        console.log("error in fetching jobs by user");
+        return { data: null, totalPages: null, status: 500 };
     }
 });
 const checkUserExists = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,17 +164,17 @@ const checkUserExists = (userId) => __awaiter(void 0, void 0, void 0, function* 
         if (findUser !== undefined) {
             if (findUser !== null) {
                 if (findUser.email) {
-                    return { message: "user exists" };
+                    return { status: 200 };
                 }
                 else {
-                    return { message: "user not found" };
+                    return { status: 404 };
                 }
             }
         }
-        return { message: "user not found" };
+        return { status: 404 };
     }
     catch (error) {
-        console.log("error happened in verifyin userId is existing or not for forgot password in Controller");
+        return { status: 500 };
     }
 });
 const resetPassword = (body) => __awaiter(void 0, void 0, void 0, function* () {
@@ -183,43 +182,42 @@ const resetPassword = (body) => __awaiter(void 0, void 0, void 0, function* () {
         const hashedPassword = yield bcrypt_1.default.hash(body.password, 15);
         body.password = hashedPassword;
         const resetPassword = yield userRepository_1.default.resetPassword(body);
-        return { message: "success" };
+        return { status: 201 };
     }
     catch (error) {
-        console.log("error in resetPassword at userService");
-        return { message: "failed" };
+        return { status: 500 };
     }
 });
 const getJobData = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield userRepository_1.default.getJobData(id);
-        console.log(data, "data---job");
         if (data && data.length) {
-            return { message: "success", data: data };
+            return { status: 201, data: data };
         }
         else {
             return {
-                message: "failed ",
+                status: 404,
                 data: null,
             };
         }
     }
     catch (error) {
-        console.log(error, "error in fetching job data at user service");
+        return {
+            status: 500,
+            data: null,
+        };
     }
 });
 const saveAppliedJob = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(body, "bodyyyyy");
         const newJob = new appliedJobs_1.default(body);
         newJob.save();
-        const x = yield userRepository_1.default.addUserEmailInJobPost(body.userEmail, body.jobId);
-        console.log(x, "xxx");
-        return { message: "success", appliedJob: newJob };
+        yield userRepository_1.default.addUserEmailInJobPost(body.userEmail, body.jobId);
+        return { status: 201, appliedJob: newJob };
     }
     catch (error) {
         console.log(error, "error happened in saving applied jobs at service");
-        return { message: "failed", appliedJob: null };
+        return { status: 500, appliedJob: null };
     }
 });
 const followAndUnfollow = (hrID, value, userID) => __awaiter(void 0, void 0, void 0, function* () {
@@ -231,34 +229,32 @@ const followAndUnfollow = (hrID, value, userID) => __awaiter(void 0, void 0, voi
         else {
             yield userRepository_1.default.UnfollowHR(hrID, userID);
         }
-        return { message: "success" };
+        return { status: 200 };
     }
     catch (error) {
         console.log(error, "error in follow and unfollow hr at service");
-        return { message: "failed" };
+        return { status: 500 };
     }
 });
 const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getPlanDatas = yield userRepository_1.default.getPlans();
-        console.log(getPlanDatas, "data-- plan");
         if (getPlanDatas && getPlanDatas.length) {
             return {
-                message: "success",
+                status: 201,
                 data: getPlanDatas,
             };
         }
         else {
             return {
-                message: "failed",
+                status: 400,
                 data: null,
             };
         }
     }
     catch (error) {
-        console.log("Error in get new plan at adminservice", error);
         return {
-            message: "failed",
+            status: 500,
             data: null,
         };
     }
@@ -271,13 +267,12 @@ const savePayment = (body, id, userEmail) => __awaiter(void 0, void 0, void 0, f
         const newTransaction = new transactions_1.default(body);
         newTransaction.save();
         if (updatePayment && updatePayment.modifiedCount !== 0 && (newTransaction === null || newTransaction === void 0 ? void 0 : newTransaction._id))
-            return true;
+            return { status: 200 };
         else
-            return false;
+            return { status: 400 };
     }
     catch (error) {
-        console.log("Error in save payment adminservice", error);
-        return false;
+        return { status: 500 };
     }
 });
 const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
@@ -297,12 +292,12 @@ const getPrevChatUsers = (userEmail) => __awaiter(void 0, void 0, void 0, functi
             }
         }
         if (usersData && usersData.length && result)
-            return { success: true, data: result };
+            return { status: 201, data: result };
         else
-            return { success: false, data: null };
+            return { status: 404, data: null };
     }
     catch (error) {
-        return { success: false, data: null };
+        return { status: 500, data: null };
     }
 });
 exports.default = {

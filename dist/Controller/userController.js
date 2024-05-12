@@ -49,7 +49,6 @@ const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getSavedOtp = yield userService_1.default.getSavedOtp(req.body.userId);
-        console.log(getSavedOtp, "666754646");
         if (getSavedOtp) {
             const expiryTime = new Date(getSavedOtp.createdAt);
             expiryTime.setMinutes(expiryTime.getMinutes() + 10);
@@ -73,7 +72,6 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        console.error("Error verifying OTP:", error);
         res.status(500).json({ status: 500, message: "Internal server error" });
     }
 });
@@ -121,16 +119,16 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.userEmail;
         const response = yield userService_1.default.getUser(id);
-        if ((response === null || response === void 0 ? void 0 : response.message) === "success")
-            console.log(response.data, 'userdat>>>>>');
+        if ((response === null || response === void 0 ? void 0 : response.status) === 200)
+            console.log(response.data, "userdat>>>>>");
         res.status(201).json({ status: 201, user: response === null || response === void 0 ? void 0 : response.data });
-        if ((response === null || response === void 0 ? void 0 : response.message) === "error")
+        if ((response === null || response === void 0 ? void 0 : response.status) === 500)
             res.status(500).json({ status: 500, user: null });
-        if ((response === null || response === void 0 ? void 0 : response.message) === "Not found")
+        if ((response === null || response === void 0 ? void 0 : response.status) === 404)
             res.status(400).json({ status: 400, user: null });
     }
     catch (error) {
-        console.log("Something went wrong", error);
+        res.status(500).json({ status: 500, user: null });
     }
 });
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -138,27 +136,26 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         console.log(req.body, "req.body update");
         const userEmail = req.userEmail;
         const updateUser = yield userService_1.default.updateUser(req.body, userEmail);
-        if ((updateUser === null || updateUser === void 0 ? void 0 : updateUser.message) === "success")
+        if ((updateUser === null || updateUser === void 0 ? void 0 : updateUser.status) === 201)
             res.status(201).json({ status: 201 });
         else
             res.status(400).json({ status: 400 });
     }
     catch (error) {
-        console.log(error, "erro in updating user data at controller");
+        res.status(500).json({ status: 500 });
     }
 });
 const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, 'body>>>controllerrr');
         const pageNumber = req.query.page;
         const jobsPerPage = req.query.jobsPerPage;
-        let userEmail = '';
+        let userEmail = "";
         if (req.userEmail)
             userEmail = req.userEmail;
         const getJobs = yield userService_1.default.getJobs(Number(pageNumber), Number(jobsPerPage), req.body, userEmail);
         if (getJobs && getJobs.data)
-            console.log(getJobs.data.length, 'length');
-        if ((getJobs === null || getJobs === void 0 ? void 0 : getJobs.message) === "success")
+            console.log(getJobs.data.length, "length");
+        if ((getJobs === null || getJobs === void 0 ? void 0 : getJobs.status) === 201)
             res.status(201).json({
                 jobData: getJobs.data,
                 totalJobs: getJobs.totalPages,
@@ -168,20 +165,18 @@ const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(400).json({ jobData: null, totalJobs: null, status: 400 });
     }
     catch (error) {
-        console.log("error happened in usercontroller for fetching jobs", error);
+        res.status(500).json({ jobData: null, totalJobs: null, status: 500 });
     }
 });
 const saveForgotOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const checkUserExists = yield userService_1.default.checkUserExists(req.body.userId);
-        console.log(checkUserExists, "checkUserExists");
-        if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.message) == "user exists") {
+        if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.status) === 200) {
             (0, mailer_1.default)(req.body.userId, req.body.otp);
             yield userService_1.default.saveOtp(req.body);
             res.status(201).json({ status: 201 });
         }
-        else if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.message) == "user not found") {
-            console.log(66144987817);
+        else if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.status) === 404) {
             res.status(404).json({ status: 404 });
         }
         else
@@ -194,14 +189,12 @@ const saveForgotOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield userService_1.default.resetPassword(req.body);
-        console.log(response, "resetpassword response");
-        if (response.message === "success")
+        if (response.status === 201)
             res.status(201).json({ status: 201 });
         else
             res.status(404).json({ status: 404 });
     }
     catch (error) {
-        console.log("error in resetPassword at controller");
         res.status(500).json({ status: 500 });
     }
 });
@@ -209,13 +202,12 @@ const getJobData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const id = req.params.id;
         const response = yield userService_1.default.getJobData(id);
-        if (response && response.message === "success")
+        if (response && response.status === 201)
             res.json({ jobDataFetched: response.data, status: 201 });
         else
             res.json({ jobDataFetched: null, status: 404 });
     }
     catch (error) {
-        console.log(error, "error in fetching jobdata at controller");
         res.json({ jobDataFetched: null, status: 500 });
     }
 });
@@ -225,35 +217,30 @@ const saveAppliedJob = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const userEmail = req.userEmail;
         const updatedBody = Object.assign(Object.assign({}, req.body), { userId: _id, userEmail: userEmail });
         const response = yield userService_1.default.saveAppliedJob(updatedBody);
-        if (response.message === "success")
+        if (response.status == 201)
             res.json({ status: 201, appliedJob: response.appliedJob });
         else
             res.json({ status: 400 });
     }
     catch (error) {
-        console.log(error, "error in saving applied job at controller");
         res.json({ status: 500 });
     }
 });
 const followAndUnfollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, "value");
         const userId = req.userId;
         const response = yield userService_1.default.followAndUnfollow(req.body.HRId, req.body.value, userId);
-        console.log(response, "res---follow unfollow");
-        if (response.message == "success")
+        if (response.status == 200)
             res.status(200).send("Changed successfully");
         else
             res.status(400).send("follow unfollow failed");
     }
     catch (error) {
-        console.log(error, "error in follow and unfollow hr at controller");
         res.status(500);
     }
 });
 const downloadFileFromChat = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body, "body---->>>>");
         const { url: pdfHttpLink, fileName } = req.body;
         https_1.default
             .get(pdfHttpLink, (pdfResponse) => {
@@ -263,26 +250,22 @@ const downloadFileFromChat = (req, res) => __awaiter(void 0, void 0, void 0, fun
             pdfResponse.pipe(res);
         })
             .on("error", (err) => {
-            console.error("Error downloading PDF:", err);
             res.status(500).send("Error downloading PDF");
         });
     }
     catch (error) {
-        console.log(error, "error happened in download file at hr controller");
         res.status(500).send("Internal Server Error");
     }
 });
 const getPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield userService_1.default.getPlans();
-        console.log(response, "response---getplans");
-        if ((response.message = "success"))
+        if (response.status == 201)
             res.json({ status: 201, planDatas: response.data });
         else
             res.json({ status: 400, planDatas: null });
     }
     catch (error) {
-        console.log("error happened in get all plan data in admincontroller");
         res.json({ status: 500, planDatas: null });
     }
 });
@@ -297,7 +280,6 @@ const savePayment = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(400).send("Bad Request");
     }
     catch (error) {
-        console.log("error happened in save payment in admincontroller");
         res.status(500).send("Something Went wrong,try again");
     }
 });
@@ -326,8 +308,7 @@ const getPrevChatUsers = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const userEmail = req.userEmail;
         const response = yield userService_1.default.getPrevChatUsers(userEmail);
-        console.log(response, 'res');
-        if (response.success === true)
+        if (response.status === 201)
             res.status(201).json({ chatData: response.data });
         else
             res.status(404).json({ chatData: null });

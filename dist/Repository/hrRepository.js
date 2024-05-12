@@ -42,6 +42,7 @@ const getOtp = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.log("Otp not found in database", error);
+        return null;
     }
 });
 const findAndUpdateOtp = (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -84,6 +85,7 @@ const jobCount = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error("error happened in fetching job count in userrepo");
+        return null;
     }
 });
 const updateProfile = (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -246,7 +248,7 @@ const getFollowersData = (HRId) => __awaiter(void 0, void 0, void 0, function* (
     try {
         return yield followers_1.default.aggregate([
             {
-                $match: { hrID: new mongodb_1.ObjectId(HRId) },
+                $match: { hrID: new mongodb_1.ObjectId(HRId), isBlocked: false },
             },
             {
                 $lookup: {

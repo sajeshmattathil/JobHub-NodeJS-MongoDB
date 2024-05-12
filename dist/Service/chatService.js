@@ -18,22 +18,23 @@ const saveChat = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newChat = new chat_1.default(data);
         newChat.save();
+        return;
     }
     catch (error) {
-        console.log(error, "error happened in chat service saving chat");
+        return;
     }
 });
 const getChat = (recipient1, recipient2) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chatData = yield chatRepository_1.default.getChat(recipient1, recipient2);
         if (chatData && chatData.length)
-            return { message: "success", data: chatData };
+            return { status: 201, data: chatData };
         else
-            return { message: "failed", data: null };
+            return { status: 400, data: null };
     }
     catch (error) {
         console.log(error, "error happened in chat service getting chat");
-        return { message: "failed", data: null };
+        return { status: 500, data: null };
     }
 });
 exports.default = {

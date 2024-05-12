@@ -19,9 +19,6 @@ const user_1 = __importDefault(require("../Model/user"));
 const plan_1 = __importDefault(require("../Model/plan"));
 const chat_1 = __importDefault(require("../Model/chat"));
 const followers_1 = __importDefault(require("../Model/followers"));
-try {
-}
-catch (error) { }
 const findUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(email, "user find repo");
     try {
@@ -58,7 +55,9 @@ const setVerifiedTrue = (userId) => __awaiter(void 0, void 0, void 0, function* 
     try {
         return yield user_1.default.updateOne({ email: userId }, { $set: { isVerified: true } });
     }
-    catch (error) { }
+    catch (error) {
+        return;
+    }
 });
 const updateUser = (data, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     try {

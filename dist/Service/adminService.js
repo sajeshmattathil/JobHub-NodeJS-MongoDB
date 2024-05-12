@@ -20,30 +20,41 @@ const verifyLoginAdmin = (body) => __awaiter(void 0, void 0, void 0, function* (
         const adminDetails = yield adminRepository_1.default.findAdmin(body.email);
         if (adminDetails !== undefined && adminDetails !== null) {
             const comparePsw = yield bcrypt_1.default.compare(body.password, adminDetails.password);
-            console.log(comparePsw, "companre");
             if (adminDetails && comparePsw)
-                return { adminData: adminDetails.email, message: "Admin verified" };
+                return { adminData: adminDetails.email, status: 201 };
             else
-                return { adminData: null, message: "Password is incorrect" };
+                return { adminData: null, status: 401 };
         }
         else {
-            return { adminData: null, message: "No user is found in this email" };
+            return { adminData: null, status: 404 };
         }
     }
     catch (error) {
         console.log(error);
-        return { adminData: null, message: "Something went wrong " };
+        return { adminData: null, status: 500 };
     }
 });
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getAllUsers = yield adminRepository_1.default.getAllUsers();
-        if (getAllUsers)
-            return getAllUsers;
+        if (getAllUsers === null || getAllUsers === void 0 ? void 0 : getAllUsers.length) {
+            return {
+                status: 201,
+                data: getAllUsers
+            };
+        }
+        else {
+            return {
+                status: 404,
+                data: null
+            };
+        }
     }
     catch (error) {
-        console.log("Users data is not found");
-        return;
+        return {
+            status: 500,
+            data: null
+        };
     }
 });
 const blockUblockUser = (email, isBlocked) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,83 +62,77 @@ const blockUblockUser = (email, isBlocked) => __awaiter(void 0, void 0, void 0, 
         const blockUblockUser = yield adminRepository_1.default.blockUblockUser(email, isBlocked);
         console.log(blockUblockUser, "blockUblockUser");
         if (blockUblockUser)
-            return { message: true };
+            return { status: 201 };
         else
-            return { message: null };
+            return { status: 404 };
     }
     catch (error) {
         console.log("Error in block n unblock", error);
-        return { message: null };
+        return { status: 500 };
     }
 });
 const getHiringManagers = (pageNumber, HRsPerPage) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const HRCount = yield adminRepository_1.default.HRCount();
-        console.log(HRCount, "jobCount1");
         const getHiringManagers = yield adminRepository_1.default.getHiringManagers(pageNumber, HRsPerPage);
         if (getHiringManagers !== undefined) {
             if (getHiringManagers.length)
                 return {
-                    message: "success",
+                    status: 201,
                     data: getHiringManagers,
                     totalPages: HRCount,
                 };
         }
         else {
-            return { message: "failed", data: null, totalPages: null };
+            return { status: 404, data: null, totalPages: null };
         }
     }
     catch (error) {
-        console.log("error happened in fetching hiring managers data in adminService");
+        return { status: 500, data: null, totalPages: null };
     }
 });
 const getHiringManagersApproved = (pageNumber, HRsPerPage) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const HRCount = yield adminRepository_1.default.HRCountApproved();
-        console.log(HRCount, "jobCount2");
         const getHiringManagers = yield adminRepository_1.default.getHiringManagersApproved(pageNumber, HRsPerPage);
         if (getHiringManagers !== undefined) {
             if (getHiringManagers.length)
                 return {
-                    message: "success",
+                    status: 201,
                     data: getHiringManagers,
                     totalPages: HRCount,
                 };
         }
         else {
-            return { message: "failed", data: null, totalPages: null };
+            return { status: 404, data: null, totalPages: null };
         }
     }
     catch (error) {
-        console.log("error happened in fetching hiring managers data in adminService");
+        return { status: 500, data: null, totalPages: null };
     }
 });
 const blockUnblockHR = (email, isBlocked) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const blockUblockHR = yield adminRepository_1.default.blockUblockHR(email, isBlocked);
-        console.log(blockUblockHR, "blockUblockUser");
         if (blockUblockHR)
-            return { message: true };
+            return { status: 201 };
         else
-            return { message: null };
+            return { status: 404 };
     }
     catch (error) {
-        console.log("Error in block n unblock", error);
-        return { message: null };
+        return { status: 500 };
     }
 });
 const hrApprove = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const hrApprove = yield adminRepository_1.default.hrApprove(email);
-        console.log(hrApprove, "hrApprove");
         if (hrApprove)
-            return { message: true };
+            return { status: 201 };
         else
-            return { message: null };
+            return { status: 404 };
     }
     catch (error) {
-        console.log("Error in hrApprove", error);
-        return { message: null };
+        return { status: 500 };
     }
 });
 const getAdmin = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -137,19 +142,19 @@ const getAdmin = (id) => __awaiter(void 0, void 0, void 0, function* () {
             adminData.password = "";
             return {
                 data: adminData,
-                message: "success",
+                status: 201,
             };
         }
         else
             return {
                 data: null,
-                message: "Not found",
+                status: 404,
             };
     }
     catch (error) {
         return {
             data: null,
-            message: "error",
+            status: 500,
         };
     }
 });
@@ -158,13 +163,12 @@ const saveNewPlan = (body) => __awaiter(void 0, void 0, void 0, function* () {
         const newPlan = new plan_1.default(body);
         yield newPlan.save();
         if (newPlan)
-            return { message: "success" };
+            return { status: 200 };
         else
-            return { message: "failed" };
+            return { status: 400 };
     }
     catch (error) {
-        console.log("Error in save new plan at adminservice", error);
-        return { message: "failed" };
+        return { status: 500 };
     }
 });
 const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -173,21 +177,20 @@ const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(getPlanDatas, "data-- plan");
         if (getPlanDatas && getPlanDatas.length) {
             return {
-                message: "success",
+                status: 201,
                 data: getPlanDatas,
             };
         }
         else {
             return {
-                message: "failed",
+                status: 404,
                 data: null,
             };
         }
     }
     catch (error) {
-        console.log("Error in get new plan at adminservice", error);
         return {
-            message: "failed",
+            status: 500,
             data: null,
         };
     }
@@ -195,23 +198,21 @@ const getPlans = () => __awaiter(void 0, void 0, void 0, function* () {
 const getPlanData = (planId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getPlanData = yield adminRepository_1.default.getPlanData(planId);
-        console.log(getPlanData, "plandata---");
         if (getPlanData && Object.keys(getPlanData).length) {
             return {
-                message: "success",
+                status: 201,
                 data: getPlanData,
             };
         }
         else
             return {
-                message: "failed",
+                status: 400,
                 data: null,
             };
     }
     catch (error) {
-        console.log("Error in get  plan at adminservice", error);
         return {
-            message: "failed",
+            status: 500,
             data: null,
         };
     }
@@ -219,44 +220,38 @@ const getPlanData = (planId) => __awaiter(void 0, void 0, void 0, function* () {
 const updatePlan = (planId, body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getUpdatedData = yield adminRepository_1.default.updatePlan(planId, body);
-        console.log(getUpdatedData, "getupdated data----");
-        console.log(getUpdatedData, "plandata---");
         if (getUpdatedData) {
             return {
-                message: "success",
+                status: 201,
             };
         }
         else
             return {
-                message: "failed",
+                status: 400,
             };
     }
     catch (error) {
-        console.log("Error in update  plan at adminservice", error);
         return {
-            message: "failed",
+            status: 500,
         };
     }
 });
 const deletePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const getDeletedData = yield adminRepository_1.default.deletePlan(id);
-        console.log(getDeletedData, "getupdated data----");
-        console.log(getDeletedData, "plandata---");
         if (getDeletedData) {
             return {
-                message: "success",
+                status: 201,
             };
         }
         else
             return {
-                message: "failed",
+                status: 400,
             };
     }
     catch (error) {
-        console.log("Error in delete  plan at adminservice", error);
         return {
-            message: "failed",
+            status: 500,
         };
     }
 });
@@ -273,7 +268,7 @@ const getAllDashboardData = () => __awaiter(void 0, void 0, void 0, function* ()
             totalActiveSubscribers !== null &&
             totalRevenueGenerated !== null) {
             return {
-                success: true,
+                status: 202,
                 data: {
                     totalUsers: totalNumberOfUsers,
                     totalHR: totalNumberOfHR,
@@ -284,13 +279,12 @@ const getAllDashboardData = () => __awaiter(void 0, void 0, void 0, function* ()
         }
         else {
             return {
-                success: false,
+                status: 404,
                 error: "Some data could not be retrieved",
             };
         }
     }
     catch (error) {
-        console.error("Error in getAllDashboardData:", error);
         return {
             success: false,
             error: "An error occurred while fetching data",
