@@ -63,7 +63,6 @@ let AdminController = class AdminController {
             }
         });
     }
-    ;
     getAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -82,7 +81,6 @@ let AdminController = class AdminController {
             }
         });
     }
-    ;
     getAllUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -99,7 +97,6 @@ let AdminController = class AdminController {
             }
         });
     }
-    ;
     blockUnblockUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

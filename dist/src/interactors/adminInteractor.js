@@ -25,7 +25,7 @@ exports.AdminInteractor = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const plan_1 = __importDefault(require("../../Model/plan"));
 const inversify_1 = require("inversify");
-const adminRepository_1 = require("../repositories/adminRepository");
+const Utils_1 = require("../../Utils");
 let AdminInteractor = class AdminInteractor {
     constructor(repository) {
         this.repository = repository;
@@ -284,5 +284,5 @@ let AdminInteractor = class AdminInteractor {
 exports.AdminInteractor = AdminInteractor;
 exports.AdminInteractor = AdminInteractor = __decorate([
     (0, inversify_1.injectable)(),
-    __param(0, (0, inversify_1.inject)(adminRepository_1.AdminRepository))
+    __param(0, (0, inversify_1.inject)(Utils_1.INTERFACE_TYPE.AdminRepository))
 ], AdminInteractor);

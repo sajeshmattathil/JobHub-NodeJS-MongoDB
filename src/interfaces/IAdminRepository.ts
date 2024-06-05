@@ -1,4 +1,5 @@
 export interface IAdminRepository {
+  
     findAdmin(email: string): Promise<any>;
     getAllUsers(): Promise<any[]>;
     blockUblockUser(email: string, isBlocked: boolean): Promise<any>;

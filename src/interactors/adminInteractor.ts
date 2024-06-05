@@ -4,13 +4,13 @@ import { IAdminInteractor, loginBody } from './../interfaces/IAdminInteractor';
 import { IAdminRepository, updatedPlan } from "../interfaces/IAdminRepository";
 import plan from "../../Model/plan";
 import { inject, injectable } from 'inversify';
-import { AdminRepository } from "../repositories/adminRepository";
+import { INTERFACE_TYPE } from "../../Utils";
 
 @injectable()
 export class AdminInteractor implements IAdminInteractor{
     private repository: IAdminRepository;
 
-    constructor(@inject(AdminRepository)repository: IAdminRepository) {
+    constructor(@inject(INTERFACE_TYPE.AdminRepository)repository: IAdminRepository) {
       this.repository = repository;
     }
 
