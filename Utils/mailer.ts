@@ -11,7 +11,7 @@ const sendOTPByEmail = async (email: string, otp: string) => {
       },
     });
 
-    const msg = `This is a testing otp send from Job Hub   ${otp}.Do not share this to any one`;
+    const msg = `Your OTP is  ${otp}. This is a test OTP sent from JobHub. This message is for trial purposes only.`;
 
     const mailDetails = {
       from: "74123loo@gmail.com",

@@ -5,6 +5,7 @@ import jwtHR from "../../Middleware/JWT/jwtHR";
 import sendOTPByEmail from "../../Utils/mailer";
 import { inject, injectable } from "inversify";
 import { INTERFACE_TYPE } from "../../Utils";
+import generateOtp from "../../Utils/otpGenertator";
 
 @injectable()
 export class HRController {
@@ -19,13 +20,17 @@ export class HRController {
       const saveHrData = await this.interactor.saveHrData(req.body);
       if (saveHrData?.status === 201) {
         res.status(201).json({ status: 201 });
-        sendOTPByEmail(req.body.email, req.body.otp);
+        const otp = generateOtp()
+        if(otp){
+         await sendOTPByEmail(req.body.email,otp);
 
-        const saveOtp = await this.interactor.saveOtp({
-          userId: req.body.email,
-          otp: req.body.otp,
-          createdAt: req.body.createdAt,
-        });
+          const saveOtp = await this.interactor.saveOtp({
+            userId: req.body.email,
+            otp: otp,
+            createdAt: req.body.createdAt,
+          });
+        }
+      
       }
       if (saveHrData?.status === 200)
         res.status(409).json({ message: "HR already exists" });

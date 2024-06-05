@@ -17,6 +17,7 @@ import { Server, Socket } from "socket.io";
 import chatService from "./Service/chatService";
 import userRouteSample from './src/routes/userRoutes'
 import http from "http";
+import generateOtp from './Utils/otpGenertator';
 
 const allowedOrigins = [
   "https://jobshub-nine.vercel.app",

@@ -5,6 +5,7 @@ import sendOTPByEmail from "../Utils/mailer";
 import jwtUser from "../Middleware/JWT/jwtUser";
 import https from "https";
 import Razorpay from "razorpay";
+import generateOtp from "../Utils/otpGenertator";
 
 interface ReqBody {
   fname: string;
@@ -100,7 +101,8 @@ const verifyOtp = async (req: Request, res: Response) => {
 
 const resendOTP = async (req: Request, res: Response) => {
   try {
-    sendOTPByEmail(req.body.userId, req.body.otp);
+    const otp : string | undefined  = generateOtp()
+     if(otp ) await sendOTPByEmail(req.body.userId, otp);
     const saveOtp = await userService.saveOtp(req.body);
     if (saveOtp?.status === 200) res.status(200).json({ status: 200 });
     else res.status(400).json({ status: 400 });

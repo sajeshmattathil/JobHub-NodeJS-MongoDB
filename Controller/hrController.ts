@@ -5,19 +5,24 @@ import { ObjectId } from "mongodb";
 import hrRepository from "../Repository/hrRepository";
 import jwtHR from "../Middleware/JWT/jwtHR";
 import https from "https";
+import generateOtp from "../Utils/otpGenertator";
 
 const hrSignup = async (req: Request, res: Response) => {
   try {
     const saveHrData = await hrService.saveHrData(req.body);
+
     if (saveHrData?.status === 201) {
       res.status(201).json({ status: 201 });
-      sendOTPByEmail(req.body.email, req.body.otp);
+      const otp = generateOtp();
+      if (otp) {
+        sendOTPByEmail(req.body.email, otp);
 
-      const saveOtp = await hrService.saveOtp({
-        userId: req.body.email,
-        otp: req.body.otp,
-        createdAt: req.body.createdAt,
-      });
+        const saveOtp = await hrService.saveOtp({
+          userId: req.body.email,
+          otp: otp,
+          createdAt: req.body.createdAt,
+        });
+      }
     }
     if (saveHrData?.status === 200)
       res.status(409).json({ message: "HR already exists" });
@@ -35,10 +40,7 @@ interface otpResponse {
   status: number;
   message: string;
 }
-const verifyOtp = async (
-  req: Request,
-  res: Response
-) => {
+const verifyOtp = async (req: Request, res: Response) => {
   try {
     const getSavedOtp = await hrService.getSavedOtp(req.body.userId);
     if (getSavedOtp && getSavedOtp.status === 200) {
@@ -49,10 +51,12 @@ const verifyOtp = async (
         req.body.otp === getSavedOtp?.data?.otp &&
         currentTime < expiryTime.getTime()
       ) {
-        const setVerifiedTrue = await hrService.setVerifiedTrue(req.body.userId);
+        const setVerifiedTrue = await hrService.setVerifiedTrue(
+          req.body.userId
+        );
 
-        if(setVerifiedTrue && setVerifiedTrue.status === 200)
-        res.status(201).json({ status: 201, message: "Hr verified" });
+        if (setVerifiedTrue && setVerifiedTrue.status === 200)
+          res.status(201).json({ status: 201, message: "Hr verified" });
       } else {
         res
           .status(401)
@@ -135,7 +139,7 @@ const getJobs = async (req: Request, res: Response) => {
 const getHR = async (req: Request, res: Response) => {
   try {
     const id = (req as any).HRId;
-console.log(id,'hr === id')
+    console.log(id, "hr === id");
     const response = await hrService.getHR(id);
 
     if (response?.message === "success") {
@@ -297,7 +301,7 @@ const getPrevChatUsers = async (req: Request, res: Response) => {
   try {
     const HREmail = (req as any).HRId;
     const response = await hrService.getPrevChatUsers(HREmail);
-    console.log(response,'res')
+    console.log(response, "res");
     if (response.success === true)
       res.status(201).json({ chatData: response.data });
     else res.status(404).json({ chatData: null });
@@ -305,20 +309,21 @@ const getPrevChatUsers = async (req: Request, res: Response) => {
     res.status(500).json({ chatData: null });
   }
 };
-const getFollowers = async (req:Request,res:Response)=>{
+const getFollowers = async (req: Request, res: Response) => {
   try {
-    const HRId = (req as any)._id
-    console.log(HRId,'id>>>>>');
-    
-    const getAllFollowers = await hrService.getFollowersData(HRId)
-    console.log(getAllFollowers,'res');
-    
-    if(getAllFollowers.status === 201) res.status(201).json({followersData:getAllFollowers.data})
-      else res.status(406).json({message:'No user found'})
+    const HRId = (req as any)._id;
+    console.log(HRId, "id>>>>>");
+
+    const getAllFollowers = await hrService.getFollowersData(HRId);
+    console.log(getAllFollowers, "res");
+
+    if (getAllFollowers.status === 201)
+      res.status(201).json({ followersData: getAllFollowers.data });
+    else res.status(406).json({ message: "No user found" });
   } catch (error) {
-    res.status(500).json({error:'Internal server error'})
+    res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 export default {
   hrSignup,
   verifyOtp,
@@ -336,5 +341,5 @@ export default {
   getShortListedUsers,
   removeFromShortListed,
   getPrevChatUsers,
-  getFollowers
+  getFollowers,
 };
