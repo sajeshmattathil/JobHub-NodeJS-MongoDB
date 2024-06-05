@@ -16,17 +16,21 @@ const hrService_1 = __importDefault(require("../Service/hrService"));
 const mailer_1 = __importDefault(require("../Utils/mailer"));
 const jwtHR_1 = __importDefault(require("../Middleware/JWT/jwtHR"));
 const https_1 = __importDefault(require("https"));
+const otpGenertator_1 = __importDefault(require("../Utils/otpGenertator"));
 const hrSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const saveHrData = yield hrService_1.default.saveHrData(req.body);
         if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 201) {
             res.status(201).json({ status: 201 });
-            (0, mailer_1.default)(req.body.email, req.body.otp);
-            const saveOtp = yield hrService_1.default.saveOtp({
-                userId: req.body.email,
-                otp: req.body.otp,
-                createdAt: req.body.createdAt,
-            });
+            const otp = (0, otpGenertator_1.default)();
+            if (otp) {
+                (0, mailer_1.default)(req.body.email, otp);
+                const saveOtp = yield hrService_1.default.saveOtp({
+                    userId: req.body.email,
+                    otp: otp,
+                    createdAt: req.body.createdAt,
+                });
+            }
         }
         if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 200)
             res.status(409).json({ message: "HR already exists" });
@@ -126,7 +130,7 @@ const getJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const getHR = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.HRId;
-        console.log(id, 'hr === id');
+        console.log(id, "hr === id");
         const response = yield hrService_1.default.getHR(id);
         if ((response === null || response === void 0 ? void 0 : response.message) === "success") {
             res.status(201).json({ status: 201, HR: response === null || response === void 0 ? void 0 : response.data });
@@ -277,7 +281,7 @@ const getPrevChatUsers = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const HREmail = req.HRId;
         const response = yield hrService_1.default.getPrevChatUsers(HREmail);
-        console.log(response, 'res');
+        console.log(response, "res");
         if (response.success === true)
             res.status(201).json({ chatData: response.data });
         else
@@ -290,16 +294,16 @@ const getPrevChatUsers = (req, res) => __awaiter(void 0, void 0, void 0, functio
 const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const HRId = req._id;
-        console.log(HRId, 'id>>>>>');
+        console.log(HRId, "id>>>>>");
         const getAllFollowers = yield hrService_1.default.getFollowersData(HRId);
-        console.log(getAllFollowers, 'res');
+        console.log(getAllFollowers, "res");
         if (getAllFollowers.status === 201)
             res.status(201).json({ followersData: getAllFollowers.data });
         else
-            res.status(406).json({ message: 'No user found' });
+            res.status(406).json({ message: "No user found" });
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 exports.default = {
@@ -319,5 +323,5 @@ exports.default = {
     getShortListedUsers,
     removeFromShortListed,
     getPrevChatUsers,
-    getFollowers
+    getFollowers,
 };

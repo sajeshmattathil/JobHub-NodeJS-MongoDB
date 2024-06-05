@@ -21,12 +21,11 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
-// import hrRouter from "./Routes/hrRoutes";
-const adminRoutes_1 = __importDefault(require("./Routes/adminRoutes"));
+// import adminRouter from "./Routes/adminRoutes";
 const hrRoutes_1 = __importDefault(require("./src/routes/hrRoutes"));
-// import adminRouter from './src/routes/adminRoutes'
+const adminRoutes_1 = __importDefault(require("./src/routes/adminRoutes"));
 const socket_io_1 = require("socket.io");
-const chatService_1 = __importDefault(require("./Service/chatService"));
+const chatService_1 = __importDefault(require("./Chat/chatService"));
 const userRoutes_1 = __importDefault(require("./src/routes/userRoutes"));
 const http_1 = __importDefault(require("http"));
 const allowedOrigins = [

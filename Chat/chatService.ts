@@ -1,5 +1,5 @@
 import chat from "../Model/chat";
-import chatRepository from "../Repository/chatRepository";
+import chatRepository from "../Chat/chatRepository";
 
 const saveChat = async (data: any) => {
   try {

@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const userController_1 = __importDefault(require("../Controller/userController"));
 const jwtUser_1 = __importDefault(require("../Middleware/JWT/jwtUser"));
-const chatController_1 = __importDefault(require("../Controller/chatController"));
+const chatController_1 = __importDefault(require("../Chat/chatController"));
 router.post('/signup_submit', userController_1.default.signupSubmit);
 router.patch('/verifyOtp', userController_1.default.verifyOtp);
 router.post('/resendOTP', userController_1.default.resendOTP);

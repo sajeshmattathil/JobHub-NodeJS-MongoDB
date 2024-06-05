@@ -10,7 +10,7 @@ const Utils_1 = require("../../Utils");
 const userRepository_1 = require("../repositories/userRepository");
 const UserController_1 = require("../controllers/UserController");
 const jwtUser_1 = __importDefault(require("../../Middleware/JWT/jwtUser"));
-const chatController_1 = __importDefault(require("../../Controller/chatController"));
+const chatController_1 = __importDefault(require("../../Chat/chatController"));
 const userInteractor_1 = require("../interactors/userInteractor");
 const container = new inversify_1.Container();
 container.bind(Utils_1.INTERFACE_TYPE.UserRepository).to(userRepository_1.UserRepository);

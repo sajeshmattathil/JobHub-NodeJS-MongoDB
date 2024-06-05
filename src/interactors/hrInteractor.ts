@@ -4,7 +4,6 @@ import { otp } from "../interfaces/IUserInteractors";
 import Hr from "../../Model/hr";
 import Job from "../../Model/job";
 import Otp from "../../Model/otp";
-import hrRepository from "../../Repository/hrRepository";
 import bcrypt from "bcrypt";
 import { HRRepository } from "../repositories/hrRepository";
 import { inject, injectable } from "inversify";
@@ -36,7 +35,7 @@ export class HRInteractor implements IHRInteractor {
 
   async saveOtp(data: otpData): Promise<void> {
     try {
-      const checkUserExists = await hrRepository.getOtp(data.userId);
+      const checkUserExists = await this.repository.getOtp(data.userId);
       if (checkUserExists) {
         await this.repository.findAndUpdateOtp(data);
       } else {

@@ -25,7 +25,6 @@ exports.HRInteractor = void 0;
 const hr_1 = __importDefault(require("../../Model/hr"));
 const job_1 = __importDefault(require("../../Model/job"));
 const otp_1 = __importDefault(require("../../Model/otp"));
-const hrRepository_1 = __importDefault(require("../../Repository/hrRepository"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const inversify_1 = require("inversify");
 const Utils_1 = require("../../Utils");
@@ -53,7 +52,7 @@ let HRInteractor = class HRInteractor {
     saveOtp(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const checkUserExists = yield hrRepository_1.default.getOtp(data.userId);
+                const checkUserExists = yield this.repository.getOtp(data.userId);
                 if (checkUserExists) {
                     yield this.repository.findAndUpdateOtp(data);
                 }

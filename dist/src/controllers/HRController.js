@@ -27,6 +27,7 @@ const jwtHR_1 = __importDefault(require("../../Middleware/JWT/jwtHR"));
 const mailer_1 = __importDefault(require("../../Utils/mailer"));
 const inversify_1 = require("inversify");
 const Utils_1 = require("../../Utils");
+const otpGenertator_1 = __importDefault(require("../../Utils/otpGenertator"));
 let HRController = class HRController {
     constructor(interactor) {
         this.interactor = interactor;
@@ -37,12 +38,15 @@ let HRController = class HRController {
                 const saveHrData = yield this.interactor.saveHrData(req.body);
                 if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 201) {
                     res.status(201).json({ status: 201 });
-                    (0, mailer_1.default)(req.body.email, req.body.otp);
-                    const saveOtp = yield this.interactor.saveOtp({
-                        userId: req.body.email,
-                        otp: req.body.otp,
-                        createdAt: req.body.createdAt,
-                    });
+                    const otp = (0, otpGenertator_1.default)();
+                    if (otp) {
+                        yield (0, mailer_1.default)(req.body.email, otp);
+                        const saveOtp = yield this.interactor.saveOtp({
+                            userId: req.body.email,
+                            otp: otp,
+                            createdAt: req.body.createdAt,
+                        });
+                    }
                 }
                 if ((saveHrData === null || saveHrData === void 0 ? void 0 : saveHrData.status) === 200)
                     res.status(409).json({ message: "HR already exists" });

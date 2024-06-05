@@ -7,7 +7,7 @@ import { UserRepository } from '../repositories/userRepository'
 import { IUserInteractors } from '../interfaces/IUserInteractors'
 import { UserController } from '../controllers/UserController'
 import jwtUser from '../../Middleware/JWT/jwtUser'
-import chatController from '../../Controller/chatController'
+import chatController from '../../Chat/chatController'
 import { UserInteractor } from '../interactors/userInteractor'
 
 const container = new Container()

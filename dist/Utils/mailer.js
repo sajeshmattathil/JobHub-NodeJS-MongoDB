@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const sendOTPByEmail = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(email, otp, "********");
         const mailTransporter = nodemailer_1.default.createTransport({
             service: "gmail",
             auth: {
@@ -24,12 +23,11 @@ const sendOTPByEmail = (email, otp) => __awaiter(void 0, void 0, void 0, functio
                 pass: "ofnmcnwftggwqith",
             },
         });
-        const msg = `Dear user  OTP to reset your  login  is  ${otp}.Do not share this to any one`;
+        const msg = `Your OTP is  ${otp}. This is a test OTP sent from JobHub. This message is for trial purposes only.`;
         const mailDetails = {
             from: "74123loo@gmail.com",
-            //  to: email,
-            to: "sajm.www@gmail.com",
-            subject: "Jobzz",
+            to: email,
+            subject: "Job Hub (Demo)",
             text: msg,
         };
         const send = yield mailTransporter.sendMail(mailDetails);

@@ -8,16 +8,13 @@ const app = express();
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
-import userRouter from "./Routes/userRoutes";
-// import hrRouter from "./Routes/hrRoutes";
-import adminRouter from "./Routes/adminRoutes";
+// import adminRouter from "./Routes/adminRoutes";
 import hrRouter from './src/routes/hrRoutes'
-// import adminRouter from './src/routes/adminRoutes'
+import adminRouter from './src/routes/adminRoutes'
 import { Server, Socket } from "socket.io";
-import chatService from "./Service/chatService";
+import chatService from "./Chat/chatService";
 import userRouteSample from './src/routes/userRoutes'
 import http from "http";
-import generateOtp from './Utils/otpGenertator';
 
 const allowedOrigins = [
   "https://jobshub-nine.vercel.app",

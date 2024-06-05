@@ -17,6 +17,7 @@ const mailer_1 = __importDefault(require("../Utils/mailer"));
 const jwtUser_1 = __importDefault(require("../Middleware/JWT/jwtUser"));
 const https_1 = __importDefault(require("https"));
 const razorpay_1 = __importDefault(require("razorpay"));
+const otpGenertator_1 = __importDefault(require("../Utils/otpGenertator"));
 const signupSubmit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.body);
     try {
@@ -77,7 +78,9 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const resendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        (0, mailer_1.default)(req.body.userId, req.body.otp);
+        const otp = (0, otpGenertator_1.default)();
+        if (otp)
+            yield (0, mailer_1.default)(req.body.userId, otp);
         const saveOtp = yield userService_1.default.saveOtp(req.body);
         if ((saveOtp === null || saveOtp === void 0 ? void 0 : saveOtp.status) === 200)
             res.status(200).json({ status: 200 });

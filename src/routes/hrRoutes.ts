@@ -3,7 +3,7 @@ const router = express.Router()
 import { Container } from 'inversify'
 import { INTERFACE_TYPE } from '../../Utils'
 
-import chatController from '../../Controller/chatController'
+import chatController from '../../Chat/chatController'
 import { HRRepository } from '../repositories/hrRepository'
 import { IHRRepository } from '../interfaces/IHRRepository'
 import { IHRInteractor } from '../interfaces/IHRInteractor'

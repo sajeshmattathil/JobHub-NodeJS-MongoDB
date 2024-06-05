@@ -28,6 +28,7 @@ const https_1 = __importDefault(require("https"));
 const jwtUser_1 = __importDefault(require("../../Middleware/JWT/jwtUser"));
 const inversify_1 = require("inversify");
 const Utils_1 = require("../../Utils");
+const otpGenertator_1 = __importDefault(require("../../Utils/otpGenertator"));
 let UserController = class UserController {
     constructor(interactor) {
         this.interactor = interactor;
@@ -42,12 +43,17 @@ let UserController = class UserController {
                     res
                         .status(201)
                         .json({ status: 201, message: "User created successfully" });
-                    yield (0, mailer_1.default)(req.body.email, req.body.otp);
-                    const saveOtp = yield this.interactor.saveOtp({
-                        userId: req.body.email,
-                        otp: req.body.otp,
-                        createdAt: req.body.createdAt,
-                    });
+                    let otp = (0, otpGenertator_1.default)();
+                    if (otp) {
+                        yield (0, mailer_1.default)(req.body.email, otp);
+                        const saveOtp = yield this.interactor.saveOtp({
+                            userId: req.body.email,
+                            otp: otp,
+                            createdAt: req.body.createdAt,
+                        });
+                    }
+                    else
+                        return;
                 }
                 else if ((newUser === null || newUser === void 0 ? void 0 : newUser.status) == 409) {
                     res.status(409).json({
@@ -79,7 +85,7 @@ let UserController = class UserController {
                         if (!req.body.purpose) {
                             yield this.interactor.setVerifiedTrue(req.body.userId);
                         }
-                        res.status(201).json({ status: 201, message: "otp verified" });
+                        res.status(200).json({ status: 200, message: "Welcome to Job Hub " });
                     }
                     else {
                         res
@@ -99,12 +105,19 @@ let UserController = class UserController {
     resendOTP(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                (0, mailer_1.default)(req.body.userId, req.body.otp);
-                const saveOtp = yield this.interactor.saveOtp(req.body);
-                if ((saveOtp === null || saveOtp === void 0 ? void 0 : saveOtp.status) === 200)
-                    res.status(200).json({ status: 200 });
-                else
+                const otp = (0, otpGenertator_1.default)();
+                if (otp) {
+                    yield (0, mailer_1.default)(req.body.userId, otp);
+                    req.body.otp = otp;
+                    const saveOtp = yield this.interactor.saveOtp(req.body);
+                    if ((saveOtp === null || saveOtp === void 0 ? void 0 : saveOtp.status) === 200)
+                        res.status(200).json({ status: 200 });
+                    else
+                        res.status(400).json({ status: 400 });
+                }
+                else {
                     res.status(400).json({ status: 400 });
+                }
             }
             catch (error) {
                 res.status(500).json({ status: 500 });
@@ -210,8 +223,10 @@ let UserController = class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const checkUserExists = yield this.interactor.checkUserExists(req.body.userId);
-                if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.status) === 200) {
-                    (0, mailer_1.default)(req.body.userId, req.body.otp);
+                const otp = (0, otpGenertator_1.default)();
+                if ((checkUserExists === null || checkUserExists === void 0 ? void 0 : checkUserExists.status) === 200 && otp) {
+                    (0, mailer_1.default)(req.body.userId, otp);
+                    req.body.otp = otp;
                     yield this.interactor.saveOtp(req.body);
                     res.status(201).json({ status: 201 });
                 }
