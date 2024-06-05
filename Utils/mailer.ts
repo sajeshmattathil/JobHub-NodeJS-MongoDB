@@ -3,7 +3,6 @@ import nodemailer from "nodemailer";
 
 const sendOTPByEmail = async (email: string, otp: string) => {
   try {
-    console.log(email, otp, "********");
     const mailTransporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -12,14 +11,13 @@ const sendOTPByEmail = async (email: string, otp: string) => {
       },
     });
 
-    const msg = `Dear user  OTP to reset your  login  is  ${otp}.Do not share this to any one`;
+    const msg = `This is a testing otp send from Job Hub   ${otp}.Do not share this to any one`;
 
     const mailDetails = {
       from: "74123loo@gmail.com",
-      //  to: email,
-      to: "sajm.www@gmail.com",
+      to: email,
 
-      subject: "Jobzz",
+      subject: "Job Hub (Demo)",
       text: msg,
     };
 

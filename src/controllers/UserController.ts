@@ -6,6 +6,7 @@ import https from "https";
 import jwtUser from "../../Middleware/JWT/jwtUser";
 import { inject, injectable } from "inversify";
 import { INTERFACE_TYPE } from "../../Utils";
+import generateOtp from "../../Utils/otpGenertator";
 
 @injectable()
 export class UserController {
@@ -27,8 +28,10 @@ export class UserController {
         res
           .status(201)
           .json({ status: 201, message: "User created successfully" });
-
-        await sendOTPByEmail(req.body.email, req.body.otp);
+          
+        let otp  = generateOtp()
+        
+        if(otp) await sendOTPByEmail(req.body.email, otp);
 
         const saveOtp = await this.interactor.saveOtp({
           userId: req.body.email,
