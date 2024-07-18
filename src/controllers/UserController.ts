@@ -125,6 +125,10 @@ export class UserController {
           verifyUser?.userData,
           verifyUser.ObjectId
         );
+        // req.session.userEmail = 'abc'
+        (req.session as any).userEmail = req.body.email;
+        (req.session as any).ip = req.ip;
+
         res.status(201).json({
           status: 201,
           message: "User verification successful",

@@ -8,6 +8,7 @@ const app = express();
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
+import { v4 as uuidv4 } from 'uuid';
 // import adminRouter from "./Routes/adminRoutes";
 import hrRouter from './src/routes/hrRoutes'
 import adminRouter from './src/routes/adminRoutes'
@@ -20,7 +21,6 @@ const allowedOrigins = [
   "https://jobshub-nine.vercel.app",
   "http://localhost:5173",
 ];
-
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -49,6 +49,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+const secretKey = process.env.SESSION_SECRET
+if(secretKey){
+  app.use(session({
+    secret:secretKey, // Replace with your own secret key
+    resave: false,
+    saveUninitialized: true
+  }));
+}
+
 io.on("connection", (socket: Socket) => {
   console.log(`⚡:user just connected!`);
   socket.on("message",  async (message) => {
@@ -69,7 +78,6 @@ io.on("connection", (socket: Socket) => {
   });
 });
 
-// app.use("/", userRouter);
 app.use('/',userRouteSample)
 app.use("/admin", adminRouter);
 app.use("/hr", hrRouter);

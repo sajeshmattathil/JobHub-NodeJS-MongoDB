@@ -1,3 +1,4 @@
+
 import { Request, Response } from "express";
 import https from "https";
 import { IHRInteractor } from "../interfaces/IHRInteractor";
@@ -35,7 +36,7 @@ export class HRController {
       if (saveHrData?.status === 200)
         res.status(409).json({ message: "HR already exists" });
     } catch (error) {
-      res.status(400).json({ status: 400 });
+      res.status(400).json({ status: 400,message:'Something went wrong' });
     }
   }
 

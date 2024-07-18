@@ -4,8 +4,8 @@ import { ObjectId } from "mongodb";
 
 const generateToken = (email: string, _id: ObjectId | string) => {
   try {
-    console.log(_id,'jwt');
-    
+    console.log(_id, "jwt");
+
     const token = jwt.sign(
       { userId: email, _id: _id },
       process.env.USER_SECRET_KEY as string,
@@ -35,7 +35,7 @@ const verifyToken = (
     }
 
     if (!token || role !== "user") {
-      console.log('Authentication failed',token,role)
+      console.log("Authentication failed", token, role);
       return res.json({
         status: 404,
         message: "authentication or authorization failed in jwt verification",
@@ -48,13 +48,25 @@ const verifyToken = (
     ) as JwtPayload;
     req.userEmail = decodedPayload.userId;
     req.userId = decodedPayload._id;
-    
+
+    if (
+      req.userEmail !== (req.session as any).userEmail &&
+      req.ip !== (req.session as any).ip
+    ) {
+      return res.json({
+        status: 404,
+        message: "authentication or authorization failed in jwt verification",
+      });
+    }
+
     console.log("Access granted");
 
     next();
   } catch (error) {
     console.error("error happend in verifying user token and role");
-    res.status(400).json({status :400,message :'Error happend in verifying user'})
+    res
+      .status(400)
+      .json({ status: 400, message: "Error happend in verifying user" });
   }
 };
 export default {
